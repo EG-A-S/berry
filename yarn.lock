@@ -5303,7 +5303,7 @@ __metadata:
     babel-loader: ^8.1.0
     chalk: ^3.0.0
     clipanion: ^3.0.0-rc.10
-    esbuild: "npm:esbuild-wasm@^0.11.14"
+    esbuild: 0.8.36
     filesize: ^4.1.2
     fork-ts-checker-webpack-plugin: ^5.0.0
     semver: ^7.1.2
@@ -5397,7 +5397,7 @@ __metadata:
     clipanion: ^3.0.0-rc.10
     cross-spawn: 7.0.3
     diff: ^4.0.1
-    esbuild: "npm:esbuild-wasm@^0.11.14"
+    esbuild: 0.8.36
     globby: ^11.0.1
     got: ^11.7.0
     json-file-plus: ^3.3.1
@@ -5445,10 +5445,10 @@ __metadata:
   resolution: "@yarnpkg/esbuild-plugin-pnp@workspace:packages/esbuild-plugin-pnp"
   dependencies:
     "@yarnpkg/pnp": "workspace:*"
-    esbuild: "npm:esbuild-wasm@^0.11.14"
+    esbuild: 0.8.36
     tslib: ^1.13.0
   peerDependencies:
-    esbuild: ^0.8.36
+    esbuild: 0.8.36
   languageName: unknown
   linkType: soft
 
@@ -10885,12 +10885,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"esbuild@npm:esbuild-wasm@^0.11.14":
-  version: 0.11.14
-  resolution: "esbuild-wasm@npm:0.11.14"
+"esbuild@npm:0.8.36":
+  version: 0.8.36
+  resolution: "esbuild@npm:0.8.36"
   bin:
     esbuild: bin/esbuild
-  checksum: ea8d27856769d023f2ae94a1db991f2493de38d7d7f1876d70b7a3bf5b9a10949f2ad23a3355e23a1c0cb1b80a7124f882b560cd2adae1b38d922a74b9195d82
+  checksum: ad6cd507c5fe59fe0e875a68f94bbf9a2661ec9c599d21bc1d8f1c84aa051c51d7be41f265841c6194fe5cc7b8b3618ebe2d43e9be6c388cb7bc20b9b1401dad
   languageName: node
   linkType: hard
 
