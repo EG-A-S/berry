@@ -10,9 +10,14 @@
     "tslib": "^1.13.0"
   },
   "devDependencies": {
+    "@rollup/plugin-commonjs": "^17.0.0",
+    "@rollup/plugin-node-resolve": "^11.0.1",
+    "@rollup/plugin-typescript": "^8.1.0",
     "@yarnpkg/builder": "workspace:*",
     "@yarnpkg/libzip": "workspace:*",
     "@yarnpkg/monorepo": "workspace:*",
+    "cjs-module-lexer": "^1.0.0",
+    "rollup": "^2.35.1",
     "typescript": "beta",
     "webpack": "^5.1.1",
     "webpack-cli": "^4.0.0-beta.8"
@@ -20,6 +25,7 @@
   "scripts": {
     "build:pnp:hook": "webpack-cli --config webpack.config.hook.js",
     "update:pnp:hook": "run build:pnp:hook && yarn install",
+    "build:esm:hook": "rollup -c",
     "build:pnp": "webpack-cli --config webpack.config.pkg.js",
     "postpack": "rm -rf lib",
     "prepack": "run build:compile packages/yarnpkg-pnp --emitDeclarationOnly && run build:pnp",
