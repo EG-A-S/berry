@@ -27,7 +27,7 @@ export async function resolve(
 ) {
   let validURL;
   if (builtins.has(specifier) || (validURL = isValidURL(specifier))) {
-    if (!validURL || pathToFileURL(specifier).protocol !== `file:`) {
+    if (!validURL || pathToFileURL(specifier).protocol !== `file:` || specifier.startsWith(`node:`)) {
       return defaultResolver(specifier, context, defaultResolver);
     } else {
       specifier = fileURLToPath(specifier);
