@@ -71,10 +71,6 @@ export async function getFormat(
       };
     }
     case `.json`: {
-      // TODO: Enable if --experimental-json-modules is present
-      throw new Error(
-        `Unknown file extension ".json" for ${fileURLToPath(resolved)}`
-      );
       return {
         format: `module`,
       };
