@@ -1,5 +1,4 @@
 import {npath, ppath, Filename, xfs} from '@yarnpkg/fslib';
-import ForkTsCheckerWebpackPlugin    from 'fork-ts-checker-webpack-plugin';
 import tsLoader                      from 'ts-loader';
 import merge                         from 'webpack-merge';
 import webpack                       from 'webpack';
@@ -114,10 +113,5 @@ export const makeConfig = (config: webpack.Configuration): webpack.Configuration
     }),
     new webpack.DefinePlugin({[`IS_WEBPACK`]: `true`}),
     new webpack.optimize.LimitChunkCountPlugin({maxChunks: 1}),
-    new ForkTsCheckerWebpackPlugin({
-      typescript: {
-        configFile: findTsconfig(),
-      },
-    }),
   ],
 }), config);

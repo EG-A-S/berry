@@ -21,6 +21,7 @@ module.exports = {
       loader: `ts-loader`,
       options: {
         compilerOptions: {declaration: false},
+        transpileOnly: true
       },
     }],
   },
