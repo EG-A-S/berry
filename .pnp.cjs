@@ -9499,7 +9499,7 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
             ["babel-loader", "virtual:e04a2594c769771b96db34e7a92a8a3af1c98ae86dce662589a5c5d5209e16875506f8cb5f4c2230a2b2ae06335b14466352c4ed470d39edf9edb6c515984525#npm:8.2.2"],
             ["chalk", "npm:3.0.0"],
             ["clipanion", "virtual:e04a2594c769771b96db34e7a92a8a3af1c98ae86dce662589a5c5d5209e16875506f8cb5f4c2230a2b2ae06335b14466352c4ed470d39edf9edb6c515984525#npm:3.0.0-rc.11"],
-            ["esbuild-wasm", "npm:0.8.57"],
+            ["esbuild", "npm:0.11.14"],
             ["filesize", "npm:4.2.1"],
             ["fork-ts-checker-webpack-plugin", "virtual:e04a2594c769771b96db34e7a92a8a3af1c98ae86dce662589a5c5d5209e16875506f8cb5f4c2230a2b2ae06335b14466352c4ed470d39edf9edb6c515984525#npm:5.2.1"],
             ["semver", "npm:7.3.5"],
@@ -9537,7 +9537,7 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
             ["babel-loader", "virtual:e04a2594c769771b96db34e7a92a8a3af1c98ae86dce662589a5c5d5209e16875506f8cb5f4c2230a2b2ae06335b14466352c4ed470d39edf9edb6c515984525#npm:8.2.2"],
             ["chalk", "npm:3.0.0"],
             ["clipanion", "virtual:e04a2594c769771b96db34e7a92a8a3af1c98ae86dce662589a5c5d5209e16875506f8cb5f4c2230a2b2ae06335b14466352c4ed470d39edf9edb6c515984525#npm:3.0.0-rc.11"],
-            ["esbuild-wasm", "npm:0.8.57"],
+            ["esbuild", "npm:0.11.14"],
             ["filesize", "npm:4.2.1"],
             ["fork-ts-checker-webpack-plugin", "virtual:e04a2594c769771b96db34e7a92a8a3af1c98ae86dce662589a5c5d5209e16875506f8cb5f4c2230a2b2ae06335b14466352c4ed470d39edf9edb6c515984525#npm:5.2.1"],
             ["semver", "npm:7.3.5"],
@@ -9575,7 +9575,7 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
             ["babel-loader", "virtual:e04a2594c769771b96db34e7a92a8a3af1c98ae86dce662589a5c5d5209e16875506f8cb5f4c2230a2b2ae06335b14466352c4ed470d39edf9edb6c515984525#npm:8.2.2"],
             ["chalk", "npm:3.0.0"],
             ["clipanion", "virtual:e04a2594c769771b96db34e7a92a8a3af1c98ae86dce662589a5c5d5209e16875506f8cb5f4c2230a2b2ae06335b14466352c4ed470d39edf9edb6c515984525#npm:3.0.0-rc.11"],
-            ["esbuild-wasm", "npm:0.8.57"],
+            ["esbuild", "npm:0.11.14"],
             ["filesize", "npm:4.2.1"],
             ["fork-ts-checker-webpack-plugin", "virtual:e04a2594c769771b96db34e7a92a8a3af1c98ae86dce662589a5c5d5209e16875506f8cb5f4c2230a2b2ae06335b14466352c4ed470d39edf9edb6c515984525#npm:5.2.1"],
             ["semver", "npm:7.3.5"],
@@ -9612,7 +9612,7 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
             ["babel-loader", "virtual:e04a2594c769771b96db34e7a92a8a3af1c98ae86dce662589a5c5d5209e16875506f8cb5f4c2230a2b2ae06335b14466352c4ed470d39edf9edb6c515984525#npm:8.2.2"],
             ["chalk", "npm:3.0.0"],
             ["clipanion", "virtual:e04a2594c769771b96db34e7a92a8a3af1c98ae86dce662589a5c5d5209e16875506f8cb5f4c2230a2b2ae06335b14466352c4ed470d39edf9edb6c515984525#npm:3.0.0-rc.11"],
-            ["esbuild-wasm", "npm:0.8.57"],
+            ["esbuild", "npm:0.11.14"],
             ["filesize", "npm:4.2.1"],
             ["fork-ts-checker-webpack-plugin", "virtual:e04a2594c769771b96db34e7a92a8a3af1c98ae86dce662589a5c5d5209e16875506f8cb5f4c2230a2b2ae06335b14466352c4ed470d39edf9edb6c515984525#npm:5.2.1"],
             ["semver", "npm:7.3.5"],
@@ -10256,10 +10256,7 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
             ["clipanion", "virtual:e04a2594c769771b96db34e7a92a8a3af1c98ae86dce662589a5c5d5209e16875506f8cb5f4c2230a2b2ae06335b14466352c4ed470d39edf9edb6c515984525#npm:3.0.0-rc.11"],
             ["cross-spawn", "npm:7.0.3"],
             ["diff", "npm:4.0.2"],
-            ["esbuild", [
-              "esbuild-wasm",
-              "npm:0.8.57"
-            ]],
+            ["esbuild", "npm:0.11.14"],
             ["globby", "npm:11.0.3"],
             ["got", "npm:11.8.2"],
             ["json-file-plus", "npm:3.3.1"],
@@ -10310,14 +10307,12 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
             ["@yarnpkg/esbuild-plugin-pnp", "virtual:e04a2594c769771b96db34e7a92a8a3af1c98ae86dce662589a5c5d5209e16875506f8cb5f4c2230a2b2ae06335b14466352c4ed470d39edf9edb6c515984525#workspace:packages/esbuild-plugin-pnp"],
             ["@types/esbuild", null],
             ["@yarnpkg/pnp", "workspace:packages/yarnpkg-pnp"],
-            ["esbuild", [
-              "esbuild-wasm",
-              "npm:0.8.57"
-            ]],
+            ["esbuild", "npm:0.11.14"],
             ["tslib", "npm:1.14.1"]
           ],
           "packagePeers": [
-            "@types/esbuild"
+            "@types/esbuild",
+            "esbuild"
           ],
           "linkType": "SOFT",
         }],
@@ -10326,10 +10321,7 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
           "packageDependencies": [
             ["@yarnpkg/esbuild-plugin-pnp", "workspace:packages/esbuild-plugin-pnp"],
             ["@yarnpkg/pnp", "workspace:packages/yarnpkg-pnp"],
-            ["esbuild", [
-              "esbuild-wasm",
-              "npm:0.8.57"
-            ]],
+            ["esbuild", "npm:0.11.14"],
             ["tslib", "npm:1.14.1"]
           ],
           "linkType": "SOFT",
@@ -20480,11 +20472,11 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
           "linkType": "HARD",
         }]
       ]],
-      ["esbuild-wasm", [
-        ["npm:0.8.57", {
-          "packageLocation": "./.yarn/cache/esbuild-wasm-npm-0.8.57-97cd07bfcb-d44810b74b.zip/node_modules/esbuild-wasm/",
+      ["esbuild", [
+        ["npm:0.11.14", {
+          "packageLocation": "./.yarn/unplugged/esbuild-npm-0.11.14-c667a78c61/node_modules/esbuild/",
           "packageDependencies": [
-            ["esbuild-wasm", "npm:0.8.57"]
+            ["esbuild", "npm:0.11.14"]
           ],
           "linkType": "HARD",
         }]
@@ -34436,10 +34428,7 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
             ["@rollup/pluginutils", "virtual:8a75fd665d2cffdae4afc565e38653aef357920bdc4cefff043dcec6bd095942c290a59daa08791f732c0600903ebb3097983add68948f2a1c3e74a290b342a7#npm:4.1.0"],
             ["@types/esbuild", null],
             ["@types/rollup", null],
-            ["esbuild", [
-              "esbuild-wasm",
-              "npm:0.8.57"
-            ]],
+            ["esbuild", "npm:0.11.14"],
             ["joycon", "npm:3.0.1"],
             ["jsonc-parser", "npm:3.0.0"],
             ["rollup", "npm:2.45.2"]
