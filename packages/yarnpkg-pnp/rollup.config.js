@@ -10,6 +10,7 @@ export default {
     file: `./sources/esm-loader/built-loader.js`,
     format: `esm`,
   },
+  external: ['esbuild'],
   plugins: [
     resolve({preferBuiltins: true}),
     ts({skipLibCheck: true, target: `ES2018`, allowSyntheticDefaultImports: true}),

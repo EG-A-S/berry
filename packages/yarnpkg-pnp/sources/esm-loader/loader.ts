@@ -30,7 +30,11 @@ export async function resolve(
     if (!validURL || pathToFileURL(specifier).protocol !== `file:` || specifier.startsWith(`node:`)) {
       return defaultResolver(specifier, context, defaultResolver);
     } else {
-      specifier = fileURLToPath(specifier);
+      try {
+        specifier = fileURLToPath(specifier);
+      } catch {
+        specifier = fileURLToPath(pathToFileURL(specifier).href);
+      }
     }
   }
 
@@ -41,7 +45,7 @@ export async function resolve(
   const result = pnpapi.resolveRequest(specifier, parentPath, {
     conditions: new Set(conditions),
     // TODO: Handle --experimental-specifier-resolution=node
-    extensions: [],
+    extensions: [`.js`, `.ts`, `.cjs`, `.mjs`, `.json`],
   });
 
   if (!result)
@@ -128,6 +132,21 @@ export async function getSource(
     return defaultGetSource(url, context, defaultGetSource);
 
   urlString = fileURLToPath(urlString);
+
+  const ext = path.extname(urlString);
+  if (ext === `.ts` || ext === `.tsx`) {
+    const { transform } = await import(`esbuild`);
+
+    const source = (await transform(await fs.promises.readFile(urlString, `utf8`), {
+        format: `esm`,
+        jsxFactory: `h`,
+        jsxFragment: `Fragment`,
+        loader: ext === `.tsx` ? `tsx` : `ts`,
+        target: `esnext`
+    })).code;
+
+    return { source };
+  }
 
   if (realModules.has(urlString)) {
     return {
