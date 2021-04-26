@@ -158,6 +158,12 @@ export async function getSource(
 
   const exports = await parseExports(urlString);
 
+  // Hacky workaround for @typescript-eslint
+  if (exports.has('TSESLintScope')) {
+    exports.add('AST_NODE_TYPES');
+    exports.add('AST_TOKEN_TYPES');
+  }
+
   let exportStrings = `export default cjs\n`;
   for (const exportName of exports) {
     if (exportName !== `default`) {
