@@ -52,7 +52,9 @@ export async function resolve(
     throw new Error(`Resolution failed`);
 
   return {
-    url: pathToFileURL(result).href,
+    url: result.includes('@linaria')
+      ? pathToFileURL(result.replace('lib', 'esm')).href
+      : pathToFileURL(result).href,
   };
 }
 
@@ -66,6 +68,11 @@ export async function getFormat(
   const parsedURL = new URL(resolved);
   if (parsedURL.protocol !== `file:`)
     return defaultGetFormat(resolved, context, defaultGetFormat);
+
+  if (parsedURL.pathname.includes('@linaria')) {
+    realModules.add(fileURLToPath(resolved));
+    return { format: 'module' };
+  }
 
   switch (path.extname(parsedURL.pathname)) {
     case `.mjs`: {
@@ -148,6 +155,13 @@ export async function getSource(
     return { source };
   }
 
+  if (urlString.includes('@linaria')) {
+    const source = await fs.promises.readFile(urlString, `utf8`);
+    return {
+        source: `import { createRequire } from 'module';\nconst require = createRequire(import.meta.url);\n${source}`,
+    };
+  }
+
   if (realModules.has(urlString)) {
     return {
       source: await fs.promises.readFile(urlString, `utf8`),
@@ -162,6 +176,11 @@ export async function getSource(
   if (exports.has('TSESLintScope')) {
     exports.add('AST_NODE_TYPES');
     exports.add('AST_TOKEN_TYPES');
+  }
+
+  // Hacky workaround for @babel/core
+  if (exports.has('transformFromAstAsync')) {
+    exports.add('types');
   }
 
   let exportStrings = `export default cjs\n`;
