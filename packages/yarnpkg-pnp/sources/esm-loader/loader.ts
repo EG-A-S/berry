@@ -52,9 +52,7 @@ export async function resolve(
     throw new Error(`Resolution failed`);
 
   return {
-    url: result.includes('@linaria')
-      ? pathToFileURL(result.replace('lib', 'esm')).href
-      : pathToFileURL(result).href,
+    url: pathToFileURL(result).href,
   };
 }
 
@@ -68,11 +66,6 @@ export async function getFormat(
   const parsedURL = new URL(resolved);
   if (parsedURL.protocol !== `file:`)
     return defaultGetFormat(resolved, context, defaultGetFormat);
-
-  if (parsedURL.pathname.includes('@linaria')) {
-    realModules.add(fileURLToPath(resolved));
-    return { format: 'module' };
-  }
 
   switch (path.extname(parsedURL.pathname)) {
     case `.mjs`: {
@@ -153,13 +146,6 @@ export async function getSource(
     })).code;
 
     return { source };
-  }
-
-  if (urlString.includes('@linaria')) {
-    const source = await fs.promises.readFile(urlString, `utf8`);
-    return {
-        source: `import { createRequire } from 'module';\nconst require = createRequire(import.meta.url);\n${source}`,
-    };
   }
 
   if (realModules.has(urlString)) {
