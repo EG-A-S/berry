@@ -45,7 +45,7 @@ export async function resolve(
   const result = pnpapi.resolveRequest(specifier, parentPath, {
     conditions: new Set(conditions),
     // TODO: Handle --experimental-specifier-resolution=node
-    extensions: [`.js`, `.ts`, `.cjs`, `.mjs`, `.json`],
+    extensions: [`.js`, `.ts`, `.tsx`, `.cjs`, `.mjs`, `.json`],
   });
 
   if (!result)
