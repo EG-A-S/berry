@@ -10,14 +10,15 @@
     "tslib": "^1.13.0"
   },
   "devDependencies": {
-    "@rollup/plugin-commonjs": "^17.0.0",
+    "@rollup/plugin-commonjs": "^18.0.0",
     "@rollup/plugin-node-resolve": "^11.0.1",
-    "@rollup/plugin-typescript": "^8.1.0",
     "@yarnpkg/builder": "workspace:*",
     "@yarnpkg/libzip": "workspace:*",
     "@yarnpkg/monorepo": "workspace:*",
-    "cjs-module-lexer": "^1.2.0",
-    "rollup": "^2.35.1",
+    "cjs-module-lexer": "^1.2.1",
+    "esbuild": "0.8.36",
+    "rollup": "^2.43.0",
+    "rollup-plugin-esbuild": "^3.0.2",
     "typescript": "beta",
     "webpack": "^5.1.1",
     "webpack-cli": "^4.0.0-beta.8"

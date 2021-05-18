@@ -1,6 +1,7 @@
 import cjs                  from '@rollup/plugin-commonjs';
 import resolve              from '@rollup/plugin-node-resolve';
-import ts                   from '@rollup/plugin-typescript';
+import path                 from 'path';
+import esbuild              from 'rollup-plugin-esbuild';
 import {brotliCompressSync} from 'zlib';
 
 // eslint-disable-next-line arca/no-default-export
@@ -12,8 +13,13 @@ export default {
   },
   external: ['esbuild'],
   plugins: [
-    resolve({preferBuiltins: true}),
-    ts({skipLibCheck: true, target: `ES2018`, allowSyntheticDefaultImports: true}),
+    resolve({
+      extensions: [`.mjs`, `.js`, `.ts`, `.tsx`, `.json`],
+      rootDir: path.join(__dirname, `../../`),
+      jail: path.join(__dirname, `../../`),
+      preferBuiltins: true,
+    }),
+    esbuild({tsconfig: false, target: `node12`}),
     cjs({requireReturnsDefault: `preferred`}),
     {
       name: `wrap-output`,

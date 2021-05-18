@@ -3622,23 +3622,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@rollup/plugin-commonjs@npm:^17.0.0":
-  version: 17.1.0
-  resolution: "@rollup/plugin-commonjs@npm:17.1.0"
-  dependencies:
-    "@rollup/pluginutils": ^3.1.0
-    commondir: ^1.0.1
-    estree-walker: ^2.0.1
-    glob: ^7.1.6
-    is-reference: ^1.2.1
-    magic-string: ^0.25.7
-    resolve: ^1.17.0
-  peerDependencies:
-    rollup: ^2.30.0
-  checksum: b83f05c7923ecc0f946eef3ef63b7cde090a7205b06aa7f43d29c06823c9848243691f4a799da9d6f07fb4915a9b12c66261c60913ea6f48441ff0715fb689a9
-  languageName: node
-  linkType: hard
-
 "@rollup/plugin-commonjs@npm:^18.0.0":
   version: 18.1.0
   resolution: "@rollup/plugin-commonjs@npm:18.1.0"
@@ -3669,20 +3652,6 @@ __metadata:
   peerDependencies:
     rollup: ^1.20.0||^2.0.0
   checksum: 6f3b3ecf9a0596a5db4212984bdeb13bb7612693602407e9457ada075dea5a5f2e4e124c592352cf27066a88b194de9b9a95390149b52cf335d5b5e17b4e265b
-  languageName: node
-  linkType: hard
-
-"@rollup/plugin-typescript@npm:^8.1.0":
-  version: 8.2.1
-  resolution: "@rollup/plugin-typescript@npm:8.2.1"
-  dependencies:
-    "@rollup/pluginutils": ^3.1.0
-    resolve: ^1.17.0
-  peerDependencies:
-    rollup: ^2.14.0
-    tslib: "*"
-    typescript: ">=3.7.0"
-  checksum: a9dbd2000ec0190742322c445e403b43db65c21f7f548279473e4f512a17f482b28f1b98b2a58373e63b24611c31aa193037043c6aea159756c67ea49658dff2
   languageName: node
   linkType: hard
 
@@ -6188,17 +6157,18 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@yarnpkg/pnp@workspace:packages/yarnpkg-pnp"
   dependencies:
-    "@rollup/plugin-commonjs": ^17.0.0
+    "@rollup/plugin-commonjs": ^18.0.0
     "@rollup/plugin-node-resolve": ^11.0.1
-    "@rollup/plugin-typescript": ^8.1.0
     "@types/node": ^13.7.0
     "@yarnpkg/builder": "workspace:*"
     "@yarnpkg/fslib": "workspace:^2.5.0-rc.2"
     "@yarnpkg/libzip": "workspace:*"
     "@yarnpkg/monorepo": "workspace:*"
-    cjs-module-lexer: ^1.2.0
+    cjs-module-lexer: ^1.2.1
+    esbuild: 0.8.36
     resolve.exports: ^1.0.2
-    rollup: ^2.35.1
+    rollup: ^2.43.0
+    rollup-plugin-esbuild: ^3.0.2
     tslib: ^1.13.0
     typescript: beta
     webpack: ^5.1.1
@@ -8540,7 +8510,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"cjs-module-lexer@npm:^1.2.0":
+"cjs-module-lexer@npm:^1.2.1":
   version: 1.2.1
   resolution: "cjs-module-lexer@npm:1.2.1"
   checksum: 9e9905e3f5b8b1f262d10ebb0d33407d25a48d0341acd3215ed402f9284188183f14d577340a171f75fd137b7654a780bcb6008dee9e9bd12957174f6c0e4661
@@ -22841,7 +22811,7 @@ resolve@^2.0.0-next.3:
   languageName: node
   linkType: hard
 
-"rollup@npm:^2.35.1, rollup@npm:^2.43.0":
+"rollup@npm:^2.43.0":
   version: 2.48.0
   resolution: "rollup@npm:2.48.0"
   dependencies:
