@@ -70,6 +70,12 @@ export async function resolve(
     }
   }
 
+  let query;
+
+  if (specifier.includes('?')) {
+    [specifier, query] = specifier.split('?');
+  }
+
   const result = pnpapi.resolveRequest(specifier, parentPath, {
     conditions: new Set(conditions),
     // TODO: Handle --experimental-specifier-resolution=node
@@ -80,7 +86,7 @@ export async function resolve(
     throw new Error(`Resolution failed`);
 
   return {
-    url: pathToFileURL(result).href,
+    url: pathToFileURL(query ? `${result}?${query}` : result).href,
   };
 }
 
@@ -163,6 +169,10 @@ export async function getSource(
   const url = new URL(urlString);
   if (url.protocol !== `file:`)
     return defaultGetSource(url, context, defaultGetSource);
+
+  if (urlString.includes('%3F')) {
+    [urlString] = urlString.split('%3F');
+  }
 
   urlString = fileURLToPath(urlString);
 
