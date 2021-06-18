@@ -1,11 +1,11 @@
 {
   "name": "@yarnpkg/pnp",
-  "version": "3.0.0-rc.2",
+  "version": "3.0.0-rc.5",
   "license": "BSD-2-Clause",
   "main": "./sources/index.ts",
   "dependencies": {
     "@types/node": "^13.7.0",
-    "@yarnpkg/fslib": "workspace:^2.5.0-rc.2",
+    "@yarnpkg/fslib": "workspace:^2.5.0-rc.5",
     "resolve.exports": "^1.0.2",
     "tslib": "^1.13.0"
   },
@@ -16,7 +16,7 @@
     "@yarnpkg/libzip": "workspace:*",
     "@yarnpkg/monorepo": "workspace:*",
     "cjs-module-lexer": "^1.2.1",
-    "esbuild": "0.8.36",
+    "esbuild": "^0.12.9",
     "rollup": "^2.43.0",
     "rollup-plugin-esbuild": "^3.0.2",
     "typescript": "^4.3.2",

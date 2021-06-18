@@ -51,6 +51,11 @@ const IGNORED_ENV_VARIABLES = new Set([
   // "wrapOutput" was a variable used to indicate nested "yarn run" processes
   // back in Yarn 1.
   `wrapOutput`,
+
+  // "YARN_HOME" and "YARN_CONF_DIR" may be present as part of the unrelated "Apache Hadoop YARN" software project.
+  // https://hadoop.apache.org/docs/r0.23.11/hadoop-project-dist/hadoop-common/SingleCluster.html
+  `home`,
+  `confDir`,
 ]);
 
 export const ENVIRONMENT_PREFIX = `yarn_`;
@@ -990,14 +995,13 @@ export class Configuration {
       [`@@core`, CorePlugin],
     ]);
 
-    const interop =
-      (obj: any) => obj.__esModule
-        ? obj.default
-        : obj;
+    const getDefault = (object: any) => {
+      return `default` in object ? object.default : object;
+    };
 
     if (pluginConfiguration !== null) {
       for (const request of pluginConfiguration.plugins.keys())
-        plugins.set(request, interop(pluginConfiguration.modules.get(request)));
+        plugins.set(request, getDefault(pluginConfiguration.modules.get(request)));
 
       const requireEntries = new Map();
       for (const request of nodeUtils.builtinModules())
@@ -1006,10 +1010,6 @@ export class Configuration {
         requireEntries.set(request, () => embedModule);
 
       const dynamicPlugins = new Set();
-
-      const getDefault = (object: any) => {
-        return object.default || object;
-      };
 
       const importPlugin = (pluginPath: PortablePath, source: string) => {
         const {factory, name} = miscUtils.dynamicRequire(npath.fromPortablePath(pluginPath));

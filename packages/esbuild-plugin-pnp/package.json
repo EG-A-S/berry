@@ -1,6 +1,6 @@
 {
   "name": "@yarnpkg/esbuild-plugin-pnp",
-  "version": "1.0.0-rc.2",
+  "version": "1.0.0-rc.5",
   "license": "BSD-2-Clause",
   "main": "./sources/index.ts",
   "dependencies": {
@@ -11,7 +11,7 @@
   },
   "devDependencies": {
     "@yarnpkg/pnp": "workspace:*",
-    "esbuild": "0.8.36"
+    "esbuild": "^0.12.9"
   },
   "scripts": {
     "postpack": "rm -rf lib",
