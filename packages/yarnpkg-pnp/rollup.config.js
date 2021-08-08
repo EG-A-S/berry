@@ -11,7 +11,7 @@ export default {
     file: `./sources/esm-loader/built-loader.js`,
     format: `esm`,
   },
-  external: ['esbuild'],
+  external: [`esbuild`],
   plugins: [
     resolve({
       extensions: [`.mjs`, `.js`, `.ts`, `.tsx`, `.json`],
@@ -19,7 +19,7 @@ export default {
       jail: path.join(__dirname, `../../`),
       preferBuiltins: true,
     }),
-    esbuild({tsconfig: false, target: `node12`}),
+    esbuild({tsconfig: false, target: `node16`}),
     cjs({requireReturnsDefault: `preferred`}),
     {
       name: `wrap-output`,
