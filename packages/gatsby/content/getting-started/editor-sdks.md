@@ -5,7 +5,7 @@ title: "Editor SDKs"
 description: An overview of the editor SDKs used to bring PnP compatibility to editors.
 ---
 
-Smart IDEs (such as VSCode or IntelliJ) require special configuration for TypeScript to work. This page intends to be a collection of settings for each editor we've worked with - please contribute to this list!
+Smart IDEs (such as VSCode or IntelliJ) require special configuration for TypeScript to work when using [Plug'n'Play installs](https://yarnpkg.com/features/pnp). This page intends to be a collection of settings for each editor we've worked with - please contribute to this list!
 
 The editor SDKs and settings can be generated using `yarn dlx @yarnpkg/sdks` (or `yarn sdks` if you added `@yarnpkg/sdks` to your dependencies). Its detailed documentation can be found on the [dedicated page](/sdks/cli/default).
 Generally speaking:
@@ -79,6 +79,8 @@ yarn dlx @yarnpkg/sdks base
 With the `.yarn/sdks` in place TypeScript support should work out of the box with [nvim-lspconfig](https://github.com/neovim/nvim-lspconfig) and [theia-ide/typescript-language-server](https://github.com/theia-ide/typescript-language-server).
 
 ##### Supporting go-to-definition et al.
+
+> **Note:** Due to a bug in [Neovim's URI handling](https://github.com/neovim/neovim/pull/14959) go-to-definition is only supported in neovim-nightly.
 
 As well as the [vim-rzip](https://github.com/lbrayner/vim-rzip) plugin you'll also need the following snippet to handle Yarn PnP's URIs emitted from [theia-ide/typescript-language-server](https://github.com/theia-ide/typescript-language-server). See [lbrayner/vim-rzip#15](https://github.com/lbrayner/vim-rzip/issues/15) for further details.
 

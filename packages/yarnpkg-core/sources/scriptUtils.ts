@@ -39,8 +39,9 @@ async function makePathWrapper(location: PortablePath, name: Filename, argv0: Na
     await xfs.writeFilePromise(ppath.format({dir: location, name, ext: `.cmd`}), cmdScript);
   }
 
-  await xfs.writeFilePromise(ppath.join(location, name), `#!/bin/sh\nexec "${argv0}" ${args.map(arg => `'${arg.replace(/'/g, `'"'"'`)}'`).join(` `)} "$@"\n`);
-  await xfs.chmodPromise(ppath.join(location, name), 0o755);
+  await xfs.writeFilePromise(ppath.join(location, name), `#!/bin/sh\nexec "${argv0}" ${args.map(arg => `'${arg.replace(/'/g, `'"'"'`)}'`).join(` `)} "$@"\n`, {
+    mode: 0o755,
+  });
 }
 
 async function detectPackageManager(location: PortablePath): Promise<PackageManagerSelection | null> {
@@ -276,7 +277,7 @@ export async function prepareExternalProject(cwd: PortablePath, outputPath: Port
             if (pack.code !== 0)
               return pack.code;
 
-            const packOutput = (await packPromise).toString().trim();
+            const packOutput = (await packPromise).toString().trim().replace(/^.*\n/s, ``);
             const packTarget = ppath.resolve(cwd, npath.toPortablePath(packOutput));
 
             // Only then can we move the pack to its rightful location

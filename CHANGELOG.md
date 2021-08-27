@@ -12,10 +12,16 @@ Yarn now accepts sponsorships! Please give a look at our [OpenCollective](https:
 
 - Direct portal dependencies for `node_modules` install are given priority during hoisting now, to prevent cases when indirect regular dependencies take place in the install tree first and block the way for direct portal dependencies.
 - Usage of `pnpify` inside directories containing spaces is now possible.
+- Hoisting algorithm speedup, impacts recurrent `node_modules` installs time.
 
 ### Installs
 
 - `hardlinks-global` node modules mode is automatically downgraded to `hardlinks-local` when global cache and install folder are on a different devices and the install continues normally. Warning is produced to the user with mitigation steps provided in documentation.
+- The nm linker maximizes chances to end-up with only one top-level node_modules in the case of using workspaces
+
+## 3.0.1
+
+- Fixes an edge case with the PnP loader when calling `readdir` with `null` as second parameter (instead of `undefined`).
 
 ## 3.0.0
 

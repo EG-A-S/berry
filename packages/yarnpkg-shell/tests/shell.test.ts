@@ -50,6 +50,15 @@ const bufferResult = async (command: string, args: Array<string> = [], options: 
       });
     },
 
+    [`echo-arguments`]: async (args, opts, state) => {
+      return await new Promise(resolve => {
+        for (const arg of args)
+          state.stdout.write(`${JSON.stringify(arg)}\n`);
+
+        resolve(0);
+      });
+    },
+
     [`echo-stdin`]: async (args, opts, state) => {
       const stdinChunks: Array<Buffer> = [];
 
@@ -113,6 +122,23 @@ describe(`Shell`, () => {
         stdout: `hello\n`,
       });
     });
+
+    it(`should support a escaped arguments`, async () => {
+      await expect(bufferResult(
+        `echo "\\x1b[1;31m red text \\x1b[0m"`,
+      )).resolves.toMatchObject({
+        stdout: `\x1b[1;31m red text \x1b[0m\n`,
+      });
+    });
+
+    // TODO:
+    // it(`should support a empty arguments`, async () => {
+    //   await expect(bufferResult(
+    //     `bash -c "echo \\$1" "" 1`,
+    //   )).resolves.toMatchObject({
+    //     stdout: `1\n`,
+    //   });
+    // });
 
     it(`should exit with an exit code 0 when everything looks fine`, async () => {
       await expect(bufferResult(
@@ -473,6 +499,30 @@ describe(`Shell`, () => {
         numbers = await getNumbers(bufferResult(`RANDOM=foo ; echo $RANDOM`));
         expect(numbers.length).toBe(1);
         numbers.forEach(validateRandomNumber);
+      });
+
+      it(`should split variables when referenced outside of quotes`, async () => {
+        await expect(bufferResult(
+          `FOO="hello world"; echo-arguments $FOO`
+        )).resolves.toMatchObject({
+          stdout: `"hello"\n"world"\n`,
+        });
+      });
+
+      it(`should keep variables unified when referenced within double quotes`, async () => {
+        await expect(bufferResult(
+          `FOO="hello   world"; echo-arguments "$FOO"`
+        )).resolves.toMatchObject({
+          stdout: `"hello   world"\n`,
+        });
+      });
+
+      it(`should ignore variables when referenced within single quotes`, async () => {
+        await expect(bufferResult(
+          `FOO="hello   world"; echo-arguments '$FOO'`
+        )).resolves.toMatchObject({
+          stdout: `"$FOO"\n`,
+        });
       });
     });
 
@@ -1731,6 +1781,29 @@ describe(`Shell`, () => {
       )).resolves.toMatchObject({
         exitCode: 0,
         stdout: `23\n`,
+      });
+    });
+
+    it(`should has left associativity`, async () => {
+      await expect(bufferResult(
+        `echo $(( 7 - 2 - 3 ))`,
+      )).resolves.toMatchObject({
+        exitCode: 0,
+        stdout: `2\n`,
+      });
+
+      await expect(bufferResult(
+        `echo $(( 32 / 4 / 8 ))`,
+      )).resolves.toMatchObject({
+        exitCode: 0,
+        stdout: `1\n`,
+      });
+
+      await expect(bufferResult(
+        `echo $(( 32 + 64 * 2 / 4 / 8 - 9 ))`,
+      )).resolves.toMatchObject({
+        exitCode: 0,
+        stdout: `27\n`,
       });
     });
 
