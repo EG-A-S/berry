@@ -83,6 +83,8 @@ export class PnpInstaller implements Installer {
     location: PortablePath,
   }> = new Map();
 
+  private isESMLoaderRequired: boolean = false;
+
   constructor(protected opts: LinkOptions) {
     this.opts = opts;
   }
@@ -90,7 +92,7 @@ export class PnpInstaller implements Installer {
   getCustomDataKey() {
     return JSON.stringify({
       name: `PnpInstaller`,
-      version: 1,
+      version: 2,
     });
   }
 
@@ -142,6 +144,9 @@ export class PnpInstaller implements Installer {
           this.customData.store.set(devirtualizedLocator.locatorHash, customPackageData);
         }
       }
+
+      if (customPackageData.manifest.type === `module`)
+        this.isESMLoaderRequired = true;
 
       dependencyMeta = this.opts.project.getDependencyMeta(devirtualizedLocator, pkg.version);
     }
@@ -288,8 +293,11 @@ export class PnpInstaller implements Installer {
     // Nothing to transform
   }
 
-  isEsmEnabled() {
-    if (this.opts.project.configuration.get(`enableExperimentalEsmLoader`))
+  private isEsmEnabled() {
+    if (this.opts.project.configuration.sources.has(`pnpEnableExperimentalEsm`))
+      return this.opts.project.configuration.get(`pnpEnableExperimentalEsm`);
+
+    if (this.isESMLoaderRequired)
       return true;
 
     for (const workspace of this.opts.project.workspaces) {
@@ -339,8 +347,10 @@ export class PnpInstaller implements Installer {
       });
     }
 
-    if (this.isEsmEnabled())
+    if (this.isEsmEnabled()) {
+      this.opts.report.reportWarning(MessageName.UNNAMED, `ESM support with PnP is experimental and can break at any moment Node decides to change the experimental loader API`);
       await xfs.writeFilePromise(pnpPath.esmLoader, getESMLoaderTemplate());
+    }
 
     const pnpUnpluggedFolder = this.opts.project.configuration.get(`pnpUnpluggedFolder`);
     if (this.unpluggedPaths.size === 0) {
@@ -486,6 +496,7 @@ async function extractCustomPackageData(fetchResult: FetchResult) {
       cpu: manifest.cpu,
       scripts: manifest.scripts,
       preferUnplugged: manifest.preferUnplugged,
+      type: manifest.type,
     },
     misc: {
       extractHint: jsInstallUtils.getExtractHint(fetchResult),

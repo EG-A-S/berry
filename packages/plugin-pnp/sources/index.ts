@@ -2,6 +2,7 @@ import {Hooks as CoreHooks, Plugin, Project, SettingsType} from '@yarnpkg/core';
 import {Filename, PortablePath, npath, ppath, xfs}         from '@yarnpkg/fslib';
 import {Hooks as StageHooks}                               from '@yarnpkg/plugin-stage';
 import semver                                              from 'semver';
+import {pathToFileURL}                                     from 'url';
 
 import {PnpLinker}                                         from './PnpLinker';
 import unplug                                              from './commands/unplug';
@@ -15,7 +16,7 @@ export const getPnpPath = (project: Project) => {
   return {
     cjs: ppath.join(project.cwd, Filename.pnpCjs),
     cjsLegacy: ppath.join(project.cwd, Filename.pnpJs),
-    esmLoader: ppath.join(project.cwd, `.pnp-loader.mjs` as Filename),
+    esmLoader: ppath.join(project.cwd, `.pnp.loader.mjs` as Filename),
   };
 };
 
@@ -28,7 +29,7 @@ async function setupScriptEnvironment(project: Project, env: {[key: string]: str
   let pnpRequire = `--require ${quotePathIfNeeded(npath.fromPortablePath(pnpPath.cjs))}`;
 
   if (xfs.existsSync(pnpPath.esmLoader))
-    pnpRequire = `${pnpRequire} --experimental-loader file:///${npath.fromPortablePath(pnpPath.esmLoader).replace(/\\/g, `/`)}`;
+    pnpRequire = `${pnpRequire} --experimental-loader ${pathToFileURL(npath.fromPortablePath(pnpPath.esmLoader)).href}`;
 
   if (pnpPath.cjs.includes(` `) && semver.lt(process.versions.node, `12.0.0`))
     throw new Error(`Expected the build location to not include spaces when using Node < 12.0.0 (${process.versions.node})`);
@@ -39,7 +40,7 @@ async function setupScriptEnvironment(project: Project, env: {[key: string]: str
     // We still support .pnp.js files to improve multi-project compatibility.
     // TODO: Drop the question mark in the RegExp after .pnp.js files stop being used.
     const pnpRegularExpression = /\s*--require\s+\S*\.pnp\.c?js\s*/g;
-    const esmLoaderExpression = /\s*--experimental-loader\s+\S*\.pnp-loader\.mjs\s*/;
+    const esmLoaderExpression = /\s*--experimental-loader\s+\S*\.pnp\.loader\.mjs\s*/;
     nodeOptions = nodeOptions.replace(pnpRegularExpression, ` `).replace(esmLoaderExpression, ` `).trim();
 
     nodeOptions = nodeOptions ? `${pnpRequire} ${nodeOptions}` : pnpRequire;
@@ -63,6 +64,7 @@ declare module '@yarnpkg/core' {
     pnpMode: string;
     pnpShebang: string;
     pnpIgnorePatterns: Array<string>;
+    pnpEnableExperimentalEsm: boolean
     pnpEnableInlining: boolean;
     pnpFallbackMode: string;
     pnpUnpluggedFolder: PortablePath;
@@ -96,6 +98,11 @@ const plugin: Plugin<CoreHooks & StageHooks> = {
       type: SettingsType.STRING,
       default: [],
       isArray: true,
+    },
+    pnpEnableExperimentalEsm: {
+      description: `If true, Yarn will generate an ESM loader (\`.pnp.loader.mjs\`). If this is not explicitly set Yarn tries to automatically detect whether ESM support is required.`,
+      type: SettingsType.BOOLEAN,
+      default: false,
     },
     pnpEnableInlining: {
       description: `If true, the PnP data will be inlined along with the generated loader`,

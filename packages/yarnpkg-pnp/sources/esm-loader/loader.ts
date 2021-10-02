@@ -1,25 +1,21 @@
-import {PortablePath}                      from '@yarnpkg/fslib';
-import {parse, init}                       from 'cjs-module-lexer';
+import {NativePath, PortablePath}          from '@yarnpkg/fslib';
 import fs                                  from 'fs';
-import * as moduleExports                  from 'module';
+import moduleExports                       from 'module';
 import path                                from 'path';
 import {fileURLToPath, pathToFileURL, URL} from 'url';
 
+import * as nodeUtils                      from '../loader/nodeUtils';
 import {PnpApi}                            from '../types';
 
-function isValidURL(str: string) {
+function tryParseURL(str: string) {
   try {
-    new URL(str);
-    return true;
+    return new URL(str);
   } catch {
-    return false;
+    return null;
   }
 }
 
 const builtins = new Set([...moduleExports.builtinModules]);
-
-// @ts-expect-error - This module, when bundled, is still ESM so this is valid
-const pnpapi: PnpApi = moduleExports.createRequire(import.meta.url)(`pnpapi`);
 
 const pathRegExp = /^(?![a-zA-Z]:[\\/]|\\\\|\.{0,2}(?:\/|$))((?:node:)?(?:@[^/]+\/)?[^/]+)\/*(.*|)$/;
 
@@ -32,26 +28,37 @@ async function exists(path: string) {
 }
 
 export async function resolve(
-  specifier: string,
+  originalSpecifier: string,
   context: any,
-  defaultResolver: any
+  defaultResolver: any,
 ) {
-  let validURL;
-  if (builtins.has(specifier) || (validURL = isValidURL(specifier))) {
-    if (!validURL || pathToFileURL(specifier).protocol !== `file:` || specifier.startsWith(`node:`)) {
-      return defaultResolver(specifier, context, defaultResolver);
-    } else {
-      try {
-        specifier = fileURLToPath(specifier);
-      } catch {
-        specifier = fileURLToPath(pathToFileURL(specifier).href);
-      }
+  const {findPnpApi} = (moduleExports as unknown as { findPnpApi?: (path: NativePath) => null | PnpApi });
+  if (!findPnpApi || builtins.has(originalSpecifier))
+    return defaultResolver(originalSpecifier, context, defaultResolver);
+
+  let specifier = originalSpecifier;
+  const url = tryParseURL(specifier);
+  if (url) {
+    if (url.protocol !== `file:` || specifier.startsWith(`node:`))
+      return defaultResolver(originalSpecifier, context, defaultResolver);
+
+    try {
+      specifier = fileURLToPath(specifier);
+    } catch {
+      specifier = fileURLToPath(pathToFileURL(specifier).href);
     }
   }
 
   const {parentURL, conditions = []} = context;
 
-  const parentPath = parentURL ? fileURLToPath(parentURL) : process.cwd();
+  const issuer = parentURL ? fileURLToPath(parentURL) : process.cwd();
+
+  // Get the pnpapi of either the issuer or the specifier.
+  // The latter is required when the specifier is an absolute path to a
+  // zip file and the issuer doesn't belong to a pnpapi
+  const pnpapi = findPnpApi(issuer) ?? (url ? findPnpApi(specifier) : null);
+  if (!pnpapi)
+    return defaultResolver(originalSpecifier, context, defaultResolver);
 
   const dependencyNameMatch = specifier.match(pathRegExp);
 
@@ -60,9 +67,10 @@ export async function resolve(
   if (dependencyNameMatch) {
     const [, dependencyName, subPath] = dependencyNameMatch as [unknown, string, PortablePath];
 
+    // If the package.json doesn't list an `exports` field, Node will tolerate omitting the extension
     // https://github.com/nodejs/node/blob/0996eb71edbd47d9f9ec6153331255993fd6f0d1/lib/internal/modules/esm/resolve.js#L686-L691
     if (subPath === ``) {
-      const resolved = pnpapi.resolveToUnqualified(`${dependencyName}/package.json`, parentPath);
+      const resolved = pnpapi.resolveToUnqualified(`${dependencyName}/package.json`, issuer);
       if (resolved && await exists(resolved)) {
         const pkg = JSON.parse(await fs.promises.readFile(resolved, `utf8`));
         allowLegacyResolve = pkg.exports == null;
@@ -72,45 +80,49 @@ export async function resolve(
 
   let query;
 
-  if (specifier.includes('?')) {
-    [specifier, query] = specifier.split('?');
-  }
+  if (specifier.includes(`?`))
+    [specifier, query] = specifier.split(`?`);
 
-  const result = pnpapi.resolveRequest(specifier, parentPath, {
+
+  const result = pnpapi.resolveRequest(specifier, issuer, {
     conditions: new Set(conditions),
     // TODO: Handle --experimental-specifier-resolution=node
     extensions: [`.js`, `.ts`, `.tsx`, `.cjs`, `.mjs`, `.json`],
   });
 
   if (!result)
-    throw new Error(`Resolution failed`);
+    throw new Error(`Resolving '${specifier}' from '${issuer}' failed`);
 
   return {
     url: pathToFileURL(query ? `${result}?${query}` : result).href,
   };
 }
 
-const realModules = new Set<string>();
-
+// The default `getFormat` doesn't support reading from zip files
 export async function getFormat(
   resolved: string,
   context: any,
-  defaultGetFormat: any
+  defaultGetFormat: any,
 ) {
-  const parsedURL = new URL(resolved);
-  if (parsedURL.protocol !== `file:`)
+  if (resolved.includes(`%3F`))
+    [resolved] = resolved.split(`%3F`);
+
+  const url = tryParseURL(resolved);
+  if (url?.protocol !== `file:`)
     return defaultGetFormat(resolved, context, defaultGetFormat);
 
-  switch (path.extname(parsedURL.pathname)) {
-    case `.mjs`: {
-      realModules.add(fileURLToPath(resolved));
+  const ext = path.extname(url.pathname);
+  switch (ext) {
+    case `.mjs`:
+    case `.ts`:
+    case `.tsx`: {
       return {
         format: `module`,
       };
     }
     case `.cjs`: {
       return {
-        format: `module`,
+        format: `commonjs`,
       };
     }
     case `.json`: {
@@ -118,118 +130,107 @@ export async function getFormat(
         format: `module`,
       };
     }
-    default: {
-      let packageJSONUrl = new URL(`./package.json`, resolved);
-      while (true) {
-        if (packageJSONUrl.pathname.endsWith(`node_modules/package.json`))
-          break;
-
-        const filePath = fileURLToPath(packageJSONUrl);
-
-        try {
-          let moduleType =
-            JSON.parse(await fs.promises.readFile(filePath, `utf8`)).type ??
-            `commonjs`;
-          if (moduleType === `commonjs`) moduleType = `module`;
-          else realModules.add(fileURLToPath(resolved));
-
-          return {
-            format: moduleType,
-          };
-        } catch {}
-
-        const lastPackageJSONUrl = packageJSONUrl;
-        packageJSONUrl = new URL(`../package.json`, packageJSONUrl);
-
-        if (packageJSONUrl.pathname === lastPackageJSONUrl.pathname) {
-          break;
-        }
+    case `.js`:
+    case ``: {
+      const pkg = nodeUtils.readPackageScope(fileURLToPath(resolved));
+      if (pkg) {
+        return {
+          format: pkg.data.type ?? `commonjs`,
+        };
       }
     }
   }
 
-  throw new Error(`Unable to get module type of '${resolved}'`);
+  return defaultGetFormat(resolved, context, defaultGetFormat);
 }
 
-let parserInit: Promise<void> | null = init().then(() => {
-  parserInit = null;
-});
-
-async function parseExports(filePath: string) {
-  const {exports} = parse(await fs.promises.readFile(filePath, `utf8`));
-
-  return new Set(exports);
-}
-
+// The default `getSource` doesn't support reading from zip files
 export async function getSource(
   urlString: string,
   context: any,
-  defaultGetSource: any
+  defaultGetSource: any,
 ) {
-  const url = new URL(urlString);
-  if (url.protocol !== `file:`)
+  if (urlString.includes(`%3F`))
+    [urlString] = urlString.split(`%3F`);
+
+  const url = tryParseURL(urlString);
+  if (url?.protocol !== `file:`)
     return defaultGetSource(url, context, defaultGetSource);
 
-  if (urlString.includes('%3F')) {
-    [urlString] = urlString.split('%3F');
-  }
-
-  urlString = fileURLToPath(urlString);
+  const content = await fs.promises.readFile(fileURLToPath(urlString), `utf8`);
 
   const ext = path.extname(urlString);
   if (ext === `.ts` || ext === `.tsx`) {
-    const { transform } = await import(`esbuild`);
+    const {transform} = await import(`esbuild`);
 
-    const source = (await transform(await fs.promises.readFile(urlString, `utf8`), {
-        format: `esm`,
-        jsxFactory: `h`,
-        jsxFragment: `Fragment`,
-        loader: ext === `.tsx` ? `tsx` : `ts`,
-        target: `esnext`
+    const source = (await transform(content, {
+      format: `esm`,
+      jsxFactory: `h`,
+      jsxFragment: `Fragment`,
+      loader: ext === `.tsx` ? `tsx` : `ts`,
+      target: `esnext`,
     })).code;
 
-    return { source };
+    return {source};
   }
-
-  if (realModules.has(urlString)) {
-    return {
-      source: await fs.promises.readFile(urlString, `utf8`),
-    };
-  }
-
-  if (parserInit !== null) await parserInit;
-
-  const exports = await parseExports(urlString);
-
-  // Hacky workaround for @typescript-eslint
-  if (exports.has('TSESLintScope')) {
-    exports.add('AST_NODE_TYPES');
-    exports.add('AST_TOKEN_TYPES');
-  }
-
-  // Hacky workaround for @babel/core
-  if (exports.has('transformFromAstAsync')) {
-    exports.add('types');
-  }
-
-  let exportStrings = `export default cjs\n`;
-  for (const exportName of exports) {
-    if (exportName !== `default`) {
-      exportStrings += `const __${exportName} = cjs['${exportName}'];\n export { __${exportName} as ${exportName} }\n`;
-    }
-  }
-
-  const fakeModulePath = path.join(path.dirname(urlString), `noop.js`);
-
-  const code = `
-  import {createRequire} from 'module';
-  const require = createRequire('${fakeModulePath.replace(/\\/g, `/`)}');
-  const cjs = require('${urlString.replace(/\\/g, `/`)}');
-
-  ${exportStrings}
-  `;
 
   return {
-    source: code,
+    source: content,
   };
 }
+
+//#region ESM to CJS support
+/*
+  In order to import CJS files from ESM Node does some translating
+  internally[1]. This translator calls an unpatched `readFileSync`[2]
+  which itself calls an internal `tryStatSync`[3] which calls
+  `binding.fstat`[4]. A PR[5] has been made to use the monkey-patchable
+  `fs.readFileSync` but assuming that wont be merged this region of code
+  patches that final `binding.fstat` call.
+
+  1: https://github.com/nodejs/node/blob/d872aaf1cf20d5b6f56a699e2e3a64300e034269/lib/internal/modules/esm/translators.js#L177-L277
+  2: https://github.com/nodejs/node/blob/d872aaf1cf20d5b6f56a699e2e3a64300e034269/lib/internal/modules/esm/translators.js#L240
+  3: https://github.com/nodejs/node/blob/1317252dfe8824fd9cfee125d2aaa94004db2f3b/lib/fs.js#L452
+  4: https://github.com/nodejs/node/blob/1317252dfe8824fd9cfee125d2aaa94004db2f3b/lib/fs.js#L403
+  5: https://github.com/nodejs/node/pull/39513
+*/
+
+const binding = (process as any).binding(`fs`) as {
+  fstat: (fd: number, useBigint: false, req: any, ctx: object) => Float64Array
+};
+const originalfstat = binding.fstat;
+
+const ZIP_FD = 0x80000000;
+binding.fstat = function(...args) {
+  const [fd, useBigint, req] = args;
+  if ((fd & ZIP_FD) !== 0 && useBigint === false && req === undefined) {
+    try {
+      const stats = fs.fstatSync(fd);
+      // The reverse of this internal util
+      // https://github.com/nodejs/node/blob/8886b63cf66c29d453fdc1ece2e489dace97ae9d/lib/internal/fs/utils.js#L542-L551
+      return new Float64Array([
+        stats.dev,
+        stats.mode,
+        stats.nlink,
+        stats.uid,
+        stats.gid,
+        stats.rdev,
+        stats.blksize,
+        stats.ino,
+        stats.size,
+        stats.blocks,
+        // atime sec
+        // atime ns
+        // mtime sec
+        // mtime ns
+        // ctime sec
+        // ctime ns
+        // birthtime sec
+        // birthtime ns
+      ]);
+    } catch {}
+  }
+
+  return originalfstat.apply(this, args);
+};
+//#endregion
