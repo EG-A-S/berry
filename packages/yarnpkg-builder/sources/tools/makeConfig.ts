@@ -57,7 +57,7 @@ export const makeConfig = (config: webpack.Configuration): webpack.Configuration
   mode: `none`,
   devtool: false,
 
-  target: `node10.19`,
+  target: `node12`,
 
   node: {
     __dirname: false,
