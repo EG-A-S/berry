@@ -174,6 +174,10 @@ export async function getSource(
     return {source};
   }
 
+  if (ext === `.json`)
+    return {source: `const data = ${content};\nexport default data;`};
+
+
   return {
     source: content,
   };
