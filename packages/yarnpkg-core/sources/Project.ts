@@ -163,6 +163,9 @@ export type PeerRequirement = {
   allRequesters: Array<LocatorHash>,
 };
 
+const makeLockfileChecksum = (normalizedContent: string) =>
+  hashUtils.makeHash(`${INSTALL_STATE_VERSION}`, normalizedContent);
+
 export class Project {
   public readonly configuration: Configuration;
   public readonly cwd: PortablePath;
@@ -193,6 +196,12 @@ export class Project {
   public accessibleLocators: Set<LocatorHash> = new Set();
   public originalPackages: Map<LocatorHash, Package> = new Map();
   public optionalBuilds: Set<LocatorHash> = new Set();
+
+  /**
+   * If true, the data contained within `originalPackages` are from a different
+   * lockfile version and need to be refreshed.
+   */
+  public lockfileNeedsRefresh: boolean = false;
 
   /**
    * Populated by the `resolveEverything` method.
@@ -279,7 +288,7 @@ export class Project {
       const content = await xfs.readFilePromise(lockfilePath, `utf8`);
 
       // We store the salted checksum of the lockfile in order to invalidate the install state when needed
-      this.lockFileChecksum = hashUtils.makeHash(`${INSTALL_STATE_VERSION}`, content);
+      this.lockFileChecksum = makeLockfileChecksum(content);
 
       const parsed: any = parseSyml(content);
 
@@ -287,6 +296,8 @@ export class Project {
       if (parsed.__metadata) {
         const lockfileVersion = parsed.__metadata.version;
         const cacheKey = parsed.__metadata.cacheKey;
+
+        this.lockfileNeedsRefresh = lockfileVersion < LOCKFILE_VERSION;
 
         for (const key of Object.keys(parsed)) {
           if (key === `__metadata`)
@@ -322,33 +333,14 @@ export class Project {
             this.storedChecksums.set(locator.locatorHash, checksum);
           }
 
-          if (lockfileVersion >= LOCKFILE_VERSION) {
-            const pkg: Package = {...locator, version, languageName, linkType, dependencies, peerDependencies, dependenciesMeta, peerDependenciesMeta, bin};
-            this.originalPackages.set(pkg.locatorHash, pkg);
-          }
+          const pkg: Package = {...locator, version, languageName, linkType, dependencies, peerDependencies, dependenciesMeta, peerDependenciesMeta, bin};
+          this.originalPackages.set(pkg.locatorHash, pkg);
 
           for (const entry of key.split(MULTIPLE_KEYS_REGEXP)) {
             const descriptor = structUtils.parseDescriptor(entry);
 
             this.storedDescriptors.set(descriptor.descriptorHash, descriptor);
-
-            if (lockfileVersion >= LOCKFILE_VERSION) {
-              // If the lockfile is up-to-date, we can simply register the
-              // resolution as a done deal.
-
-              this.storedResolutions.set(descriptor.descriptorHash, locator.locatorHash);
-            } else {
-              // But if it isn't, then we instead setup an alias so that the
-              // descriptor will be re-resolved (so that we get to retrieve the
-              // new fields) while still resolving to the same locators.
-
-              const resolutionDescriptor = structUtils.convertLocatorToDescriptor(locator);
-
-              if (resolutionDescriptor.descriptorHash !== descriptor.descriptorHash) {
-                this.storedDescriptors.set(resolutionDescriptor.descriptorHash, resolutionDescriptor);
-                this.resolutionAliases.set(descriptor.descriptorHash, resolutionDescriptor.descriptorHash);
-              }
-            }
+            this.storedResolutions.set(descriptor.descriptorHash, locator.locatorHash);
           }
         }
       }
@@ -671,9 +663,14 @@ export class Project {
     const legacyMigrationResolver = new LegacyMigrationResolver();
     await legacyMigrationResolver.setup(this, {report: opts.report});
 
-    const resolver: Resolver = opts.lockfileOnly
-      ? new MultiResolver([new LockfileResolver(), new RunInstallPleaseResolver(realResolver)])
-      : new MultiResolver([new LockfileResolver(), legacyMigrationResolver, realResolver]);
+    const resolverChain = opts.lockfileOnly
+      ? [new RunInstallPleaseResolver(realResolver)]
+      : [legacyMigrationResolver, realResolver];
+
+    const resolver: Resolver = new MultiResolver([
+      new LockfileResolver(realResolver),
+      ...resolverChain,
+    ]);
 
     const fetcher = this.configuration.makeFetcher();
 
@@ -689,6 +686,8 @@ export class Project {
 
     const packageResolutionPromises = new Map<LocatorHash, Promise<Package>>();
     const descriptorResolutionPromises = new Map<DescriptorHash, Promise<Package>>();
+
+    const dependencyResolutionLocator = this.topLevelWorkspace.anchoredLocator;
 
     const resolutionQueue: Array<Promise<unknown>> = [];
 
@@ -756,7 +755,8 @@ export class Project {
 
       const resolutionDependencies = resolver.getResolutionDependencies(descriptor, resolveOptions);
       const resolvedDependencies = new Map(await Promise.all(resolutionDependencies.map(async dependency => {
-        return [dependency.descriptorHash, await scheduleDescriptorResolution(dependency)] as const;
+        const bound = resolver.bindDescriptor(dependency, dependencyResolutionLocator, resolveOptions);
+        return [dependency.descriptorHash, await scheduleDescriptorResolution(bound)] as const;
       })));
 
       const candidateResolutions = await miscUtils.prettifyAsyncErrors(async () => {
@@ -1623,11 +1623,23 @@ export class Project {
 
   async persistLockfile() {
     const lockfilePath = ppath.join(this.cwd, this.configuration.get(`lockfileFilename`));
-    const lockfileContent = this.generateLockfile();
 
-    await xfs.changeFilePromise(lockfilePath, lockfileContent, {
-      automaticNewlines: true,
-    });
+    let currentContent = ``;
+    try {
+      currentContent = await xfs.readFilePromise(lockfilePath, `utf8`);
+    } catch (error) {
+      // ignore errors, no big deal
+    }
+
+    const newContent = this.generateLockfile();
+    const normalizedContent = normalizeLineEndings(currentContent, newContent);
+    if (normalizedContent === currentContent)
+      return;
+
+    await xfs.writeFilePromise(lockfilePath, normalizedContent);
+
+    this.lockFileChecksum = makeLockfileChecksum(normalizedContent);
+    this.lockfileNeedsRefresh = false;
   }
 
   async persistInstallStateFile() {
@@ -1853,18 +1865,18 @@ function applyVirtualResolutionMutations({
     return pkg;
   };
 
-  const resolvePeerDependencies = (parentLocator: Locator, peerSlots: Map<IdentHash, LocatorHash>, {top, optional}: {top: LocatorHash, optional: boolean}) => {
+  const resolvePeerDependencies = (parentDescriptor: Descriptor, parentLocator: Locator, peerSlots: Map<IdentHash, LocatorHash>, {top, optional}: {top: LocatorHash, optional: boolean}) => {
     if (resolutionStack.length > 1000)
       reportStackOverflow();
 
     resolutionStack.push(parentLocator);
-    const result = resolvePeerDependenciesImpl(parentLocator, peerSlots, {top, optional});
+    const result = resolvePeerDependenciesImpl(parentDescriptor, parentLocator, peerSlots, {top, optional});
     resolutionStack.pop();
 
     return result;
   };
 
-  const resolvePeerDependenciesImpl = (parentLocator: Locator, peerSlots: Map<IdentHash, LocatorHash>, {top, optional}: {top: LocatorHash, optional: boolean}) => {
+  const resolvePeerDependenciesImpl = (parentDescriptor: Descriptor, parentLocator: Locator, peerSlots: Map<IdentHash, LocatorHash>, {top, optional}: {top: LocatorHash, optional: boolean}) => {
     if (accessibleLocators.has(parentLocator.locatorHash))
       return;
 
@@ -1940,7 +1952,7 @@ function applyVirtualResolutionMutations({
         throw new Error(`Assertion failed: The package (${resolution}, resolved from ${structUtils.prettyDescriptor(project.configuration, descriptor)}) should have been registered`);
 
       if (pkg.peerDependencies.size === 0) {
-        resolvePeerDependencies(pkg, new Map(), {top, optional: isOptional});
+        resolvePeerDependencies(descriptor, pkg, new Map(), {top, optional: isOptional});
         continue;
       }
 
@@ -1981,14 +1993,8 @@ function applyVirtualResolutionMutations({
         for (const peerRequest of virtualizedPackage.peerDependencies.values()) {
           let peerDescriptor = parentPackage.dependencies.get(peerRequest.identHash);
 
-          if (!peerDescriptor && structUtils.areIdentsEqual(parentLocator, peerRequest)) {
-            peerDescriptor = structUtils.convertLocatorToDescriptor(parentLocator);
-
-            allDescriptors.set(peerDescriptor.descriptorHash, peerDescriptor);
-            allResolutions.set(peerDescriptor.descriptorHash, parentLocator.locatorHash);
-
-            volatileDescriptors.delete(peerDescriptor.descriptorHash);
-          }
+          if (!peerDescriptor && structUtils.areIdentsEqual(parentLocator, peerRequest))
+            peerDescriptor = parentDescriptor;
 
           // If the peerRequest isn't provided by the parent then fall back to dependencies
           if ((!peerDescriptor || peerDescriptor.range === `missing:`) && virtualizedPackage.dependencies.has(peerRequest.identHash)) {
@@ -2029,7 +2035,7 @@ function applyVirtualResolutionMutations({
         const next = typeof current !== `undefined` ? current + 1 : 1;
 
         virtualStack.set(pkg.locatorHash, next);
-        resolvePeerDependencies(virtualizedPackage, nextPeerSlots, {top, optional: isOptional});
+        resolvePeerDependencies(virtualizedDescriptor, virtualizedPackage, nextPeerSlots, {top, optional: isOptional});
         virtualStack.set(pkg.locatorHash, next - 1);
       });
 
@@ -2144,7 +2150,7 @@ function applyVirtualResolutionMutations({
     const locator = workspace.anchoredLocator;
 
     volatileDescriptors.delete(workspace.anchoredDescriptor.descriptorHash);
-    resolvePeerDependencies(locator, new Map(), {top: locator.locatorHash, optional: false});
+    resolvePeerDependencies(workspace.anchoredDescriptor, locator, new Map(), {top: locator.locatorHash, optional: false});
   }
 
   enum WarningType {
