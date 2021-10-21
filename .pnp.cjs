@@ -4465,6 +4465,24 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
           "linkType": "HARD",
         }]
       ]],
+      ["@chevrotain/types", [
+        ["npm:9.1.0", {
+          "packageLocation": "./.yarn/cache/@chevrotain-types-npm-9.1.0-80ac254cc2-5f26ff26aa.zip/node_modules/@chevrotain/types/",
+          "packageDependencies": [
+            ["@chevrotain/types", "npm:9.1.0"]
+          ],
+          "linkType": "HARD",
+        }]
+      ]],
+      ["@chevrotain/utils", [
+        ["npm:9.1.0", {
+          "packageLocation": "./.yarn/cache/@chevrotain-utils-npm-9.1.0-5e5d6d7acc-ca78c97c7c.zip/node_modules/@chevrotain/utils/",
+          "packageDependencies": [
+            ["@chevrotain/utils", "npm:9.1.0"]
+          ],
+          "linkType": "HARD",
+        }]
+      ]],
       ["@cnakazawa/watch", [
         ["npm:1.0.4", {
           "packageLocation": "./.yarn/cache/@cnakazawa-watch-npm-1.0.4-ee43493884-88f395ca0a.zip/node_modules/@cnakazawa/watch/",
@@ -5830,7 +5848,7 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
             ["mkdirp", "npm:0.5.5"],
             ["phin", "npm:2.9.3"],
             ["pixelmatch", "npm:4.0.2"],
-            ["tinycolor2", "npm:1.4.2"]
+            ["tinycolor2", "npm:1.4.1"]
           ],
           "linkType": "HARD",
         }],
@@ -5849,7 +5867,7 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
             ["mkdirp", "npm:0.5.5"],
             ["phin", "npm:2.9.3"],
             ["pixelmatch", "npm:4.0.2"],
-            ["tinycolor2", "npm:1.4.2"]
+            ["tinycolor2", "npm:1.4.1"]
           ],
           "linkType": "HARD",
         }]
@@ -6138,7 +6156,7 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
             ["@jimp/custom", "npm:0.14.0"],
             ["@jimp/utils", "npm:0.14.0"],
             ["@types/jimp__custom", null],
-            ["tinycolor2", "npm:1.4.2"]
+            ["tinycolor2", "npm:1.4.1"]
           ],
           "packagePeers": [
             "@jimp/custom",
@@ -6155,7 +6173,7 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
             ["@jimp/utils", "npm:0.9.8"],
             ["@types/jimp__custom", null],
             ["core-js", "npm:3.18.1"],
-            ["tinycolor2", "npm:1.4.2"]
+            ["tinycolor2", "npm:1.4.1"]
           ],
           "packagePeers": [
             "@jimp/custom",
@@ -10713,6 +10731,7 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
             ["stream-to-promise", "npm:2.2.0"],
             ["strip-ansi", "npm:6.0.1"],
             ["tar", "npm:6.1.11"],
+            ["tinylogic", "npm:1.0.3"],
             ["treeify", "npm:1.1.0"],
             ["tslib", "npm:1.14.1"],
             ["tunnel", "npm:0.0.6"]
@@ -10901,7 +10920,7 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
             ["regenerator-runtime", "npm:0.13.9"],
             ["remark-html", "npm:9.0.1"],
             ["remark-parse", "npm:6.0.3"],
-            ["tinycolor2", "npm:1.4.2"],
+            ["tinycolor2", "npm:1.4.1"],
             ["tslib", "npm:1.14.1"],
             ["typedoc", "virtual:118b26a6cee620b5aa3e7e8d8b8e34cd9e486f75b92701001168da9be550fadd8c9d9b12643c642e2d528c2624fd8fe7e128eec9d715340efac44400432a0e0c#npm:0.22.4"],
             ["typedoc-neo-theme", "npm:1.0.7"],
@@ -15958,7 +15977,7 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
             ["@yarnpkg/libzip", "workspace:packages/yarnpkg-libzip"],
             ["@yarnpkg/monorepo", "workspace:."],
             ["esbuild", "npm:0.13.3"],
-            ["resolve.exports", "npm:1.0.2"],
+            ["resolve.exports", "npm:1.1.0"],
             ["rollup", "npm:2.58.0"],
             ["rollup-plugin-esbuild", "virtual:16110bda3ce959c103b1979c5d750ceb8ac9cfbd2049c118b6278e46e65aa65fd17e71e04a0ce5f75b7ca3203efd8e9c9b03c948a76c7f4bca807539915b5cfc#npm:3.0.4"],
             ["tslib", "npm:1.14.1"],
@@ -18432,6 +18451,18 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
             ["domelementtype", "npm:2.2.0"],
             ["domhandler", "npm:4.2.2"],
             ["domutils", "npm:2.8.0"]
+          ],
+          "linkType": "HARD",
+        }]
+      ]],
+      ["chevrotain", [
+        ["npm:9.1.0", {
+          "packageLocation": "./.yarn/cache/chevrotain-npm-9.1.0-9280f9d77f-632d0d7c69.zip/node_modules/chevrotain/",
+          "packageDependencies": [
+            ["chevrotain", "npm:9.1.0"],
+            ["@chevrotain/types", "npm:9.1.0"],
+            ["@chevrotain/utils", "npm:9.1.0"],
+            ["regexp-to-ast", "npm:0.5.0"]
           ],
           "linkType": "HARD",
         }]
@@ -22270,7 +22301,7 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
             ["require-directory", "npm:2.1.1"],
             ["sharp", "npm:0.23.4"],
             ["through2", "npm:3.0.2"],
-            ["tinycolor2", "npm:1.4.2"],
+            ["tinycolor2", "npm:1.4.1"],
             ["to-ico", "npm:1.1.5"],
             ["vinyl", "npm:2.2.1"],
             ["xml2js", "npm:0.4.23"]
@@ -27345,7 +27376,7 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
             ["read-chunk", "npm:1.0.1"],
             ["request", "npm:2.88.2"],
             ["stream-to-buffer", "npm:0.1.0"],
-            ["tinycolor2", "npm:1.4.2"],
+            ["tinycolor2", "npm:1.4.1"],
             ["url-regex", "npm:3.2.0"]
           ],
           "linkType": "HARD",
@@ -33872,6 +33903,15 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
           "linkType": "HARD",
         }]
       ]],
+      ["regexp-to-ast", [
+        ["npm:0.5.0", {
+          "packageLocation": "./.yarn/cache/regexp-to-ast-npm-0.5.0-1e96b9f3a0-72e32f2a12.zip/node_modules/regexp-to-ast/",
+          "packageDependencies": [
+            ["regexp-to-ast", "npm:0.5.0"]
+          ],
+          "linkType": "HARD",
+        }]
+      ]],
       ["regexp.prototype.flags", [
         ["npm:1.3.1", {
           "packageLocation": "./.yarn/cache/regexp.prototype.flags-npm-1.3.1-f0c34f894f-343595db5a.zip/node_modules/regexp.prototype.flags/",
@@ -34365,10 +34405,10 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
         }]
       ]],
       ["resolve.exports", [
-        ["npm:1.0.2", {
-          "packageLocation": "./.yarn/cache/resolve.exports-npm-1.0.2-bbb8d62ef6-1de1e50dc6.zip/node_modules/resolve.exports/",
+        ["npm:1.1.0", {
+          "packageLocation": "./.yarn/cache/resolve.exports-npm-1.1.0-81756e03ba-52865af8ed.zip/node_modules/resolve.exports/",
           "packageDependencies": [
-            ["resolve.exports", "npm:1.0.2"]
+            ["resolve.exports", "npm:1.1.0"]
           ],
           "linkType": "HARD",
         }]
@@ -36662,10 +36702,20 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
         }]
       ]],
       ["tinycolor2", [
-        ["npm:1.4.2", {
-          "packageLocation": "./.yarn/cache/tinycolor2-npm-1.4.2-462ba30c26-57ed262e08.zip/node_modules/tinycolor2/",
+        ["npm:1.4.1", {
+          "packageLocation": "./.yarn/cache/tinycolor2-npm-1.4.1-c3c0a28523-ffc22d9866.zip/node_modules/tinycolor2/",
           "packageDependencies": [
-            ["tinycolor2", "npm:1.4.2"]
+            ["tinycolor2", "npm:1.4.1"]
+          ],
+          "linkType": "HARD",
+        }]
+      ]],
+      ["tinylogic", [
+        ["npm:1.0.3", {
+          "packageLocation": "./.yarn/cache/tinylogic-npm-1.0.3-bd596a96c4-fdf7fcc170.zip/node_modules/tinylogic/",
+          "packageDependencies": [
+            ["tinylogic", "npm:1.0.3"],
+            ["chevrotain", "npm:9.1.0"]
           ],
           "linkType": "HARD",
         }]

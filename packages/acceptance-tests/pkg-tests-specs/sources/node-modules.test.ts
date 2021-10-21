@@ -285,7 +285,7 @@ describe(`Node_Modules`, () => {
         const stdout = (await run(`install`)).stdout;
 
         expect(stdout).not.toContain(`Shall not be run`);
-        expect(stdout).toMatch(new RegExp(`dep@file:./dep.*The platform ${process.platform} is incompatible with this module, link skipped.`));
+        expect(stdout).toMatch(new RegExp(`dep@file:./dep.*The ${process.platform}-${process.arch} architecture is incompatible with this module, link skipped.`));
 
         await expect(source(`require('dep')`)).rejects.toMatchObject({
           externalException: {
@@ -1500,6 +1500,39 @@ describe(`Node_Modules`, () => {
         });
         await expect(source(`require('module').createRequire(require.resolve('nested1/package.json') + '/..')('no-deps')`)).resolves.toMatchObject({
           version: `2.0.0`,
+        });
+      },
+    ),
+  );
+
+  it(`should install project when portal is pointing to a workspace`,
+    makeTemporaryEnv(
+      {
+        workspaces: [`ws1`, `ws2`],
+      },
+      {
+        nodeLinker: `node-modules`,
+      },
+      async ({path, run, source}) => {
+        await xfs.mkdirpPromise(ppath.join(path, `ws1` as PortablePath));
+        await xfs.writeJsonPromise(ppath.join(path, `ws1/${Filename.manifest}` as PortablePath), {
+          name: `ws1`,
+          devDependencies: {
+            [`no-deps`]: `1.0.0`,
+          },
+        });
+        await xfs.mkdirpPromise(ppath.join(path, `ws2` as PortablePath));
+        await xfs.writeJsonPromise(ppath.join(path, `ws2/${Filename.manifest}` as PortablePath), {
+          name: `ws2`,
+          devDependencies: {
+            [`ws1`]: `portal:../ws1`,
+          },
+        });
+
+        await run(`install`);
+
+        await expect(source(`require('no-deps')`)).resolves.toMatchObject({
+          version: `1.0.0`,
         });
       },
     ),

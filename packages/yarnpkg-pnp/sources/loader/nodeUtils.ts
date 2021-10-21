@@ -17,6 +17,7 @@ export function resolveMainPath(main: NativePath) {
 
 // https://github.com/nodejs/node/blob/e817ba70f56c4bfd5d4a68dce8b165142312e7b6/lib/internal/modules/run_main.js#L26-L41
 export function shouldUseESMLoader(mainPath: NativePath) {
+  return true;
   // const userLoader = getOptionValue(`--experimental-loader`);
   // if (userLoader)
   //   return true;

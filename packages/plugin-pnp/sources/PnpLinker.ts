@@ -1,7 +1,7 @@
 import {miscUtils, structUtils, formatUtils, Descriptor, LocatorHash}                                           from '@yarnpkg/core';
 import {FetchResult, Locator, Package}                                                                          from '@yarnpkg/core';
 import {Linker, LinkOptions, MinimalLinkOptions, Manifest, MessageName, DependencyMeta, LinkType, Installer}    from '@yarnpkg/core';
-import {CwdFS, PortablePath, VirtualFS, npath, ppath, xfs, Filename}                                            from '@yarnpkg/fslib';
+import {AliasFS, CwdFS, PortablePath, VirtualFS, npath, ppath, xfs, Filename}                                   from '@yarnpkg/fslib';
 import {generateInlinedScript, generateSplitScript, PackageRegistry, PnpApi, PnpSettings, getESMLoaderTemplate} from '@yarnpkg/pnp';
 import {UsageError}                                                                                             from 'clipanion';
 
@@ -348,8 +348,11 @@ export class PnpInstaller implements Installer {
     }
 
     if (this.isEsmEnabled()) {
-      this.opts.report.reportWarning(MessageName.UNNAMED, `ESM support with PnP is experimental and can break at any moment Node decides to change the experimental loader API`);
-      await xfs.writeFilePromise(pnpPath.esmLoader, getESMLoaderTemplate());
+      this.opts.report.reportWarning(MessageName.UNNAMED, `ESM support for PnP uses the experimental loader API and is therefore experimental`);
+      await xfs.changeFilePromise(pnpPath.esmLoader, getESMLoaderTemplate(), {
+        automaticNewlines: true,
+        mode: 0o644,
+      });
     }
 
     const pnpUnpluggedFolder = this.opts.project.configuration.get(`pnpUnpluggedFolder`);
@@ -411,6 +414,9 @@ export class PnpInstaller implements Installer {
     if (FORCED_UNPLUG_PACKAGES.has(pkg.identHash))
       return true;
 
+    if (pkg.conditions !== null)
+      return true;
+
     if (customPackageData.manifest.preferUnplugged !== null)
       return customPackageData.manifest.preferUnplugged;
 
@@ -422,6 +428,9 @@ export class PnpInstaller implements Installer {
 
   private async unplugPackage(locator: Locator, fetchResult: FetchResult) {
     const unplugPath = pnpUtils.getUnpluggedPath(locator, {configuration: this.opts.project.configuration});
+    if (this.opts.project.disabledLocators.has(locator.locatorHash))
+      return new AliasFS(unplugPath, {baseFs: fetchResult.packageFs, pathUtils: ppath});
+
     this.unpluggedPaths.add(unplugPath);
 
     const readyFile = ppath.join(unplugPath, fetchResult.prefixPath, `.ready` as Filename);
@@ -492,8 +501,6 @@ async function extractCustomPackageData(fetchResult: FetchResult) {
 
   return {
     manifest: {
-      os: manifest.os,
-      cpu: manifest.cpu,
       scripts: manifest.scripts,
       preferUnplugged: manifest.preferUnplugged,
       type: manifest.type,
