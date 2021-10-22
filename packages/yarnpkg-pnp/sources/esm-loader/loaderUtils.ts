@@ -51,7 +51,8 @@ export function getFileFormat(filepath: string): string | null {
       // Waiting on https://github.com/nodejs/node/issues/36935
       return `module`;
     }
-    case `.js`: {
+    case `.js`:
+    case ``: {
       const pkg = nodeUtils.readPackageScope(filepath);
       if (pkg) {
         return pkg.data.type ?? `commonjs`;
