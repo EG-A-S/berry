@@ -51,8 +51,10 @@ export function getFileFormat(filepath: string): string | null {
       // Waiting on https://github.com/nodejs/node/issues/36935
       return `module`;
     }
-    case `.js`:
-    case ``: {
+    // Matching files without extensions deviates from Node's default
+    // behaviour but is a fix for https://github.com/nodejs/node/issues/33226
+    case ``:
+    case `.js`: {
       const pkg = nodeUtils.readPackageScope(filepath);
       if (pkg) {
         return pkg.data.type ?? `commonjs`;
@@ -63,14 +65,14 @@ export function getFileFormat(filepath: string): string | null {
   return null;
 }
 
-let esbuild;
+let esbuild: typeof import('esbuild');
 
 export async function readSource(url: URL): Promise<string> {
   const content = await fs.promises.readFile(fileURLToPath(url), `utf8`);
 
   const ext = path.extname(fileURLToPath(url));
   if (ext === `.ts` || ext === `.tsx`) {
-    const {transform} = esbuild ?? (esbuild ??= await import(`esbuild`));
+    const {transform} = esbuild ??= await import(`esbuild`);
 
     return (await transform(content, {
       format: `esm`,
