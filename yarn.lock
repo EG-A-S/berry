@@ -5658,7 +5658,7 @@ __metadata:
     terser-webpack-plugin: ^3.0.4
     ts-loader: ^7.0.5
     tslib: ^1.13.0
-    typescript: ^4.4.2
+    typescript: ^4.5.2
     val-loader: ^2.1.1
     webpack: ^5.1.1
     webpack-merge: ^4.2.2
@@ -5706,7 +5706,7 @@ __metadata:
     semver: ^7.1.2
     tslib: ^1.13.0
     typanion: ^3.3.0
-    typescript: ^4.4.2
+    typescript: ^4.5.2
     yup: ^0.32.9
   peerDependencies:
     "@yarnpkg/core": "workspace:^"
@@ -5758,6 +5758,7 @@ __metadata:
     pretty-bytes: ^5.1.0
     rollup: ^2.43.0
     rollup-plugin-esbuild: ^3.0.2
+    rollup-plugin-terser: ^7.0.2
     semver: ^7.1.2
     stream-to-promise: ^2.2.0
     strip-ansi: ^6.0.0
@@ -5783,7 +5784,7 @@ __metadata:
     micromatch: ^4.0.2
     p-limit: ^2.2.0
     tslib: ^1.13.0
-    typescript: ^4.4.2
+    typescript: ^4.5.2
   bin:
     doctor: ./sources/boot-cli-dev.js
   languageName: unknown
@@ -5919,7 +5920,7 @@ __metadata:
     typedoc: ^0.22.4
     typedoc-neo-theme: ^1.0.7
     typedoc-plugin-yarn: "portal:./typedoc-plugin-yarn"
-    typescript: ^4.4.2
+    typescript: ^4.5.2
     unescape-html: ^1.1.0
     unfetch: ^4.1.0
     unified: ^7.1.0
@@ -5997,7 +5998,7 @@ __metadata:
     jest-junit: ^10.0.0
     micromatch: ^4.0.2
     tslib: ^1.13.0
-    typescript: ^4.4.2
+    typescript: ^4.5.2
   dependenciesMeta:
     core-js:
       built: false
@@ -6075,7 +6076,7 @@ __metadata:
     node-emoji: ^1.8.1
     tau-prolog: ^0.2.66
     tslib: ^1.13.0
-    typescript: ^4.4.2
+    typescript: ^4.5.2
   peerDependencies:
     "@yarnpkg/cli": "workspace:^"
     "@yarnpkg/core": "workspace:^"
@@ -6135,7 +6136,7 @@ __metadata:
     "@yarnpkg/core": "workspace:^"
     "@yarnpkg/fslib": "workspace:^"
     tslib: ^1.13.0
-    typescript: ^4.4.2
+    typescript: ^4.5.2
   peerDependencies:
     "@yarnpkg/core": "workspace:^"
   languageName: unknown
@@ -6235,7 +6236,7 @@ __metadata:
     react: ^16.13.1
     semver: ^7.1.2
     tslib: ^1.13.0
-    typescript: ^4.4.2
+    typescript: ^4.5.2
   peerDependencies:
     "@yarnpkg/cli": "workspace:^"
     "@yarnpkg/core": "workspace:^"
@@ -6407,7 +6408,7 @@ __metadata:
     "@yarnpkg/fslib": "workspace:^"
     clipanion: ^3.0.1
     tslib: ^1.13.0
-    typescript: ^4.4.2
+    typescript: ^4.5.2
   peerDependencies:
     "@yarnpkg/cli": "workspace:^"
     "@yarnpkg/core": "workspace:^"
@@ -6428,7 +6429,7 @@ __metadata:
     algoliasearch: ^4.2.0
     semver: ^7.1.2
     tslib: ^1.13.0
-    typescript: ^4.4.2
+    typescript: ^4.5.2
   peerDependencies:
     "@yarnpkg/cli": "workspace:^"
     "@yarnpkg/core": "workspace:^"
@@ -6456,7 +6457,7 @@ __metadata:
     react: ^16.13.1
     semver: ^7.1.2
     tslib: ^1.13.0
-    typescript: ^4.4.2
+    typescript: ^4.5.2
   peerDependencies:
     "@yarnpkg/cli": "workspace:^"
     "@yarnpkg/core": "workspace:^"
@@ -6479,7 +6480,7 @@ __metadata:
     p-limit: ^2.2.0
     tslib: ^1.13.0
     typanion: ^3.3.0
-    typescript: ^4.4.2
+    typescript: ^4.5.2
   peerDependencies:
     "@yarnpkg/cli": "workspace:^"
     "@yarnpkg/core": "workspace:^"
@@ -6503,7 +6504,7 @@ __metadata:
     rollup: ^2.43.0
     rollup-plugin-esbuild: ^3.0.2
     tslib: ^1.13.0
-    typescript: ^4.4.2
+    typescript: ^4.5.2
     webpack: ^5.1.1
     webpack-cli: ^4.0.0-beta.8
   languageName: unknown
@@ -24351,19 +24352,19 @@ typescript@^3.8.3:
   languageName: node
   linkType: hard
 
-typescript@^4.4.2:
-  version: 4.4.3
-  resolution: "typescript@npm:4.4.3"
+"typescript@npm:^4.5.2":
+  version: 4.5.2
+  resolution: "typescript@npm:4.5.2"
   bin:
     tsc: bin/tsc
     tsserver: bin/tsserver
-  checksum: 05823f21796d450531a7e4ab299715d38fd9ded0e4ce7400876053f4b5166ca3dde7a68cecfe72d9086039f03c0b6edba36516fb10ed83c5837d9600532ea4c2
+  checksum: 74f9ce65d532bdf5d0214b3f60cf37992180023388c87a11ee6f838a803067ef0b63c600fa501b0deb07f989257dce1e244c9635ed79feca40bbccf6e0aa1ebc
   languageName: node
   linkType: hard
 
 "typescript@patch:typescript@3.7.x#~builtin<compat/typescript>":
   version: 3.7.7
-  resolution: "typescript@patch:typescript@npm%3A3.7.7#~builtin<compat/typescript>::version=3.7.7&hash=ddd1e8"
+  resolution: "typescript@patch:typescript@npm%3A3.7.7#~builtin<compat/typescript>::version=3.7.7&hash=493e53"
   bin:
     tsc: bin/tsc
     tsserver: bin/tsserver
@@ -24373,7 +24374,7 @@ typescript@^4.4.2:
 
 "typescript@patch:typescript@^3.8.3#~builtin<compat/typescript>":
   version: 3.9.10
-  resolution: "typescript@patch:typescript@npm%3A3.9.10#~builtin<compat/typescript>::version=3.9.10&hash=ddd1e8"
+  resolution: "typescript@patch:typescript@npm%3A3.9.10#~builtin<compat/typescript>::version=3.9.10&hash=493e53"
   bin:
     tsc: bin/tsc
     tsserver: bin/tsserver
@@ -24381,13 +24382,13 @@ typescript@^4.4.2:
   languageName: node
   linkType: hard
 
-"typescript@patch:typescript@^4.4.2#~builtin<compat/typescript>":
-  version: 4.4.3
-  resolution: "typescript@patch:typescript@npm%3A4.4.3#~builtin<compat/typescript>::version=4.4.3&hash=ddd1e8"
+"typescript@patch:typescript@^4.5.2#~builtin<compat/typescript>":
+  version: 4.5.2
+  resolution: "typescript@patch:typescript@npm%3A4.5.2#~builtin<compat/typescript>::version=4.5.2&hash=493e53"
   bin:
     tsc: bin/tsc
     tsserver: bin/tsserver
-  checksum: 79f5c13d21c9dea3eb44d2b7002ff25a0569fefc432e083d65a360e3aca990aca25fc733e14aa6883b5e9a68e3e2f0330a34123e048806f91d701732ece00e6f
+  checksum: 53838d56aba6fcc947d63aa0771e5d966b1b648fddafed6e221d7f38c71219c4e036ece8cfe9e35ed80cf5a35ff4eb958934c993f99c3233773ec4f9ccd53f69
   languageName: node
   linkType: hard
 
