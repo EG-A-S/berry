@@ -182,7 +182,7 @@
     },
     "globalFolder": {
       "_package": "@yarnpkg/core",
-      "description": "The path where all system-global files (for example the list of all packages registered through `yarn link`) are stored.",
+      "description": "The path where all system-global files are stored.",
       "type": "string",
       "format": "uri-reference",
       "examples": ["./.yarn/global"]
@@ -620,6 +620,12 @@
     "preferInteractive": {
       "_package": "@yarnpkg/core",
       "description": "If true, Yarn will ask for your guidance when some actions would be improved by being disambiguated. Enabling this setting also unlocks some features (for example the `yarn add` command will suggest to reuse the same dependencies as other workspaces if pertinent).",
+      "type": "boolean",
+      "default": false
+    },
+    "preferTruncatedLines": {
+      "_package": "@yarnpkg/core",
+      "description": "If true, Yarn will truncate lines that would go beyond the size of the terminal. If progress bars are disabled, lines will never be truncated. Forgettable lines (e.g. the fetch step logs) are always truncated.",
       "type": "boolean",
       "default": false
     },

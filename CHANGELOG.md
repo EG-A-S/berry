@@ -8,8 +8,13 @@ Yarn now accepts sponsorships! Please give a look at our [OpenCollective](https:
 
 **Note:** features in `master` can be tried out by running `yarn set version from sources` in your project (existing contrib plugins are updated automatically, while new contrib plugins can be added by running `yarn plugin import from sources <name>`).
 
+### Commands
+
+- A new `yarn explain` command has been added. It can be used to explain an error code or list all available error codes.
+
 ### Installs
 
+- The node-modules linker now tolerates if node_modules is a symbolic link and does not recreates it
 - The pnpm linker has received various improvements:
   - It will now remove the `node_modules/.store` and `node_modules` folders if they are empty.
   - It now supports running binaries of soft links.
@@ -22,11 +27,16 @@ Yarn now accepts sponsorships! Please give a look at our [OpenCollective](https:
 - The ESM loader is now enabled regardless of the entrypoint module type, this fixes support for dynamic imports in commonjs modules when the entrypoint is also commonjs
 - `yarn workspaces foreach run` is now able to run binaries
 - The `node` field inside the `npm_config_user_agent` Yarn sets will now include a leading `v`.
+- Yarn is now able to recover from a corrupted install state.
 
 ### Miscellaneous Features
 
 - Reporting for Git errors has been improved.
 - The resolution step now has a progress indicator.
+
+## 3.1.1
+
+- Updates the PnP compatibility layer for TypeScript 4.5
 
 ## 3.1.0
 

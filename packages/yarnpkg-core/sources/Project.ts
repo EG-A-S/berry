@@ -694,7 +694,7 @@ export class Project {
     const descriptorResolutionPromises = new Map<DescriptorHash, Promise<Package>>();
 
     const dependencyResolutionLocator = this.topLevelWorkspace.anchoredLocator;
-    const allResolutionDependencyPackages = new Set<LocatorHash>();
+    const resolutionDependencies = new Set<LocatorHash>();
 
     const resolutionQueue: Array<Promise<unknown>> = [];
 
@@ -774,12 +774,12 @@ export class Project {
         if (typeof alias !== `undefined`)
           return startDescriptorAliasing(descriptor, this.storedDescriptors.get(alias)!);
 
-        const resolutionDependencies = resolver.getResolutionDependencies(descriptor, resolveOptions);
-        const resolvedDependencies = new Map(await miscUtils.allSettledSafe(resolutionDependencies.map(async dependency => {
+        const resolutionDependenciesList = resolver.getResolutionDependencies(descriptor, resolveOptions);
+        const resolvedDependencies = new Map(await miscUtils.allSettledSafe(resolutionDependenciesList.map(async dependency => {
           const bound = resolver.bindDescriptor(dependency, dependencyResolutionLocator, resolveOptions);
 
           const resolvedPackage = await scheduleDescriptorResolution(bound);
-          allResolutionDependencyPackages.add(resolvedPackage.locatorHash);
+          resolutionDependencies.add(resolvedPackage.locatorHash);
 
           return [dependency.descriptorHash, resolvedPackage] as const;
         })));
@@ -848,7 +848,7 @@ export class Project {
       allPackages,
     });
 
-    for (const locatorHash of allResolutionDependencyPackages)
+    for (const locatorHash of resolutionDependencies)
       optionalBuilds.delete(locatorHash);
 
     // All descriptors still referenced within the volatileDescriptors set are
@@ -1739,15 +1739,19 @@ export class Project {
 
   async restoreInstallState({restoreInstallersCustomData = true, restoreResolutions = true, restoreBuildState = true}: RestoreInstallStateOpts = {}) {
     const installStatePath = this.configuration.get(`installStatePath`);
-    if (!xfs.existsSync(installStatePath)) {
+
+    let installState: InstallState;
+    try {
+      const installStateBuffer = await gunzip(await xfs.readFilePromise(installStatePath)) as Buffer;
+      installState = v8.deserialize(installStateBuffer);
+      this.installStateChecksum = hashUtils.makeHash(installStateBuffer);
+    } catch {
+      // If for whatever reason the install state can't be restored
+      // carry on as if it doesn't exist.
       if (restoreResolutions)
         await this.applyLightResolution();
       return;
     }
-
-    const installStateBuffer = await gunzip(await xfs.readFilePromise(installStatePath)) as Buffer;
-    this.installStateChecksum = hashUtils.makeHash(installStateBuffer);
-    const installState: InstallState = v8.deserialize(installStateBuffer);
 
     if (restoreInstallersCustomData)
       if (typeof installState.installersCustomData !== `undefined`)
@@ -1855,8 +1859,8 @@ function applyVirtualResolutionMutations({
 
   accessibleLocators = new Set(),
   optionalBuilds = new Set(),
-  volatileDescriptors = new Set(),
   peerRequirements = new Map(),
+  volatileDescriptors = new Set(),
 
   report,
 
@@ -1870,8 +1874,8 @@ function applyVirtualResolutionMutations({
 
   accessibleLocators?: Set<LocatorHash>;
   optionalBuilds?: Set<LocatorHash>;
-  volatileDescriptors?: Set<DescriptorHash>;
   peerRequirements?: Project['peerRequirements'];
+  volatileDescriptors?: Set<DescriptorHash>;
 
   report: Report | null;
 
@@ -2032,14 +2036,6 @@ function applyVirtualResolutionMutations({
         continue;
       }
 
-      // The stack overflow is checked against two level because a workspace
-      // may have a dev dependency on another workspace that lists the first
-      // one as a regular dependency. In this case the loop will break so we
-      // don't need to throw an exception.
-      const stackDepth = virtualStack.get(pkg.locatorHash);
-      if (typeof stackDepth === `number` && stackDepth >= 2)
-        reportStackOverflow();
-
       let virtualizedDescriptor: Descriptor;
       let virtualizedPackage: Package;
 
@@ -2118,6 +2114,15 @@ function applyVirtualResolutionMutations({
         if (!allPackages.has(virtualizedPackage.locatorHash))
           return;
 
+        // The stack overflow is checked against two level because a workspace
+        // may have a dev dependency on another workspace that lists the first
+        // one as a regular dependency. In this case the loop will break so we
+        // don't need to throw an exception.
+        const stackDepth = virtualStack.get(pkg.locatorHash);
+
+        if (typeof stackDepth === `number` && stackDepth >= 2)
+          reportStackOverflow();
+
         const current = virtualStack.get(pkg.locatorHash);
         const next = typeof current !== `undefined` ? current + 1 : 1;
 
@@ -2166,9 +2171,6 @@ function applyVirtualResolutionMutations({
       stable = true;
 
       for (const [physicalLocator, virtualDescriptor, virtualPackage] of newVirtualInstances) {
-        if (!allPackages.has(virtualPackage.locatorHash))
-          continue;
-
         const otherVirtualInstances = miscUtils.getMapWithDefault(allVirtualInstances, physicalLocator.locatorHash);
 
         // We take all the dependencies from the new virtual instance and
@@ -2205,8 +2207,6 @@ function applyVirtualResolutionMutations({
         if (masterDescriptor === virtualDescriptor)
           continue;
 
-        stable = false;
-
         allPackages.delete(virtualPackage.locatorHash);
         allDescriptors.delete(virtualDescriptor.descriptorHash);
         allResolutions.delete(virtualDescriptor.descriptorHash);
@@ -2222,6 +2222,9 @@ function applyVirtualResolutionMutations({
           const pkg = allPackages.get(dependent);
           if (typeof pkg === `undefined`)
             continue;
+
+          if (pkg.dependencies.get(virtualDescriptor.identHash)!.descriptorHash !== masterDescriptor.descriptorHash)
+            stable = false;
 
           pkg.dependencies.set(virtualDescriptor.identHash, masterDescriptor);
         }
