@@ -2,5 +2,7 @@ import Module from 'module';
 
 export function builtinModules(): Set<string> {
   // @ts-expect-error
-  return new Set(Module.builtinModules || Object.keys(process.binding(`natives`)));
+  const builtins = Module.builtinModules || Object.keys(process.binding(`natives`));
+
+  return new Set([...builtins, ...builtins.map(module => `node:${module}`)]);
 }
