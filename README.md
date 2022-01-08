@@ -27,7 +27,22 @@ Yarn is a modern package manager split into various packages. Its novel architec
 
 ## Our supports
 
-We wish to thank the following companies for their support:
+### [Gold sponsors](https://opencollective.com/yarnpkg)
+
+<table width="100%">
+  <tr>
+    <td>
+      <a href="https://www.doppler.com/?utm_campaign=github_repo&utm_medium=referral&utm_content=yarn&utm_source=github">
+        <img src="https://assets.website-files.com/5de9972f49103c5df3964004/5f0c1146992a5e9e4fa553e6_logo.svg" width="140"/>
+      </a>
+    </td>
+    <td>
+      <b>All your environment variables, in one place</b>. Stop struggling with scattered API keys, hacking together home-brewed tools, and avoiding access controls. Keep your team and servers in sync with <b><a href="https://www.doppler.com/?utm_campaign=github_repo&utm_medium=referral&utm_content=yarn&utm_source=github">Doppler</a></b>.
+    </td>
+  </tr>
+</table>
+
+### But also
 
 <table width="100%">
   <tr>
@@ -118,6 +133,7 @@ On top of our classic integration tests, we also run Yarn every day against the 
 </td><td valign="top">
 
 [![](https://github.com/yarnpkg/berry/workflows/E2E%20ESBuild/badge.svg?event=schedule)](https://github.com/yarnpkg/berry/blob/master/.github/workflows/e2e-esbuild-workflow.yml)<br/>
+[![](https://github.com/yarnpkg/berry/workflows/E2E%20Docusaurus/badge.svg?event=schedule)](https://github.com/yarnpkg/berry/blob/master/.github/workflows/e2e-docusaurus-workflow.yml)<br/>
 [![](https://github.com/yarnpkg/berry/workflows/E2E%20ESLint/badge.svg?event=schedule)](https://github.com/yarnpkg/berry/blob/master/.github/workflows/e2e-eslint-workflow.yml)<br/>
 [![](https://github.com/yarnpkg/berry/workflows/E2E%20FSEvents/badge.svg?event=schedule)](https://github.com/yarnpkg/berry/blob/master/.github/workflows/e2e-fsevents-workflow.yml)<br/>
 [![](https://github.com/yarnpkg/berry/workflows/E2E%20Husky/badge.svg?event=schedule)](https://github.com/yarnpkg/berry/blob/master/.github/workflows/e2e-husky-workflow.yml)<br/>

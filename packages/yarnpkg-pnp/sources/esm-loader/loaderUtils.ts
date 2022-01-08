@@ -16,12 +16,9 @@ export async function tryReadFile(path: NativePath): Promise<string | null> {
   }
 }
 
-export function tryParseURL(str: string) {
-  if (str.includes(`%3F`))
-    [str] = str.split(`%3F`);
-
+export function tryParseURL(str: string, base?: string | URL | undefined) {
   try {
-    return new URL(str);
+    return new URL(str, base);
   } catch {
     return null;
   }

@@ -11,6 +11,11 @@ Yarn now accepts sponsorships! Please give a look at our [OpenCollective](https:
 ### Commands
 
 - A new `yarn explain` command has been added. It can be used to explain an error code or list all available error codes.
+- `yarn upgrade-interactive` now has improved paging:
+  - Yarn will display as many suggestions as can fit in the viewport (rather than a fixed-size list).
+  - The suggestions that fit in the viewport will be fetched in the foreground and will load one-by-one.
+  - The suggestions that don't will be fetched in the background and will be loaded in batches to increase responsiveness and reduce input lag.
+  - Most notably, you won't have to wait for all of the suggestions to be fetched (which took a very long time before on large monorepos) before you can start navigating through the list.
 
 ### Installs
 
@@ -25,14 +30,18 @@ Yarn now accepts sponsorships! Please give a look at our [OpenCollective](https:
 
 - `@yarnpkg/pnpify` now escapes paths correctly
 - The ESM loader is now enabled regardless of the entrypoint module type, this fixes support for dynamic imports in commonjs modules when the entrypoint is also commonjs
+- The ESM loader is now able to resolve relative imports with search parameters
 - `yarn workspaces foreach run` is now able to run binaries
 - The `node` field inside the `npm_config_user_agent` Yarn sets will now include a leading `v`.
 - Yarn is now able to recover from a corrupted install state.
+- Yarn is now able to migrate classic lockfiles containing unconventional tarball URLs
+- The nm linker hoists portals after hoisting their dependencies first
 
 ### Miscellaneous Features
 
 - Reporting for Git errors has been improved.
 - The resolution step now has a progress indicator.
+- The experimental ESM loader warning emitted by Node.js is now suppressed.
 
 ## 3.1.1
 
