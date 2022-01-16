@@ -1,5 +1,6 @@
 import {NativePath, PortablePath}     from '@yarnpkg/fslib';
 import moduleExports                  from 'module';
+import path                           from 'path';
 import {fileURLToPath, pathToFileURL} from 'url';
 
 import * as nodeUtils                 from '../../loader/nodeUtils';
@@ -59,11 +60,33 @@ export async function resolve(
     }
   }
 
-  const result = pnpapi.resolveRequest(specifier, issuer, {
-    conditions: new Set(conditions),
-    // TODO: Handle --experimental-specifier-resolution=node
-    extensions: [`.js`, `.ts`, `.tsx`, `.cjs`, `.mjs`, `.json`],
-  });
+  let result;
+
+  try {
+    result = pnpapi.resolveRequest(specifier, issuer, {
+      conditions: new Set(conditions),
+      // TODO: Handle --experimental-specifier-resolution=node
+      extensions: [`.js`, `.ts`, `.tsx`, `.cjs`, `.mjs`, `.json`],
+    });
+  } catch (error) {
+    const issuerExt = path.extname(issuer);
+    const specifierExt = path.extname(specifier);
+
+    const doResolveWithTypeScriptCompatLayer = (issuerExt === `.ts` || issuerExt === `.tsx`) && (specifierExt === `.js` || specifierExt === `.jsx`);
+
+    if (!doResolveWithTypeScriptCompatLayer)
+      throw error;
+
+    const compatSpecifier = specifierExt === `.jsx`
+      ? specifier.replace(/\.jsx$/, `.tsx`)
+      : specifier.replace(/\.js$/, `.ts`);
+
+    result = pnpapi.resolveRequest(compatSpecifier, issuer, {
+      conditions: new Set(conditions),
+      // TODO: Handle --experimental-specifier-resolution=node
+      extensions: [`.js`, `.ts`, `.tsx`, `.cjs`, `.mjs`, `.json`],
+    });
+  }
 
   if (!result)
     throw new Error(`Resolving '${specifier}' from '${issuer}' failed`);
