@@ -866,9 +866,11 @@ export function makeApi(runtimeState: RuntimeState, opts: MakeApiOptions): PnpAp
           ? isPathIgnored(issuer)
           : false;
 
-      const remappedPath = (!considerBuiltins || !nodeUtils.isBuiltinModule(request)) && !isIssuerIgnored()
+      let remappedPath = (!considerBuiltins || !nodeUtils.isBuiltinModule(request)) && !isIssuerIgnored()
         ? resolveUnqualifiedExport(request, unqualifiedPath, conditions)
         : unqualifiedPath;
+
+      remappedPath = remappedPath.replace(/\.jsx?$/, ``);
 
       return resolveUnqualified(remappedPath, {extensions});
     } catch (error) {
