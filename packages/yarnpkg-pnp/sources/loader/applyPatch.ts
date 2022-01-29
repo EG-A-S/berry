@@ -61,6 +61,26 @@ export function applyPatch(pnpapi: PnpApi, opts: ApplyPatchOptions) {
     return requireStack;
   }
 
+  let esbuild;
+
+  Module._extensions[`.ts`] = function (module, filename) {
+    esbuild ??= eval(`require("esbuild");`);
+
+    const source = fs.readFileSync(filename, {encoding: `utf8`});
+
+    const {code} = esbuild.transformSync(source, {
+      format: `cjs`,
+      loader: `ts`,
+      target: `esnext`,
+    });
+
+    module._compile(code, filename);
+
+    if (`default` in module.exports) {
+      module.exports = module.exports.default;
+    }
+  };
+
   // A small note: we don't replace the cache here (and instead use the native one). This is an effort to not
   // break code similar to "delete require.cache[require.resolve(FOO)]", where FOO is a package located outside
   // of the Yarn dependency tree. In this case, we defer the load to the native loader. If we were to replace the
