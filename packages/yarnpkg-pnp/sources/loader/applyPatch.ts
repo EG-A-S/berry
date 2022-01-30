@@ -1,7 +1,7 @@
 import {FakeFS, PosixFS, npath, patchFs, PortablePath, NativePath} from '@yarnpkg/fslib';
 import fs                                                          from 'fs';
 import {Module}                                                    from 'module';
-import {URL, fileURLToPath}                                        from 'url';
+import {URL, fileURLToPath, pathToFileURL}                         from 'url';
 
 import {PnpApi}                                                    from '../types';
 
@@ -420,6 +420,10 @@ export function applyPatch(pnpapi: PnpApi, opts: ApplyPatchOptions) {
     transpile(module, filename, `ts`);
   };
 
+  Module._extensions[`.tsx`] = function (module: Module, filename: string) {
+    transpile(module, filename, `tsx`);
+  };
+
   let esbuild;
 
   function transpile(module: Module, filename: string, loader: string) {
@@ -427,10 +431,17 @@ export function applyPatch(pnpapi: PnpApi, opts: ApplyPatchOptions) {
 
     const source = fs.readFileSync(filename, {encoding: `utf8`});
 
+    const importMetaURL = JSON.stringify(pathToFileURL(filename).href);
+
     const {code} = esbuild.transformSync(source, {
+      loader,
       format: `cjs`,
       target: `esnext`,
-      loader,
+      jsxFactory: `h`,
+      jsxFragment: `Fragment`,
+      define: {
+        'import.meta.url': importMetaURL,
+      },
     });
 
     module._compile(code, filename);
@@ -442,7 +453,7 @@ export function applyPatch(pnpapi: PnpApi, opts: ApplyPatchOptions) {
 
       if (/[/\\]node_modules[/\\]chalk[/\\]/.test(filename)) {
         module.exports.default = defaultExports;
-      } else if (loader !== `ts`) {
+      } else if (loader === `js`) {
         for (const key in originalModuleExports) {
           module.exports[key] = originalModuleExports[key];
         }
