@@ -424,6 +424,10 @@ export function applyPatch(pnpapi: PnpApi, opts: ApplyPatchOptions) {
     transpile(module, filename, `tsx`);
   };
 
+  if (typeof process.env.VSCODE_PID !== `undefined`)
+    process.env.ESBUILD_WORKER_THREADS = `0`;
+
+
   let esbuild;
 
   function transpile(module: Module, filename: string, loader: string) {
