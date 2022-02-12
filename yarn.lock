@@ -5755,7 +5755,7 @@ __metadata:
     esbuild: ^0.14.10
     semver: ^7.1.2
     tslib: ^1.13.0
-    typescript: 4.6.0-beta
+    typescript: 4.6.1-rc
   bin:
     builder: ./sources/boot-cli-dev.js
   languageName: unknown
@@ -5874,7 +5874,7 @@ __metadata:
     micromatch: ^4.0.2
     p-limit: ^2.2.0
     tslib: ^1.13.0
-    typescript: 4.6.0-beta
+    typescript: 4.6.1-rc
   bin:
     doctor: ./sources/boot-cli-dev.js
   languageName: unknown
@@ -6002,6 +6002,7 @@ __metadata:
     react-icons: ^3.10.0
     react-instantsearch-dom: ^6.6.0
     react-monaco-editor: ^0.36.0
+    react-responsive-carousel: ^3.2.22
     react-scroll-into-view-if-needed: ^2.1.7
     react-select: ^3.1.0
     react-spinners: ^0.8.3
@@ -6016,7 +6017,7 @@ __metadata:
     typedoc: ^0.22.4
     typedoc-neo-theme: ^1.0.7
     typedoc-plugin-yarn: "portal:./typedoc-plugin-yarn"
-    typescript: 4.6.0-beta
+    typescript: 4.6.1-rc
     unescape-html: ^1.1.0
     unfetch: ^4.1.0
     unified: ^7.1.0
@@ -6094,7 +6095,7 @@ __metadata:
     jest-junit: ^10.0.0
     micromatch: ^4.0.2
     tslib: ^1.13.0
-    typescript: 4.6.0-beta
+    typescript: 4.6.1-rc
   dependenciesMeta:
     core-js:
       built: false
@@ -6111,6 +6112,8 @@ __metadata:
     gatsby-plugin-mdx@2.14.0:
       unplugged: true
     gatsby-telemetry:
+      built: false
+    sharp:
       built: false
     svg2png:
       unplugged: true
@@ -21700,6 +21703,15 @@ __metadata:
   languageName: node
   linkType: hard
 
+"react-easy-swipe@npm:^0.0.21":
+  version: 0.0.21
+  resolution: "react-easy-swipe@npm:0.0.21"
+  dependencies:
+    prop-types: ^15.5.8
+  checksum: 225f12a9dd410db1c790220867ab1eb58e2ef0a2bdae8541330805fc5b9905e242ab307b019f9aaed76473849a753f363baff03fa8a77e7a1860d7b41dc83ec0
+  languageName: node
+  linkType: hard
+
 "react-error-overlay@npm:^6.0.9":
   version: 6.0.10
   resolution: "react-error-overlay@npm:6.0.10"
@@ -21833,6 +21845,17 @@ __metadata:
   version: 0.9.0
   resolution: "react-refresh@npm:0.9.0"
   checksum: 6440146176f19402ffb7d66f317e40b1c42c88579b4d439b49021e38be6307c642da3e8732a72e6997b6bb1127db0da92f4aa433da4313ce8ebad0c1efa2ed4a
+  languageName: node
+  linkType: hard
+
+"react-responsive-carousel@npm:^3.2.22":
+  version: 3.2.22
+  resolution: "react-responsive-carousel@npm:3.2.22"
+  dependencies:
+    classnames: ^2.2.5
+    prop-types: ^15.5.8
+    react-easy-swipe: ^0.0.21
+  checksum: 6e6ef7a2c140494bb0186af292dd8327ecb8626a3e93fb188923881c760bc996ab84346370066913481d9a4e967555e3c6386046c2aadde69496d1f41ffd5096
   languageName: node
   linkType: hard
 
@@ -25401,13 +25424,13 @@ __metadata:
   languageName: node
   linkType: hard
 
-"typescript@npm:4.6.0-beta":
-  version: 4.6.0-beta
-  resolution: "typescript@npm:4.6.0-beta"
+"typescript@npm:4.6.1-rc":
+  version: 4.6.1-rc
+  resolution: "typescript@npm:4.6.1-rc"
   bin:
     tsc: bin/tsc
     tsserver: bin/tsserver
-  checksum: da9ea9760add3d6ab09270717bce661e9a2aa24a0f04562244dd54613464d096d4647096f2a9c07f4cb0e2d7b1c28ac37d27f964c54d382f9a9187d91ee578e4
+  checksum: d456efbc299b3569e049b4cefb92c920b9b631d88f3e85ea9326ee185cb872de98fb02e4ad9e998ae12491e9d5025ee4a85f45f6fe938709cabae9d419c6108b
   languageName: node
   linkType: hard
 
@@ -25421,13 +25444,13 @@ __metadata:
   languageName: node
   linkType: hard
 
-"typescript@patch:typescript@4.6.0-beta#~builtin<compat/typescript>":
-  version: 4.6.0-beta
-  resolution: "typescript@patch:typescript@npm%3A4.6.0-beta#~builtin<compat/typescript>::version=4.6.0-beta&hash=de8f8a"
+"typescript@patch:typescript@4.6.1-rc#~builtin<compat/typescript>":
+  version: 4.6.1-rc
+  resolution: "typescript@patch:typescript@npm%3A4.6.1-rc#~builtin<compat/typescript>::version=4.6.1-rc&hash=de8f8a"
   bin:
     tsc: bin/tsc
     tsserver: bin/tsserver
-  checksum: fb56ac2d919cd110a904cc71d9ccbf96e2d2914b599336f4e49a69fe8c4447a560d53a5b3a80efd6439d67e83d2ada16e961f62dc5e5ae2eeed967bf4b9cd7ac
+  checksum: 27bc11254482fa74b50a2a9d4c8114ecbaf02b129ac523de49703dec4efe61831ab8235f5a412fbc8c14d51f2d1c4d7313216ab40e47bfb2524bad6e70bf2243
   languageName: node
   linkType: hard
 

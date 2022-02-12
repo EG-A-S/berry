@@ -9,7 +9,7 @@ import {getPatch as getTypescriptPatch}          from './patches/typescript.patc
 const PATCHES = new Map([
   [structUtils.makeIdent(null, `fsevents`).identHash, getFseventsPatch],
   [structUtils.makeIdent(null, `resolve`).identHash, getResolvePatch],
-  [structUtils.makeIdent(null, `typescript`).identHash, getTypescriptPatch],
+  // [structUtils.makeIdent(null, `typescript`).identHash, getTypescriptPatch],
 ]);
 
 const plugin: Plugin<CoreHooks & PatchHooks> = {
