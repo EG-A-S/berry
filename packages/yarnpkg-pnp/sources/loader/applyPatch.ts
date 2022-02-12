@@ -427,11 +427,12 @@ export function applyPatch(pnpapi: PnpApi, opts: ApplyPatchOptions) {
   if (typeof process.env.VSCODE_PID !== `undefined`)
     process.env.ESBUILD_WORKER_THREADS = `0`;
 
+  const useWasm = process.env.USE_ESBUILD_WASM === `true`;
 
   let esbuild;
 
   function transpile(module: Module, filename: string, loader: string) {
-    esbuild ??= eval(`require("esbuild");`);
+    esbuild ??= (useWasm ? eval(`require("esbuild-wasm");`) : eval(`require("esbuild");`));
 
     const source = fs.readFileSync(filename, {encoding: `utf8`});
 
