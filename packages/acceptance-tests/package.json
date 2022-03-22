@@ -8,11 +8,7 @@
     "pkg-tests-specs"
   ],
   "devDependencies": {
-    "@yarnpkg/cli": "workspace:^",
-    "@yarnpkg/core": "workspace:^",
-    "@yarnpkg/fslib": "workspace:^",
     "@yarnpkg/monorepo": "workspace:^",
-    "is-wsl": "^2.1.1",
     "jest-json": "^2.0.0",
     "pkg-tests-core": "workspace:^"
   },
@@ -25,6 +21,6 @@
     "directory": "packages/acceptance-tests"
   },
   "engines": {
-    "node": ">=12 <14 || 14.2 - 14.9 || >14.10.0"
+    "node": ">=14.15.0"
   }
 }

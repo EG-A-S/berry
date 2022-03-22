@@ -29,6 +29,7 @@
     "@yarnpkg/sdks": "workspace:^",
     "babel-jest": "^26.0.1",
     "clipanion": "^3.2.0-rc.4",
+    "esbuild": "^0.14.27",
     "eslint": "^8.2.0",
     "github-api": "^3.2.2",
     "jest": "^26.0.1",
@@ -92,6 +93,6 @@
     "directory": "."
   },
   "engines": {
-    "node": ">=12 <14 || 14.2 - 14.9 || >14.10.0"
+    "node": ">=14.15.0"
   }
 }

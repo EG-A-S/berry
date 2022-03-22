@@ -1,6 +1,6 @@
 {
   "name": "@yarnpkg/builder",
-  "version": "3.2.0-rc.2",
+  "version": "3.2.0",
   "license": "BSD-2-Clause",
   "bin": "./sources/boot-cli-dev.js",
   "dependencies": {
@@ -10,7 +10,7 @@
     "@yarnpkg/fslib": "workspace:^",
     "chalk": "^3.0.0",
     "clipanion": "^3.2.0-rc.4",
-    "esbuild": "^0.14.10",
+    "esbuild": "^0.14.27",
     "semver": "^7.1.2",
     "tslib": "^1.13.0"
   },
@@ -36,7 +36,6 @@
     "directory": "packages/yarnpkg-builder"
   },
   "engines": {
-    "node": ">=12 <14 || 14.2 - 14.9 || >14.10.0"
-  },
-  "stableVersion": "3.1.0"
+    "node": ">=14.15.0"
+  }
 }

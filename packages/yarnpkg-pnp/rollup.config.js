@@ -99,7 +99,7 @@ export default defineConfig([
         }),
         esbuild({
           tsconfig: false,
-          target: `node12`,
+          target: `node14`,
           define: {
             document: `undefined`,
             XMLHttpRequest: `undefined`,
