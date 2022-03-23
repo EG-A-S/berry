@@ -80,9 +80,11 @@ export async function readSource(url: URL): Promise<string> {
 
   const ext = path.extname(fileURLToPath(url));
   if (ext === `.ts` || ext === `.tsx`) {
-    const {transform} = esbuild ??= await import(`esbuild`);
+    esbuild ??= process.env.USE_ESBUILD_WASM === `true`
+      ? await import(`esbuild-wasm`)
+      : await import(`esbuild`);
 
-    return (await transform(content, {
+    return (await esbuild.transform(content, {
       format: `esm`,
       jsxFactory: `h`,
       jsxFragment: `Fragment`,
