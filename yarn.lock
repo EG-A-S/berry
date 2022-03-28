@@ -1825,20 +1825,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@chevrotain/types@npm:^9.1.0":
-  version: 9.1.0
-  resolution: "@chevrotain/types@npm:9.1.0"
-  checksum: 95621f85dde7afbc3298440407814a04857f45fa0deefed0006441d1bdd1e09ae2243e141753ca2d1b08845f3c391dd03532f219e12be8c5e1d12b0b12ad342a
-  languageName: node
-  linkType: hard
-
-"@chevrotain/utils@npm:^9.1.0":
-  version: 9.1.0
-  resolution: "@chevrotain/utils@npm:9.1.0"
-  checksum: 3bf20cd22e2f5d64f9cfd968c6355e440abb833b8283a37ff67d1ba56a219f2c9f93a194f2c51befb9932475c6d1fa98376f2ace248c2e391639931e0305a783
-  languageName: node
-  linkType: hard
-
 "@cnakazawa/watch@npm:^1.0.3":
   version: 1.0.4
   resolution: "@cnakazawa/watch@npm:1.0.4"
@@ -4720,7 +4706,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/lodash@npm:*, @types/lodash@npm:^4.14.136, @types/lodash@npm:^4.14.175, @types/lodash@npm:^4.14.92":
+"@types/lodash@npm:*, @types/lodash@npm:^4.14.136, @types/lodash@npm:^4.14.92":
   version: 4.14.180
   resolution: "@types/lodash@npm:4.14.180"
   checksum: 5a3d710fd1460f0bea0ecf6f4f3df0dda2c83e210c9b091f8e7d2ea40030ecc5a66245963d2469e023873484022f9dfa94108674a421b0421d7c207159eacfcc
@@ -5226,13 +5212,6 @@ __metadata:
   version: 1.9.2
   resolution: "@types/yoga-layout@npm:1.9.2"
   checksum: f6c8a0c3cc28b9604cc2e3a747944577f562be8dd5be46fbb522237fe52e0266c51571764322032f6d7e96d6b8f27cf51ba8e4be3024c6e68f5f173e1bd38761
-  languageName: node
-  linkType: hard
-
-"@types/yup@npm:^0":
-  version: 0.29.13
-  resolution: "@types/yup@npm:0.29.13"
-  checksum: b1a9ee83b9419a275022926e4c70b96b30204ad2209d789b349a3cf4c3d53f2b7a140557df4fe49579ba1a1a67c6059deb7fe3610a918d42cb52b9996b722975
   languageName: node
   linkType: hard
 
@@ -5832,7 +5811,6 @@ __metadata:
   resolution: "@yarnpkg/cli@workspace:packages/yarnpkg-cli"
   dependencies:
     "@types/semver": ^7.1.0
-    "@types/yup": ^0
     "@yarnpkg/builder": "workspace:^"
     "@yarnpkg/core": "workspace:^"
     "@yarnpkg/fslib": "workspace:^"
@@ -5863,7 +5841,6 @@ __metadata:
     semver: ^7.1.2
     tslib: ^1.13.0
     typanion: ^3.3.0
-    yup: ^0.32.9
   peerDependencies:
     "@yarnpkg/core": "workspace:^"
   languageName: unknown
@@ -5911,7 +5888,7 @@ __metadata:
     semver: ^7.1.2
     strip-ansi: ^6.0.0
     tar: ^6.0.5
-    tinylogic: ^1.0.3
+    tinylogic: ^2.0.0
     treeify: ^1.1.0
     tslib: ^1.13.0
     tunnel: ^0.0.6
@@ -8719,17 +8696,6 @@ __metadata:
     parse5-htmlparser2-tree-adapter: ^6.0.1
     tslib: ^2.2.0
   checksum: 549f4c79ae50bc39f3e3934539dd157ba4d66e234ffd819f0ac5457d6475d5f8e3cf3ca795e51c1ab91dc178e807822603022c8deb93a0fa24649bd59aa59880
-  languageName: node
-  linkType: hard
-
-"chevrotain@npm:^9.1.0":
-  version: 9.1.0
-  resolution: "chevrotain@npm:9.1.0"
-  dependencies:
-    "@chevrotain/types": ^9.1.0
-    "@chevrotain/utils": ^9.1.0
-    regexp-to-ast: 0.5.0
-  checksum: d8e5cd89c0baa0b227ed39eb425cc8a1ffe533fe9993850f130bd7771963f30bb6095624e58c2acd0dc933b622834f17df0e5100f63d1008d64967a135f6e229
   languageName: node
   linkType: hard
 
@@ -17112,13 +17078,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"lodash-es@npm:^4.17.21":
-  version: 4.17.21
-  resolution: "lodash-es@npm:4.17.21"
-  checksum: d1c3ee94118daeeee47c630ab5f91e94cc4e41ebe2452d837edbe599e853eb2d4be7edf82b4fe62f9fc74f27a8ed7f82fdbd9d301d0acef88f00941db64c4843
-  languageName: node
-  linkType: hard
-
 "lodash._reinterpolate@npm:^3.0.0":
   version: 3.0.0
   resolution: "lodash._reinterpolate@npm:3.0.0"
@@ -19065,13 +19024,6 @@ __metadata:
   dependencies:
     node-gyp: latest
   checksum: 8e0cfc248c39f5e81af8d3654b9765a2f03bd4c634bf13f9d7121a814756e51022bc52b93787176b4a6b4a9217c00ed939221e6130586b13a880e423607067ce
-  languageName: node
-  linkType: hard
-
-"nanoclone@npm:^0.2.1":
-  version: 0.2.1
-  resolution: "nanoclone@npm:0.2.1"
-  checksum: 24a9268a93d4e40f5bda016777ebbc4bdf878ec92c062070fee95d0d77ae22869da6589eb1037116c9d59ded61fd30f8c4418bff24bec9d49f4c65ea7f0c4746
   languageName: node
   linkType: hard
 
@@ -21256,13 +21208,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"property-expr@npm:^2.0.4":
-  version: 2.0.5
-  resolution: "property-expr@npm:2.0.5"
-  checksum: 2759ff5de231b60cf9f8569eb7997b73953fb5bfbdcbbc63c57bbe25c4c7514005e43060cdf22339bd72687d685c680ac279d675c615ede84939338752ba869c
-  languageName: node
-  linkType: hard
-
 "property-information@npm:^5.0.0, property-information@npm:^5.3.0":
   version: 5.6.0
   resolution: "property-information@npm:5.6.0"
@@ -22208,13 +22153,6 @@ __metadata:
     extend-shallow: ^3.0.2
     safe-regex: ^1.1.0
   checksum: 98ef0dc9de7cfb315c7a6362e062e16926dc73ab33bf2fec90116a19755a2b1dc8866238a1db1f718f148889584f6e72a6f250059901fb90f34e2a72ace21e94
-  languageName: node
-  linkType: hard
-
-"regexp-to-ast@npm:0.5.0":
-  version: 0.5.0
-  resolution: "regexp-to-ast@npm:0.5.0"
-  checksum: 7f03ab05187a8e2bece21ef75ea844cf280202fc011e91408d109ea02f324d1662757f5a746ab68716606bb582e9490af4bf9ebece5f3200737fb99ac3132efc
   languageName: node
   linkType: hard
 
@@ -24857,12 +24795,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"tinylogic@npm:^1.0.3":
-  version: 1.0.3
-  resolution: "tinylogic@npm:1.0.3"
-  dependencies:
-    chevrotain: ^9.1.0
-  checksum: c2df54738430317f7900bb50502ee74ea57ccd31ce49bd42b51f05be7ef4460240ac18304a014ac51dd2457a873200114b424ee371a89f5bd017db47854fb936
+"tinylogic@npm:^2.0.0":
+  version: 2.0.0
+  resolution: "tinylogic@npm:2.0.0"
+  checksum: 8c97825b2916ace0cee7dbd9f39762c063ca7cf27f5f0c3f0c16bab2de8580b07a8bb123ebcd52767ff5923919eb70f241ccc4f7d1889ad0c07aa77d88dcb409
   languageName: node
   linkType: hard
 
@@ -27325,21 +27261,6 @@ __metadata:
     synchronous-promise: ^2.0.6
     toposort: ^2.0.2
   checksum: 4d02e6a0af9c6b74d36149a037c39f4e698834ea2ca06cac1165a63f74f0e0472f103a8d2812c12d1b0e9f1169b71691b8f43961ed5a680d202b78f23dc8fb31
-  languageName: node
-  linkType: hard
-
-"yup@npm:^0.32.9":
-  version: 0.32.11
-  resolution: "yup@npm:0.32.11"
-  dependencies:
-    "@babel/runtime": ^7.15.4
-    "@types/lodash": ^4.14.175
-    lodash: ^4.17.21
-    lodash-es: ^4.17.21
-    nanoclone: ^0.2.1
-    property-expr: ^2.0.4
-    toposort: ^2.0.2
-  checksum: fcf9ef69f4a3733c3e55fe73a55a5aa8163b3a912589eb22a3a29c7989c6e12aa676c763137c82d3956451a4b3f1a0f1d14b4cc9a98ca971f0fbce9a9c5cd37a
   languageName: node
   linkType: hard
 
