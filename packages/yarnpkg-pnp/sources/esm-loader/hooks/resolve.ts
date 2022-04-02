@@ -39,22 +39,20 @@ export async function resolve(
   if (!pnpapi)
     return defaultResolver(originalSpecifier, context, defaultResolver);
 
-  const dependencyNameMatch = specifier.match(pathRegExp);
+  if (specifier.startsWith('#')) {
+    const issuerLocator = pnpapi.findPackageLocator(issuer);
+    const resolved = issuerLocator
+      ? pnpapi.resolveToUnqualified(`${issuerLocator.name}/package.json`, issuer)
+      : null;
 
-  let allowLegacyResolve = false;
+    if (resolved) {
+      const content = await loaderUtils.tryReadFile(resolved);
 
-  if (dependencyNameMatch) {
-    const [, dependencyName, subPath] = dependencyNameMatch as [unknown, string, PortablePath];
+      if (content) {
+        const pkg = JSON.parse(content);
 
-    // If the package.json doesn't list an `exports` field, Node will tolerate omitting the extension
-    // https://github.com/nodejs/node/blob/0996eb71edbd47d9f9ec6153331255993fd6f0d1/lib/internal/modules/esm/resolve.js#L686-L691
-    if (subPath === ``) {
-      const resolved = pnpapi.resolveToUnqualified(`${dependencyName}/package.json`, issuer);
-      if (resolved) {
-        const content = await loaderUtils.tryReadFile(resolved);
-        if (content) {
-          const pkg = JSON.parse(content);
-          allowLegacyResolve = pkg.exports == null;
+        if (typeof pkg.imports[specifier] === 'string') {
+          specifier = path.join(path.dirname(resolved), pkg.imports[specifier]);
         }
       }
     }
@@ -72,19 +70,19 @@ export async function resolve(
     const issuerExt = path.extname(issuer);
     const specifierExt = path.extname(specifier);
 
-    const doResolveWithTypeScriptCompatLayer = (issuerExt === `.ts` || issuerExt === `.tsx`) && (specifierExt === `.js` || specifierExt === `.jsx`);
+    const doResolveWithTypeScriptCompatLayer =
+      (issuerExt === `.ts` || issuerExt === `.tsx`) &&
+      (specifierExt === `.js` || specifierExt === `.jsx`);
 
     if (!doResolveWithTypeScriptCompatLayer)
       throw error;
 
-    const compatSpecifier = specifierExt === `.jsx`
-      ? specifier.replace(/\.jsx$/, `.tsx`)
-      : specifier.replace(/\.js$/, `.ts`);
+    const compatSpecifier = specifier.replace(/\.j(sx?)$/, '.t$1');
 
     result = pnpapi.resolveRequest(compatSpecifier, issuer, {
       conditions: new Set(conditions),
       // TODO: Handle --experimental-specifier-resolution=node
-      extensions: [`.js`, `.ts`, `.tsx`, `.cjs`, `.mjs`, `.json`],
+      extensions: [],
     });
   }
 
