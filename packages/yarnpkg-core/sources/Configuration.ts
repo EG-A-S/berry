@@ -2,7 +2,7 @@ import {Filename, PortablePath, npath, ppath, xfs}                              
 import {DEFAULT_COMPRESSION_LEVEL}                                                                      from '@yarnpkg/fslib';
 import {parseSyml, stringifySyml}                                                                       from '@yarnpkg/parsers';
 import camelcase                                                                                        from 'camelcase';
-import {isCI}                                                                                           from 'ci-info';
+import {isCI, isPR, GITHUB_ACTIONS}                                                                     from 'ci-info';
 import {UsageError}                                                                                     from 'clipanion';
 import pLimit, {Limit}                                                                                  from 'p-limit';
 import {PassThrough, Writable}                                                                          from 'stream';
@@ -12,7 +12,6 @@ import {Manifest, PeerDependencyMeta}                                           
 import {MultiFetcher}                                                                                   from './MultiFetcher';
 import {MultiResolver}                                                                                  from './MultiResolver';
 import {Plugin, Hooks}                                                                                  from './Plugin';
-import {ProtocolResolver}                                                                               from './ProtocolResolver';
 import {Report}                                                                                         from './Report';
 import {TelemetryManager}                                                                               from './TelemetryManager';
 import {VirtualFetcher}                                                                                 from './VirtualFetcher';
@@ -26,6 +25,10 @@ import * as nodeUtils                                                           
 import * as semverUtils                                                                                 from './semverUtils';
 import * as structUtils                                                                                 from './structUtils';
 import {IdentHash, Package, Descriptor, PackageExtension, PackageExtensionType, PackageExtensionStatus} from './types';
+
+const isPublicRepository = GITHUB_ACTIONS && process.env.GITHUB_EVENT_PATH
+  ? !(xfs.readJsonSync(npath.toPortablePath(process.env.GITHUB_EVENT_PATH)).repository?.private ?? true)
+  : false;
 
 const IGNORED_ENV_VARIABLES = new Set([
   // "binFolder" is the magic location where the parent process stored the
@@ -57,6 +60,8 @@ const IGNORED_ENV_VARIABLES = new Set([
   `home`,
   `confDir`,
 ]);
+
+export const TAG_REGEXP = /^(?!v)[a-z0-9._-]+$/i;
 
 export const ENVIRONMENT_PREFIX = `yarn_`;
 export const DEFAULT_RC_FILENAME = `.yarnrc.yml` as Filename;
@@ -470,6 +475,12 @@ export const coreDefinitions: {[coreSettingName: string]: SettingsDefinition} = 
   },
 
   // Settings related to security
+  enableHardenedMode: {
+    description: `If true, automatically enable --check-resolutions --refresh-lockfile on installs`,
+    type: SettingsType.BOOLEAN,
+    default: isPR && isPublicRepository,
+    defaultText: `<true on public PRs>`,
+  },
   enableScripts: {
     description: `If true, packages are allowed to have install scripts by default`,
     type: SettingsType.BOOLEAN,
@@ -549,7 +560,7 @@ export type MapConfigurationValue<T extends object> = miscUtils.ToMapValue<T>;
 export interface ConfigurationValueMap {
   lastUpdateCheck: string | null;
 
-  yarnPath: PortablePath;
+  yarnPath: PortablePath | null;
   ignorePath: boolean;
   ignoreCwd: boolean;
 
@@ -608,6 +619,7 @@ export interface ConfigurationValueMap {
   telemetryUserId: string | null;
 
   // Settings related to security
+  enableHardenedMode: boolean;
   enableScripts: boolean;
   enableStrictSettings: boolean;
   enableImmutableCache: boolean;
@@ -905,6 +917,8 @@ export type FindProjectOptions = {
 };
 
 export class Configuration {
+  public static deleteProperty = Symbol();
+
   public static telemetry: TelemetryManager | null = null;
 
   public startingCwd: PortablePath;
@@ -1273,7 +1287,11 @@ export class Configuration {
         if (currentValue === nextValue)
           continue;
 
-        replacement[key] = nextValue;
+        if (nextValue === Configuration.deleteProperty)
+          delete replacement[key];
+        else
+          replacement[key] = nextValue;
+
         patched = true;
       }
 
@@ -1451,13 +1469,14 @@ export class Configuration {
       for (const resolver of plugin.resolvers || [])
         pluginResolvers.push(new resolver());
 
-    return new MultiResolver([
-      new VirtualResolver(),
-      new WorkspaceResolver(),
-      new ProtocolResolver(),
+    return (
+      new MultiResolver([
+        new VirtualResolver(),
+        new WorkspaceResolver(),
 
-      ...pluginResolvers,
-    ]);
+        ...pluginResolvers,
+      ])
+    );
   }
 
   makeFetcher() {
@@ -1547,6 +1566,22 @@ export class Configuration {
     }
   }
 
+  normalizeDependency(dependency: Descriptor) {
+    if (semverUtils.validRange(dependency.range))
+      return structUtils.makeDescriptor(dependency, `${this.get(`defaultProtocol`)}${dependency.range}`);
+
+    if (TAG_REGEXP.test(dependency.range))
+      return structUtils.makeDescriptor(dependency, `${this.get(`defaultProtocol`)}${dependency.range}`);
+
+    return dependency;
+  }
+
+  normalizeDependencyMap<TKey>(dependencyMap: Map<TKey, Descriptor>) {
+    return new Map([...dependencyMap].map(([key, dependency]) => {
+      return [key, this.normalizeDependency(dependency)];
+    }));
+  }
+
   normalizePackage(original: Package) {
     const pkg = structUtils.copyPackage(original);
 
@@ -1576,7 +1611,7 @@ export class Configuration {
                 const currentDependency = pkg.dependencies.get(extension.descriptor.identHash);
                 if (typeof currentDependency === `undefined`) {
                   extension.status = PackageExtensionStatus.Active;
-                  pkg.dependencies.set(extension.descriptor.identHash, extension.descriptor);
+                  pkg.dependencies.set(extension.descriptor.identHash, this.normalizeDependency(extension.descriptor));
                 }
               } break;
 
@@ -1584,7 +1619,7 @@ export class Configuration {
                 const currentPeerDependency = pkg.peerDependencies.get(extension.descriptor.identHash);
                 if (typeof currentPeerDependency === `undefined`) {
                   extension.status = PackageExtensionStatus.Active;
-                  pkg.peerDependencies.set(extension.descriptor.identHash, extension.descriptor);
+                  pkg.peerDependencies.set(extension.descriptor.identHash, this.normalizeDependency(extension.descriptor));
                 }
               } break;
 
