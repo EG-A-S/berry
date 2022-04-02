@@ -45,9 +45,7 @@ export function getFileFormat(filepath: string): string | null {
     case `.wasm`: {
       // TODO: Enable if --experimental-wasm-modules is present
       // Waiting on https://github.com/nodejs/node/issues/36935
-      throw new Error(
-        `Unknown file extension ".wasm" for ${filepath}`,
-      );
+      return 'module';
     }
     case `.json`: {
       // TODO: Enable if --experimental-json-modules is present
