@@ -273,6 +273,7 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
             ["@yarnpkg/fslib", "workspace:packages/yarnpkg-fslib"],\
             ["@yarnpkg/sdks", "workspace:packages/yarnpkg-sdks"],\
             ["clipanion", "virtual:576bf3e379b293160348e4cadfbd6541796e6f78477b0875c4437065090cec6f78b6ec2281b8e15d1c870d61578dc7dee16a5ae49a65701fec83e592ce2ebdeb#npm:3.2.0-rc.10"],\
+            ["esbuild", "npm:0.14.36"],\
             ["eslint", "npm:8.13.0"],\
             ["jest", "npm:26.6.3"],\
             ["tslib", "npm:1.14.1"],\
@@ -11435,6 +11436,7 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
             ["@yarnpkg/fslib", "workspace:packages/yarnpkg-fslib"],\
             ["@yarnpkg/sdks", "workspace:packages/yarnpkg-sdks"],\
             ["clipanion", "virtual:576bf3e379b293160348e4cadfbd6541796e6f78477b0875c4437065090cec6f78b6ec2281b8e15d1c870d61578dc7dee16a5ae49a65701fec83e592ce2ebdeb#npm:3.2.0-rc.10"],\
+            ["esbuild", "npm:0.14.36"],\
             ["eslint", "npm:8.13.0"],\
             ["jest", "npm:26.6.3"],\
             ["tslib", "npm:1.14.1"],\
