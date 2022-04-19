@@ -41,7 +41,7 @@ export default defineConfig({
     }),
     esbuild({
       tsconfig: false,
-      target: `node14`,
+      target: `esnext`,
       define: {
         document: `undefined`,
         XMLHttpRequest: `undefined`,

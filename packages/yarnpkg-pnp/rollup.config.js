@@ -43,7 +43,7 @@ export default defineConfig([
       }),
       esbuild({
         tsconfig: false,
-        target: `node16`,
+        target: `esnext`,
         define: {
           document: `undefined`,
           XMLHttpRequest: `undefined`,
@@ -71,7 +71,7 @@ export default defineConfig([
       }),
       esbuild({
         tsconfig: false,
-        target: `node16`,
+        target: `esnext`,
         define: {
           document: `undefined`,
           XMLHttpRequest: `undefined`,
@@ -99,7 +99,7 @@ export default defineConfig([
         }),
         esbuild({
           tsconfig: false,
-          target: `node14`,
+          target: `esnext`,
           define: {
             document: `undefined`,
             XMLHttpRequest: `undefined`,
