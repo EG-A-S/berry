@@ -409,9 +409,9 @@ export function applyPatch(pnpapi: PnpApi, opts: ApplyPatchOptions) {
       }
     }
 
-    if (filename.endsWith('.wasm')) {
-      filename += '.js'
-    }
+    if (filename.endsWith(`.wasm`))
+      filename += `.js`;
+
     originalExtensionJSFunction.call(this, module, filename);
   };
 
@@ -483,9 +483,7 @@ export function applyPatch(pnpapi: PnpApi, opts: ApplyPatchOptions) {
     if (
       name === `warning` &&
       typeof data === `object` &&
-      data.name === `ExperimentalWarning` &&
-      (data.message.includes(`--experimental-loader`) ||
-        data.message.includes(`Custom ESM Loaders is an experimental feature`))
+      data.name === `ExperimentalWarning`
     )
       return false;
 
