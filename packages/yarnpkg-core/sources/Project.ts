@@ -936,7 +936,7 @@ export class Project {
         disabledLocators.add(pkg.locatorHash);
       }
 
-      if (!structUtils.isPackageCompatible(pkg, currentArchitecture))
+      if (!(structUtils.isPackageCompatible(pkg, currentArchitecture) || process.env.BERRY_FORCE_UNPLUG_CONDITIONAL_PACKAGES === `true`))
         disabledLocators.add(pkg.locatorHash);
 
       conditionalLocators.add(pkg.locatorHash);
