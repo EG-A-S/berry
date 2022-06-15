@@ -860,6 +860,8 @@ export function isPackageCompatible(pkg: Package, architectures: nodeUtils.Archi
     const [, name, value] = specifier.match(conditionRegex)!;
     const supported = architectures[name as keyof typeof architectures];
 
-    return supported ? supported.length === 0 || supported.includes(value) : true;
+    return supported
+      ? supported.length === 0 || supported.includes(value) || (value === `glibc` && supported.includes(`gnu`))
+      : true;
   });
 }
