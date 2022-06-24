@@ -351,12 +351,14 @@ export class NodeFS extends BasePortableFakeFS {
   }
 
   async mkdirPromise(p: PortablePath, opts?: MkdirOptions) {
-    return await new Promise<void>((resolve, reject) => {
+    return await new Promise<string | undefined>((resolve, reject) => {
+      // @ts-expect-error - Types are outdated, the second argument in the callback is either a string or undefined
       this.realFs.mkdir(npath.fromPortablePath(p), opts, this.makeCallback(resolve, reject));
     });
   }
 
-  mkdirSync(p: PortablePath, opts?: MkdirOptions) {
+  mkdirSync(p: PortablePath, opts?: MkdirOptions): string | undefined {
+    // @ts-expect-error - Types are outdated, returns either a string or undefined
     return this.realFs.mkdirSync(npath.fromPortablePath(p), opts);
   }
 
@@ -457,6 +459,16 @@ export class NodeFS extends BasePortableFakeFS {
 
   truncateSync(p: PortablePath, len?: number) {
     return this.realFs.truncateSync(npath.fromPortablePath(p), len);
+  }
+
+  async ftruncatePromise(fd: number, len?: number): Promise<void> {
+    return await new Promise<void>((resolve, reject) => {
+      this.realFs.ftruncate(fd, len, this.makeCallback(resolve, reject));
+    });
+  }
+
+  ftruncateSync(fd: number, len?: number): void {
+    return this.realFs.ftruncateSync(fd, len);
   }
 
   watch(p: PortablePath, cb?: WatchCallback): Watcher;

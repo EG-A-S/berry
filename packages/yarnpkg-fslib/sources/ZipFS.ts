@@ -1244,10 +1244,8 @@ export class ZipFS extends BasePortableFakeFS {
   }
 
   mkdirSync(p: PortablePath, {mode = 0o755, recursive = false}: MkdirOptions = {}) {
-    if (recursive) {
-      this.mkdirpSync(p, {chmod: mode});
-      return;
-    }
+    if (recursive)
+      return this.mkdirpSync(p, {chmod: mode});
 
     if (this.readOnly)
       throw errors.EROFS(`mkdir '${p}'`);
@@ -1259,6 +1257,7 @@ export class ZipFS extends BasePortableFakeFS {
 
     this.hydrateDirectory(resolvedP);
     this.chmodSync(resolvedP, mode);
+    return undefined;
   }
 
   async rmdirPromise(p: PortablePath, opts?: RmdirOptions) {
@@ -1478,6 +1477,14 @@ export class ZipFS extends BasePortableFakeFS {
     source.copy(truncated);
 
     return this.writeFileSync(p, truncated);
+  }
+
+  async ftruncatePromise(fd: number, len?: number): Promise<void> {
+    return this.truncatePromise(this.fdToPath(fd, `ftruncate`), len);
+  }
+
+  ftruncateSync(fd: number, len?: number): void {
+    return this.truncateSync(this.fdToPath(fd, `ftruncateSync`), len);
   }
 
   watch(p: PortablePath, cb?: WatchCallback): Watcher;

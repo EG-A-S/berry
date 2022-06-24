@@ -193,8 +193,8 @@ export abstract class FakeFS<P extends Path> {
   abstract chownPromise(p: P, uid: number, gid: number): Promise<void>;
   abstract chownSync(p: P, uid: number, gid: number): void;
 
-  abstract mkdirPromise(p: P, opts?: MkdirOptions): Promise<void>;
-  abstract mkdirSync(p: P, opts?: MkdirOptions): void;
+  abstract mkdirPromise(p: P, opts?: MkdirOptions): Promise<string | undefined>;
+  abstract mkdirSync(p: P, opts?: MkdirOptions): string | undefined;
 
   abstract rmdirPromise(p: P, opts?: RmdirOptions): Promise<void>;
   abstract rmdirSync(p: P, opts?: RmdirOptions): void;
@@ -234,6 +234,9 @@ export abstract class FakeFS<P extends Path> {
 
   abstract readlinkPromise(p: P): Promise<P>;
   abstract readlinkSync(p: P): P;
+
+  abstract ftruncatePromise(fd: number, len?: number): Promise<void>;
+  abstract ftruncateSync(fd: number, len?: number): void;
 
   abstract truncatePromise(p: P, len?: number): Promise<void>;
   abstract truncateSync(p: P, len?: number): void;
@@ -330,12 +333,14 @@ export abstract class FakeFS<P extends Path> {
     }
   }
 
-  async mkdirpPromise(p: P, {chmod, utimes}: {chmod?: number, utimes?: [Date | string | number, Date | string | number]} = {}) {
+  async mkdirpPromise(p: P, {chmod, utimes}: {chmod?: number, utimes?: [Date | string | number, Date | string | number]} = {}): Promise<string | undefined> {
     p = this.resolve(p);
     if (p === this.pathUtils.dirname(p))
-      return;
+      return undefined;
 
     const parts = p.split(this.pathUtils.sep);
+
+    let createdDirectory: P | undefined;
 
     for (let u = 2; u <= parts.length; ++u) {
       const subPath = parts.slice(0, u).join(this.pathUtils.sep) as P;
@@ -351,6 +356,8 @@ export abstract class FakeFS<P extends Path> {
           }
         }
 
+        createdDirectory ??= subPath;
+
         if (chmod != null)
           await this.chmodPromise(subPath, chmod);
 
@@ -362,14 +369,18 @@ export abstract class FakeFS<P extends Path> {
         }
       }
     }
+
+    return createdDirectory;
   }
 
-  mkdirpSync(p: P, {chmod, utimes}: {chmod?: number, utimes?: [Date | string | number, Date | string | number]} = {}) {
+  mkdirpSync(p: P, {chmod, utimes}: {chmod?: number, utimes?: [Date | string | number, Date | string | number]} = {}): string | undefined {
     p = this.resolve(p);
     if (p === this.pathUtils.dirname(p))
-      return;
+      return undefined;
 
     const parts = p.split(this.pathUtils.sep);
+
+    let createdDirectory: P | undefined;
 
     for (let u = 2; u <= parts.length; ++u) {
       const subPath = parts.slice(0, u).join(this.pathUtils.sep) as P;
@@ -385,6 +396,8 @@ export abstract class FakeFS<P extends Path> {
           }
         }
 
+        createdDirectory ??= subPath;
+
         if (chmod != null)
           this.chmodSync(subPath, chmod);
 
@@ -396,6 +409,8 @@ export abstract class FakeFS<P extends Path> {
         }
       }
     }
+
+    return createdDirectory;
   }
 
   copyPromise(destination: P, source: P, options?: {baseFs?: undefined, overwrite?: boolean, stableSort?: boolean, stableTime?: boolean, linkStrategy?: LinkStrategy}): Promise<void>;
