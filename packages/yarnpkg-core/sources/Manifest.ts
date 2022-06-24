@@ -245,7 +245,7 @@ export class Manifest {
         if (typeof item !== `string`) {
           errors.push(new Error(`Parsing failed for the 'libc' field`));
         } else {
-          libc.push(item);
+          libc.push(item === `gnu` ? `glibc` : item);
         }
       }
     } else {
@@ -1045,7 +1045,8 @@ function toConditionToken(name: string, raw: string) {
     return `invalid`;
 
   const prefix = index % 2 === 0 ? `` : `!`;
-  const value = raw.slice(index);
+  let value = raw.slice(index);
+  value = value === `gnu` ? `glibc` : value;
 
   return `${prefix}${name}=${value}`;
 }
