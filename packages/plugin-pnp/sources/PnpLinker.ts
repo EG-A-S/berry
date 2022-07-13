@@ -442,7 +442,7 @@ export class PnpInstaller implements Installer {
 
   private async unplugPackage(locator: Locator, fetchResult: FetchResult, api: InstallPackageExtraApi) {
     const unplugPath = pnpUtils.getUnpluggedPath(locator, {configuration: this.opts.project.configuration});
-    if (this.opts.project.disabledLocators.has(locator.locatorHash))
+    if (this.opts.project.disabledLocators.has(locator.locatorHash) || this.opts.project.forcePluggedLocators.has(locator.locatorHash))
       return new AliasFS(unplugPath, {baseFs: fetchResult.packageFs, pathUtils: ppath});
 
     this.unpluggedPaths.add(unplugPath);
@@ -504,7 +504,7 @@ function normalizeDirectoryPath(root: PortablePath, folder: PortablePath) {
   return relativeFolder.replace(/\/?$/, `/`)  as PortablePath;
 }
 
-type UnboxPromise<T extends Promise<any>> = T extends Promise<infer U> ? U: never;
+type UnboxPromise<T extends Promise<any>> = T extends Promise<infer U> ? U : never;
 type CustomPackageData = UnboxPromise<ReturnType<typeof extractCustomPackageData>>;
 
 async function extractCustomPackageData(fetchResult: FetchResult) {
