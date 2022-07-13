@@ -606,24 +606,22 @@ export class ZipFS extends BasePortableFakeFS {
       throw errors.ENOENT(`stat '${p}'`);
     }
 
-    if (p[p.length - 1] === `/` && !this.listings.has(resolvedP)) {
-      if (opts?.throwIfNoEntry === false) return undefined;
+    if (p[p.length - 1] === `/` && !this.listings.has(resolvedP))
       throw errors.ENOTDIR(`stat '${p}'`);
-    }
 
     return this.statImpl(`stat '${p}'`, resolvedP, opts);
   }
 
-  async fstatPromise(fd: number): Promise<Stats>;
-  async fstatPromise(fd: number, opts: {bigint: true}): Promise<BigIntStats>;
-  async fstatPromise(fd: number, opts?: {bigint: boolean}): Promise<BigIntStats | Stats>;
+  async fstatPromise(fd: number): Promise<Stats>
+  async fstatPromise(fd: number, opts: {bigint: true}): Promise<BigIntStats>
+  async fstatPromise(fd: number, opts?: {bigint: boolean}): Promise<BigIntStats | Stats>
   async fstatPromise(fd: number, opts?: {bigint: boolean}) {
     return this.fstatSync(fd, opts);
   }
 
-  fstatSync(fd: number): Stats;
-  fstatSync(fd: number, opts: {bigint: true}): BigIntStats;
-  fstatSync(fd: number, opts?: {bigint: boolean}): BigIntStats | Stats;
+  fstatSync(fd: number): Stats
+  fstatSync(fd: number, opts: {bigint: true}): BigIntStats
+  fstatSync(fd: number, opts?: {bigint: boolean}): BigIntStats | Stats
   fstatSync(fd: number, opts?: {bigint: boolean}) {
     const entry = this.fds.get(fd);
     if (typeof entry === `undefined`)
@@ -964,10 +962,10 @@ export class ZipFS extends BasePortableFakeFS {
     return (attributes & S_IFMT) === S_IFLNK;
   }
 
-  private getFileSource(index: number): Buffer;
-  private getFileSource(index: number, opts: {asyncDecompress: false}): Buffer;
-  private getFileSource(index: number, opts: {asyncDecompress: true}): Promise<Buffer>;
-  private getFileSource(index: number, opts: {asyncDecompress: boolean}): Promise<Buffer> | Buffer;
+  private getFileSource(index: number): Buffer
+  private getFileSource(index: number, opts: {asyncDecompress: false}): Buffer
+  private getFileSource(index: number, opts: {asyncDecompress: true}): Promise<Buffer>
+  private getFileSource(index: number, opts: {asyncDecompress: boolean}): Promise<Buffer> | Buffer
   private getFileSource(index: number, opts: {asyncDecompress: boolean} = {asyncDecompress: false}): Promise<Buffer> | Buffer {
     const cachedFileSource = this.fileSources.get(index);
     if (typeof cachedFileSource !== `undefined`)
@@ -1408,10 +1406,10 @@ export class ZipFS extends BasePortableFakeFS {
     return encoding ? data.toString(encoding) : data;
   }
 
-  private readFileBuffer(p: FSPath<PortablePath>): Buffer;
-  private readFileBuffer(p: FSPath<PortablePath>, opts: {asyncDecompress: false}): Buffer;
-  private readFileBuffer(p: FSPath<PortablePath>, opts: {asyncDecompress: true}): Promise<Buffer>;
-  private readFileBuffer(p: FSPath<PortablePath>, opts: {asyncDecompress: boolean}): Promise<Buffer> | Buffer;
+  private readFileBuffer(p: FSPath<PortablePath>): Buffer
+  private readFileBuffer(p: FSPath<PortablePath>, opts: {asyncDecompress: false}): Buffer
+  private readFileBuffer(p: FSPath<PortablePath>, opts: {asyncDecompress: true}): Promise<Buffer>
+  private readFileBuffer(p: FSPath<PortablePath>, opts: {asyncDecompress: boolean}): Promise<Buffer> | Buffer
   private readFileBuffer(p: FSPath<PortablePath>, opts: {asyncDecompress: boolean} = {asyncDecompress: false}): Buffer | Promise<Buffer> {
     if (typeof p === `number`)
       p = this.fdToPath(p, `read`);
