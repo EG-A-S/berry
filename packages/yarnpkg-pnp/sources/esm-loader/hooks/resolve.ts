@@ -39,20 +39,22 @@ export async function resolve(
   if (!pnpapi)
     return nextResolve(originalSpecifier, context, nextResolve);
 
-  if (specifier.startsWith('#')) {
+  if (specifier.startsWith(`#`)) {
     const issuerLocator = pnpapi.findPackageLocator(issuer);
-    const resolved = issuerLocator
-      ? pnpapi.resolveToUnqualified(`${issuerLocator.name}/package.json`, issuer)
-      : null;
-
+    const resolved = issuerLocator ? pnpapi.resolveToUnqualified(`${issuerLocator.name}/package.json`, issuer) : null;
     if (resolved) {
       const content = await loaderUtils.tryReadFile(resolved);
-
       if (content) {
         const pkg = JSON.parse(content);
-
-        if (typeof pkg.imports[specifier] === 'string') {
-          specifier = path.join(path.dirname(resolved), pkg.imports[specifier]);
+        if (pkg.imports != null && typeof pkg.imports === `object`) {
+          const [prefix, ...rest] = specifier.split(`/`);
+          const paths = Object.keys(pkg.imports ?? {});
+          const match = paths.find(path => path.startsWith(prefix));
+          if (match && match.endsWith(`/*`)) {
+            specifier = path.join(path.dirname(resolved), pkg.imports[match].replace(`*`, rest.join(`/`)));
+          } else if (match) {
+            specifier = path.join(path.dirname(resolved), pkg.imports[match]);
+          }
         }
       }
     }
@@ -77,7 +79,7 @@ export async function resolve(
     if (!doResolveWithTypeScriptCompatLayer)
       throw error;
 
-    const compatSpecifier = specifier.replace(/\.j(sx?)$/, '.t$1');
+    const compatSpecifier = specifier.replace(/\.j(sx?)$/, `.t$1`);
 
     result = pnpapi.resolveRequest(compatSpecifier, issuer, {
       conditions: new Set(conditions),
