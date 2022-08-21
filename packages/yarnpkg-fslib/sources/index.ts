@@ -3,12 +3,14 @@ import * as statUtils from './statUtils';
 
 export {constants};
 
-export {LinkStrategy} from './algorithms/copyPromise';
-export {opendir}      from './algorithms/opendir';
+export type {LinkStrategy} from './algorithms/copyPromise';
+export {setupCopyIndex}    from './algorithms/copyPromise';
+export {opendir}           from './algorithms/opendir';
 
 export {statUtils};
 
 export {normalizeLineEndings}          from './FakeFS';
+export type {BufferEncodingOrBuffer}   from './FakeFS';
 export type {CreateReadStreamOptions}  from './FakeFS';
 export type {CreateWriteStreamOptions} from './FakeFS';
 export type {Dirent, Dir, SymlinkType} from './FakeFS';
@@ -46,7 +48,7 @@ export {VirtualFS}                 from './VirtualFS';
 export {ZipFS}                     from './ZipFS';
 export {ZipOpenFS}                 from './ZipOpenFS';
 
-export {patchFs, extendFs} from './patchFs';
+export {patchFs, extendFs} from './patchFs/patchFs';
 
 export {xfs} from './xfs';
 export type {XFS} from './xfs';

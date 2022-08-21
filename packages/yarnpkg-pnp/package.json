@@ -1,21 +1,22 @@
 {
   "name": "@yarnpkg/pnp",
-  "version": "4.0.0-rc.11",
+  "version": "4.0.0-rc.14",
+  "stableVersion": "3.2.2",
   "license": "BSD-2-Clause",
   "main": "./sources/index.ts",
   "dependencies": {
-    "@types/node": "^13.7.0",
+    "@types/node": "^18.7.6",
     "@yarnpkg/fslib": "workspace:^"
   },
   "devDependencies": {
     "@rollup/plugin-commonjs": "^21.0.1",
     "@rollup/plugin-node-resolve": "^11.0.1",
     "@yarnpkg/libzip": "workspace:^",
-    "esbuild": "^0.14.47",
+    "esbuild": "^0.15.5",
     "resolve.exports": "^1.1.0",
     "rollup": "^2.59.0",
     "rollup-plugin-esbuild": "^3.0.2",
-    "tslib": "^1.13.0"
+    "tslib": "^2.4.0"
   },
   "scripts": {
     "build:pnp:hook": "rollup -c",
@@ -40,6 +41,5 @@
   },
   "engines": {
     "node": ">=14.15.0"
-  },
-  "stableVersion": "3.2.0"
+  }
 }

@@ -1,17 +1,18 @@
 {
   "name": "@yarnpkg/esbuild-plugin-pnp",
-  "version": "3.0.0-rc.11",
+  "version": "3.0.0-rc.14",
+  "stableVersion": "2.0.3",
   "license": "BSD-2-Clause",
   "main": "./sources/index.ts",
   "dependencies": {
-    "tslib": "^1.13.0"
+    "tslib": "^2.4.0"
   },
   "peerDependencies": {
     "esbuild": ">=0.10.0"
   },
   "devDependencies": {
     "@yarnpkg/pnp": "workspace:^",
-    "esbuild": "^0.14.47"
+    "esbuild": "^0.15.5"
   },
   "scripts": {
     "postpack": "rm -rf lib",
@@ -32,6 +33,5 @@
   },
   "engines": {
     "node": ">=14.15.0"
-  },
-  "stableVersion": "2.0.1"
+  }
 }

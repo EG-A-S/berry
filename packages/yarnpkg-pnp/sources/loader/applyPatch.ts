@@ -1,13 +1,13 @@
-import {FakeFS, PosixFS, npath, patchFs, PortablePath, NativePath} from '@yarnpkg/fslib';
-import fs                                                          from 'fs';
-import {Module}                                                    from 'module';
-import {URL, fileURLToPath, pathToFileURL}                         from 'url';
+import {FakeFS, PosixFS, npath, patchFs, PortablePath, NativePath, VirtualFS} from '@yarnpkg/fslib';
+import fs                                                                     from 'fs';
+import {Module}                                                               from 'module';
+import {URL, fileURLToPath, pathToFileURL}                                    from 'url';
 
-import {PnpApi}                                                    from '../types';
+import {PnpApi}                                                               from '../types';
 
-import {ErrorCode, makeError, getIssuerModule}                     from './internalTools';
-import {Manager}                                                   from './makeManager';
-import * as nodeUtils                                              from './nodeUtils';
+import {ErrorCode, makeError, getIssuerModule}                                from './internalTools';
+import {Manager}                                                              from './makeManager';
+import * as nodeUtils                                                         from './nodeUtils';
 
 export type ApplyPatchOptions = {
   fakeFs: FakeFS<PortablePath>;
@@ -19,12 +19,20 @@ type PatchedModule = Module & {
   isLoading?: boolean;
 };
 
+declare global {
+  module NodeJS {
+    interface Process {
+      dlopen: (module: Object, filename: string, flags?: number) => void;
+    }
+  }
+}
+
 export function applyPatch(pnpapi: PnpApi, opts: ApplyPatchOptions) {
   /**
    * The cache that will be used for all accesses occurring outside of a PnP context.
    */
 
-  const defaultCache: NodeJS.NodeRequireCache = {};
+  const defaultCache: NodeJS.Dict<NodeModule> = {};
 
   /**
    * Used to disable the resolution hooks (for when we want to fallback to the previous resolution - we then need
@@ -33,7 +41,6 @@ export function applyPatch(pnpapi: PnpApi, opts: ApplyPatchOptions) {
 
   let enableNativeHooks = true;
 
-  // @ts-expect-error
   process.versions.pnp = String(pnpapi.VERSIONS.std);
 
   const moduleExports = require(`module`);
@@ -415,6 +422,17 @@ export function applyPatch(pnpapi: PnpApi, opts: ApplyPatchOptions) {
     originalExtensionJSFunction.call(this, module, filename);
   };
 
+  const originalDlopen = process.dlopen;
+  process.dlopen = function (...args) {
+    const [module, filename, ...rest] = args;
+    return originalDlopen.call(
+      this,
+      module,
+      npath.fromPortablePath(VirtualFS.resolveVirtual(npath.toPortablePath(filename))),
+      ...rest,
+    );
+  };
+
   Module._extensions[`.mjs`] = function (module: Module, filename: string) {
     transpile(module, filename, `js`);
   };
@@ -479,7 +497,7 @@ export function applyPatch(pnpapi: PnpApi, opts: ApplyPatchOptions) {
   // Since that doesn't provide any value we suppress the warning.
   const originalEmit = process.emit;
   // @ts-expect-error - TS complains about the return type of originalEmit.apply
-  process.emit = function (name, data, ...args) {
+  process.emit = function (name, data: any, ...args) {
     if (
       name === `warning` &&
       typeof data === `object` &&

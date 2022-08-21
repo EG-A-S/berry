@@ -12,7 +12,7 @@ import v8                                                               from 'v8
 import zlib                                                             from 'zlib';
 
 import {Cache, CacheOptions}                                            from './Cache';
-import {Configuration, FormatType}                                      from './Configuration';
+import {Configuration}                                                  from './Configuration';
 import {Fetcher, FetchOptions}                                          from './Fetcher';
 import {Installer, BuildDirective, BuildType, InstallStatus}            from './Installer';
 import {LegacyMigrationResolver}                                        from './LegacyMigrationResolver';
@@ -130,11 +130,6 @@ export type InstallOptions = {
    * install has completed.
    */
   persistProject?: boolean;
-
-  /**
-   * @deprecated Use `mode=skip-build`
-   */
-  skipBuild?: never;
 };
 
 const INSTALL_STATE_FIELDS = {
@@ -395,10 +390,6 @@ export class Project {
           continue;
 
         const workspace = await this.addWorkspace(workspaceCwd);
-
-        const workspacePkg = this.storedPackages.get(workspace.anchoredLocator.locatorHash);
-        if (workspacePkg)
-          workspace.dependencies = workspacePkg.dependencies;
 
         for (const workspaceCwd of workspace.workspacesCwds) {
           workspaceCwds.push(workspaceCwd);
@@ -837,7 +828,7 @@ export class Project {
 
         const finalResolution = candidateResolutions[0];
         if (typeof finalResolution === `undefined`)
-          throw new Error(`${structUtils.prettyDescriptor(this.configuration, descriptor)}: No candidates found`);
+          throw new ReportError(MessageName.RESOLUTION_FAILED, `${structUtils.prettyDescriptor(this.configuration, descriptor)}: No candidates found`);
 
         if (opts.checkResolutions) {
           const {locators} = await noLockfileResolver.getSatisfying(descriptor, resolvedDependencies, [finalResolution], {...resolveOptions, resolver: noLockfileResolver});
@@ -931,7 +922,7 @@ export class Project {
           }-${
             process.arch
           }) is supported by this package, but is missing from the ${
-            formatUtils.pretty(this.configuration, `supportedArchitectures`, FormatType.SETTING)
+            formatUtils.pretty(this.configuration, `supportedArchitectures`, formatUtils.Type.SETTING)
           } setting`);
         }
 
@@ -1046,7 +1037,7 @@ export class Project {
     };
 
     const fetcher = optFetcher || this.configuration.makeFetcher();
-    const fetcherOptions: FetchOptions = {checksums: this.storedChecksums, project: this, cache, fetcher, report, skipIntegrityCheck: true, cacheOptions};
+    const fetcherOptions: FetchOptions = {checksums: this.storedChecksums, project: this, cache, fetcher, report, cacheOptions};
 
     const linkers = this.configuration.getLinkers();
     const linkerOptions: LinkOptions = {project: this, report};
