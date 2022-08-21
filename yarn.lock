@@ -2533,11 +2533,11 @@ __metadata:
   linkType: hard
 
 "@iconify/icons-logos@npm:^1.2.10":
-  version: 1.2.15
-  resolution: "@iconify/icons-logos@npm:1.2.15"
+  version: 1.2.10
+  resolution: "@iconify/icons-logos@npm:1.2.10"
   dependencies:
-    "@iconify/types": "*"
-  checksum: 79ba3a93bc49dcc614a9dc022c246e507b4801f63d2c33a0d97206d0a4c96b1b0dad10e68bbd4e6097c66bd0931f0ffa439639e183ee62a939ead9be34d1d2ca
+    "@iconify/types": "npm:*"
+  checksum: 002d292859c7815f811a385dec7a7d7d691791b155b585ebbc9fade1e4ca9f9ec57a11af68b7003bfccace74e2b9b057e76e548bd9fa2183f828a884f0d012db
   languageName: node
   linkType: hard
 

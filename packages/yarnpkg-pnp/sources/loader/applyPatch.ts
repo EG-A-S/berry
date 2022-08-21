@@ -463,8 +463,9 @@ export function applyPatch(pnpapi: PnpApi, opts: ApplyPatchOptions) {
       loader,
       format: `cjs`,
       target: `esnext`,
-      jsxFactory: `h`,
-      jsxFragment: `Fragment`,
+      jsx: `automatic`,
+      jsxDev: process.env.NODE_ENV === `development`,
+      jsxImportSource: `preact`,
       define: {
         'import.meta.url': importMetaURL,
       },

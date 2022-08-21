@@ -45,7 +45,7 @@ export function getFileFormat(filepath: string): string | null {
     case `.wasm`: {
       // TODO: Enable if --experimental-wasm-modules is present
       // Waiting on https://github.com/nodejs/node/issues/36935
-      return 'module';
+      return `module`;
     }
     case `.json`: {
       // TODO: Enable if --experimental-json-modules is present
@@ -89,8 +89,9 @@ export async function readSource(url: URL): Promise<string> {
 
     return (await esbuild.transform(content, {
       format: `esm`,
-      jsxFactory: `h`,
-      jsxFragment: `Fragment`,
+      jsx: `automatic`,
+      jsxDev: process.env.NODE_ENV === `development`,
+      jsxImportSource: `preact`,
       loader: ext === `.tsx` ? `tsx` : `ts`,
       target: `esnext`,
     })).code;
