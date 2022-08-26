@@ -37338,10 +37338,12 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
             ["@yarnpkg/fslib", "workspace:packages/yarnpkg-fslib"],\
             ["@yarnpkg/monorepo", "workspace:."],\
             ["@yarnpkg/parsers", "workspace:packages/yarnpkg-parsers"],\
+            ["@yarnpkg/pnp", "workspace:packages/yarnpkg-pnp"],\
             ["lodash", "npm:4.17.21"],\
             ["pkg-tests-core", "workspace:packages/acceptance-tests/pkg-tests-core"],\
             ["semver", "npm:7.3.7"],\
-            ["tar", "npm:6.1.11"]\
+            ["tar", "npm:6.1.11"],\
+            ["tslib", "npm:2.4.0"]\
           ],\
           "linkType": "SOFT"\
         }]\
