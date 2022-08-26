@@ -102,8 +102,5 @@ export async function readSource(url: URL): Promise<string> {
     })).code;
   }
 
-  if (ext === `.json`)
-    return `const data = ${content};export default data;`;
-
   return content;
 }
