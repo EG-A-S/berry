@@ -479,7 +479,7 @@ export function applyPatch(pnpapi: PnpApi, opts: ApplyPatchOptions) {
       module.exports = defaultExports;
 
       if (/[/\\]node_modules[/\\]chalk[/\\]/.test(filename)) {
-        module.exports.default = defaultExports;
+        Object.defineProperty(module.exports, `default`, {value: defaultExports});
       } else if (loader === `js`) {
         for (const key in originalModuleExports) {
           module.exports[key] = originalModuleExports[key];

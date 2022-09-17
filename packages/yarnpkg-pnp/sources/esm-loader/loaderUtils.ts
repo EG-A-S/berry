@@ -32,7 +32,7 @@ export function setEntrypointPath(file: NativePath) {
   entrypointPath = file;
 }
 
-const forcedModulePackages = new Set(['fp-ts']);
+const forcedModulePackages = new Set([`fp-ts`]);
 
 export function getFileFormat(filepath: string): string | null {
   const ext = path.extname(filepath);
@@ -64,7 +64,7 @@ export function getFileFormat(filepath: string): string | null {
       // assume CJS for files outside of a package boundary
       if (!pkg)
         return `commonjs`;
-      return forcedModulePackages.has(pkg.data.name) ? 'module' : pkg.data.type ?? `commonjs`;
+      return forcedModulePackages.has(pkg.data.name) ? `module` : pkg.data.type ?? `commonjs`;
     }
     // Matching files beyond those handled above deviates from Node's default
     // --experimental-loader behavior but is required to work around
