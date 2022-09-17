@@ -36,7 +36,7 @@ export class NodeModulesFS extends ProxiedFS<NativePath, PortablePath> {
   }
 }
 
-interface PortableNodeModulesFSOptions extends NodeModulesTreeOptions {
+export interface PortableNodeModulesFSOptions extends NodeModulesTreeOptions {
   baseFs?: FakeFS<PortablePath>;
   pnpifyFs?: boolean;
 }
@@ -376,6 +376,14 @@ export class PortableNodeModulesFS extends FakeFS<PortablePath> {
 
   chmodSync(p: PortablePath, mask: number) {
     return this.baseFs.chmodSync(this.resolveDirOrFilePath(p), mask);
+  }
+
+  async fchownPromise(fd: number, uid: number, gid: number): Promise<void> {
+    return this.baseFs.fchownPromise(this.resolveDirOrFilePath(fd), uid, gid);
+  }
+
+  fchownSync(fd: number, uid: number, gid: number): void {
+    return this.baseFs.fchownSync(this.resolveDirOrFilePath(fd), uid, gid);
   }
 
   async chownPromise(p: PortablePath, uid: number, gid: number) {

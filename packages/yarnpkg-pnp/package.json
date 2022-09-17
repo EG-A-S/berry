@@ -1,9 +1,14 @@
 {
   "name": "@yarnpkg/pnp",
-  "version": "4.0.0-rc.15",
+  "version": "4.0.0-rc.18",
   "stableVersion": "3.2.2",
   "license": "BSD-2-Clause",
   "main": "./sources/index.ts",
+  "exports": {
+    ".": "./sources/index.ts",
+    "./sources/esm-loader/loaderFlags": "./sources/esm-loader/loaderFlags.ts",
+    "./package.json": "./package.json"
+  },
   "dependencies": {
     "@types/node": "^18.7.6",
     "@yarnpkg/fslib": "workspace:^"
@@ -12,7 +17,7 @@
     "@rollup/plugin-commonjs": "^21.0.1",
     "@rollup/plugin-node-resolve": "^11.0.1",
     "@yarnpkg/libzip": "workspace:^",
-    "esbuild": "^0.15.5",
+    "esbuild": "^0.15.7",
     "resolve.exports": "^1.1.0",
     "rollup": "^2.59.0",
     "rollup-plugin-esbuild": "^3.0.2",
@@ -29,7 +34,10 @@
   },
   "publishConfig": {
     "main": "./lib/index.js",
-    "types": "./lib/index.d.ts"
+    "exports": {
+      ".": "./lib/index.js",
+      "./package.json": "./package.json"
+    }
   },
   "files": [
     "/lib/**/*"
