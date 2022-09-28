@@ -3,6 +3,7 @@ import fs                                                                     fr
 import {Module}                                                               from 'module';
 import {URL, fileURLToPath, pathToFileURL}                                    from 'url';
 
+import {convertMapsToIndexableObjects}                                        from '../../../yarnpkg-core/sources/miscUtils';
 import {PnpApi}                                                               from '../types';
 
 import {ErrorCode, makeError, getIssuerModule}                                from './internalTools';
@@ -476,9 +477,9 @@ export function applyPatch(pnpapi: PnpApi, opts: ApplyPatchOptions) {
     if ((`default` in module.exports)) {
       const defaultExports = module.exports.default;
       const originalModuleExports = module.exports;
-      module.exports = defaultExports;
+      module.exports = typeof defaultExports === `string` ? {} : defaultExports;
 
-      if (/[/\\]node_modules[/\\]chalk[/\\]/.test(filename)) {
+      if (/[/\\]node_modules[/\\](?:chalk|clean-stack)[/\\]/.test(filename)) {
         Object.defineProperty(module.exports, `default`, {value: defaultExports});
       } else if (loader === `js`) {
         for (const key in originalModuleExports) {
