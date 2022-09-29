@@ -5944,7 +5944,7 @@ __metadata:
     esbuild: ^0.15.7
     semver: ^7.1.2
     tslib: ^2.4.0
-    typescript: 4.8.1-rc
+    typescript: 4.9.1-beta
   bin:
     builder: ./sources/boot-cli-dev.js
   languageName: unknown
@@ -6062,7 +6062,7 @@ __metadata:
     micromatch: ^4.0.2
     p-limit: ^2.2.0
     tslib: ^2.4.0
-    typescript: 4.8.1-rc
+    typescript: 4.9.1-beta
   bin:
     doctor: ./sources/boot-cli-dev.js
   languageName: unknown
@@ -6205,7 +6205,7 @@ __metadata:
     typedoc: 0.17.0-3
     typedoc-neo-theme: ^1.0.7
     typedoc-plugin-yarn: "portal:./typedoc-plugin-yarn"
-    typescript: 4.8.1-rc
+    typescript: 4.9.1-beta
     unescape-html: ^1.1.0
     unfetch: ^4.1.0
     unified: ^7.1.0
@@ -6258,13 +6258,14 @@ __metadata:
     "@yarnpkg/core": "workspace:^"
     "@yarnpkg/eslint-config": "workspace:^"
     "@yarnpkg/fslib": "workspace:^"
+    "@yarnpkg/libzip": "workspace:^"
     "@yarnpkg/sdks": "workspace:^"
     clipanion: ^3.2.0-rc.10
     esbuild: ^0.15.7
     eslint: ^8.2.0
     jest: ^28.1.3
     tslib: ^2.4.0
-    typescript: 4.8.1-rc
+    typescript: 4.9.1-beta
   dependenciesMeta:
     core-js:
       built: false
@@ -25300,13 +25301,13 @@ __metadata:
   languageName: node
   linkType: hard
 
-"typescript@npm:4.8.1-rc":
-  version: 4.8.1-rc
-  resolution: "typescript@npm:4.8.1-rc"
+"typescript@npm:4.9.1-beta":
+  version: 4.9.1-beta
+  resolution: "typescript@npm:4.9.1-beta"
   bin:
     tsc: bin/tsc
     tsserver: bin/tsserver
-  checksum: 1c8fdbdb63588078108eb993cadc005459cbea2163f9cadefc1f55bcf9fc9b5c5ea0db9a4dfbf70178d20056b6828486d613dae5b6f6eec5ecc6482e207e90a4
+  checksum: e024fb9fb4abd95c2b2fa877ec9b3aab833a388690709d2e12aef0a9adc12be95fb2f9410b479a5b3c277c240b026e92e82227a5e4ece1868b57ce5be6f45cef
   languageName: node
   linkType: hard
 
