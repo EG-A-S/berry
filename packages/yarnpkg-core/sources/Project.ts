@@ -532,20 +532,6 @@ export class Project {
     return workspace;
   }
 
-  /**
-   * Import the dependencies of each resolved workspace into their own
-   * `Workspace` instance.
-   */
-  private refreshWorkspaceDependencies() {
-    for (const workspace of this.workspaces) {
-      const pkg = this.storedPackages.get(workspace.anchoredLocator.locatorHash);
-      if (!pkg)
-        throw new Error(`Assertion failed: Expected workspace ${structUtils.prettyWorkspace(this.configuration, workspace)} (${formatUtils.pretty(this.configuration, ppath.join(workspace.cwd, Filename.manifest), formatUtils.Type.PATH)}) to have been resolved. Run "yarn install" to update the lockfile`);
-
-      workspace.dependencies = new Map(pkg.dependencies);
-    }
-  }
-
   forgetResolution(descriptor: Descriptor): void;
   forgetResolution(locator: Locator): void;
   forgetResolution(dataStructure: Descriptor | Locator): void {
@@ -949,11 +935,6 @@ export class Project {
     this.originalPackages = originalPackages;
     this.optionalBuilds = optionalBuilds;
     this.peerRequirements = peerRequirements;
-
-    // Now that the internal resolutions have been updated, we can refresh the
-    // dependencies of each resolved workspace's `Workspace` instance.
-
-    this.refreshWorkspaceDependencies();
   }
 
   async fetchEverything({cache, report, fetcher: userFetcher, mode}: InstallOptions) {
@@ -988,7 +969,7 @@ export class Project {
     let firstError = false;
 
     const progress = Report.progressViaCounter(locatorHashes.length);
-    report.reportProgress(progress);
+    await report.reportProgress(progress);
 
     const limit = pLimit(FETCHER_CONCURRENCY);
 
@@ -1814,7 +1795,6 @@ export class Project {
     if (restoreResolutions) {
       if (installState.lockFileChecksum === this.lockFileChecksum) {
         Object.assign(this, pick(installState, INSTALL_STATE_FIELDS.restoreResolutions));
-        this.refreshWorkspaceDependencies();
       } else {
         await this.applyLightResolution();
       }
