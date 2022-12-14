@@ -6266,10 +6266,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/node@npm:*, @types/node@npm:>= 8, @types/node@npm:^18.7.6":
-  version: 18.11.9
-  resolution: "@types/node@npm:18.11.9"
-  checksum: 7b7d90894dd1ae9b6836e49ace5bdea55cc08806a508e38851e333f1ad77ec81ea6dca58e6a2444ad0471fee965b9908cc1ef06028eebca9c20d54729df98bab
+"@types/node@npm:*, @types/node@npm:^18.11.11":
+  version: 18.11.11
+  resolution: "@types/node@npm:18.11.11"
+  checksum: 7ff6dfb616544cf046b95a988435b2eddf31ea839864454fedb9b0512bbe0b9abbf7f61c3e9d3c6160b626ec8d15cf6b2255a242827ba8e599c5525952b696a5
   languageName: node
   linkType: hard
 
@@ -6277,6 +6277,13 @@ __metadata:
   version: 16.9.1
   resolution: "@types/node@npm:16.9.1"
   checksum: a1c1fbda0467f11f42c50621a0d65890c0a27da8458cf3107e18b7259b420bf3812793a19191d36ab83a624cd267af2c97ba70bedc6f46c37a8f57f22c120b83
+  languageName: node
+  linkType: hard
+
+"@types/node@npm:>= 8":
+  version: 18.11.9
+  resolution: "@types/node@npm:18.11.9"
+  checksum: 7b7d90894dd1ae9b6836e49ace5bdea55cc08806a508e38851e333f1ad77ec81ea6dca58e6a2444ad0471fee965b9908cc1ef06028eebca9c20d54729df98bab
   languageName: node
   linkType: hard
 
@@ -7402,10 +7409,10 @@ __metadata:
     "@yarnpkg/monorepo": "workspace:^"
     chalk: "npm:^3.0.0"
     clipanion: "npm:^3.2.0-rc.10"
-    esbuild: "npm:^0.15.7"
+    esbuild: "npm:esbuild-wasm@^0.15.15"
     semver: "npm:^7.1.2"
     tslib: "npm:^2.4.0"
-    typescript: "npm:4.9.2-rc"
+    typescript: "npm:4.9.4"
   bin:
     builder: ./sources/boot-cli-dev.js
   languageName: unknown
@@ -7470,7 +7477,7 @@ __metadata:
     "@types/diff": "npm:^5.0.0"
     "@types/lodash": "npm:^4.14.136"
     "@types/micromatch": "npm:^4.0.1"
-    "@types/node": "npm:^18.7.6"
+    "@types/node": "npm:^18.11.11"
     "@types/semver": "npm:^7.1.0"
     "@types/tar": "npm:^4.0.4"
     "@types/treeify": "npm:^1.0.0"
@@ -7490,7 +7497,7 @@ __metadata:
     comment-json: "npm:^2.2.0"
     cross-spawn: "npm:7.0.3"
     diff: "npm:^5.1.0"
-    esbuild: "npm:^0.15.7"
+    esbuild: "npm:esbuild-wasm@^0.15.15"
     globby: "npm:^11.0.1"
     got: "npm:^11.7.0"
     lodash: "npm:^4.17.15"
@@ -7523,7 +7530,7 @@ __metadata:
     micromatch: "npm:^4.0.2"
     p-limit: "npm:^2.2.0"
     tslib: "npm:^2.4.0"
-    typescript: "npm:4.9.2-rc"
+    typescript: "npm:4.9.4"
   bin:
     doctor: ./sources/boot-cli-dev.js
   languageName: unknown
@@ -7702,7 +7709,7 @@ __metadata:
     tslib: "npm:^2.4.0"
     typedoc: "patch:typedoc@npm%3A0.17.0-3#~/.yarn/patches/typedoc-npm-0.17.0-3-0ce05847cf.patch"
     typedoc-neo-theme: "npm:^1.0.7"
-    typescript: "npm:4.9.2-rc"
+    typescript: "npm:4.9.4"
     unescape-html: "npm:^1.1.0"
     unfetch: "npm:^4.1.0"
     unified: "npm:^7.1.0"
@@ -7750,7 +7757,7 @@ __metadata:
     "@babel/preset-typescript": "npm:^7.18.6"
     "@babel/register": "npm:^7.18.9"
     "@types/jest": "npm:^28.1.6"
-    "@types/node": "npm:^18.7.6"
+    "@types/node": "npm:^18.11.11"
     "@yarnpkg/cli": "workspace:^"
     "@yarnpkg/core": "workspace:^"
     "@yarnpkg/eslint-config": "workspace:^"
@@ -7762,7 +7769,7 @@ __metadata:
     eslint: "npm:^8.2.0"
     jest: "npm:^29.2.1"
     tslib: "npm:^2.4.0"
-    typescript: "npm:4.9.2-rc"
+    typescript: "npm:4.9.4"
   dependenciesMeta:
     core-js:
       built: false
@@ -8250,10 +8257,10 @@ __metadata:
   dependencies:
     "@rollup/plugin-commonjs": "npm:^21.0.1"
     "@rollup/plugin-node-resolve": "npm:^11.0.1"
-    "@types/node": "npm:^18.7.6"
+    "@types/node": "npm:^18.11.11"
     "@yarnpkg/fslib": "workspace:^"
     "@yarnpkg/libzip": "workspace:^"
-    esbuild: "npm:^0.15.7"
+    esbuild: "npm:esbuild-wasm@^0.15.15"
     resolve.exports: "npm:^1.1.0"
     rollup: "npm:^2.59.0"
     rollup-plugin-esbuild: "npm:^3.0.2"
@@ -13131,10 +13138,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"es6-promisify@npm:^6.0.0":
-  version: 6.1.1
-  resolution: "es6-promisify@npm:6.1.1"
-  checksum: 945d91cf71d723b1c1f796a66d6a0fadb7a6458d18f5a9f8ef05e76fb737950b680db77f35979353de478a82a03ff75b8696726682bb5e4d786af727eb4e29f6
+"es6-promisify@npm:^7.0.0":
+  version: 7.0.0
+  resolution: "es6-promisify@npm:7.0.0"
+  checksum: e206d3fbcf8cc56efe94f4ae1719bcc57459f8502d9c3d2ad17596aa86974a7855465a1c45d330aa399834ebc37b93e5c20b1b98321b2b37679f55cddbc86991
   languageName: node
   linkType: hard
 
@@ -13393,12 +13400,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"esbuild@npm:esbuild-wasm@^0.15.7":
-  version: 0.15.13
-  resolution: "esbuild-wasm@npm:0.15.13"
+"esbuild@npm:esbuild-wasm@^0.15.15":
+  version: 0.15.15
+  resolution: "esbuild-wasm@npm:0.15.15"
   bin:
     esbuild: bin/esbuild
-  checksum: baec7bd7f18ab04d6b29a8f240945d35a5805b2fad1cf7c98651c2638361f6ef1ba6010e6b1e3601016f0edc684043776f5f243dfe618b99425c7dd48f2d4bbb
+  checksum: 965efb09e7846cb8aa705c25a4c2ecac92e74b09da1a628ac1fe45f3d9061a2a08892f2c8990a2e1a442bdbbbc03382caaeb66f4ea0994e8be9911b35ccc0a5e
   languageName: node
   linkType: hard
 
@@ -20183,7 +20190,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"md5@npm:^2.2.1":
+"md5@npm:^2.3.0":
   version: 2.3.0
   resolution: "md5@npm:2.3.0"
   dependencies:
@@ -22357,7 +22364,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"os-tmpdir@npm:^1.0.1, os-tmpdir@npm:~1.0.2":
+"os-tmpdir@npm:^1.0.2, os-tmpdir@npm:~1.0.2":
   version: 1.0.2
   resolution: "os-tmpdir@npm:1.0.2"
   checksum: c69d1cc11e9da80f1e2b21a08566fec9a690e4b5bc47b3ac996cfe8d24f4e9e6857779a39a326bf322f2e8bc936ada1a92d48aa10c6dda99c13c551c23bdadfb
@@ -22998,15 +23005,15 @@ __metadata:
   languageName: node
   linkType: hard
 
-"pem@npm:^1.14.4":
-  version: 1.14.6
-  resolution: "pem@npm:1.14.6"
+pem@dexus/pem:
+  version: 1.14.5
+  resolution: "pem@https://github.com/dexus/pem.git#commit=71dae3346801dafb5a8bcebcd4c7267fd182666f"
   dependencies:
-    es6-promisify: "npm:^6.0.0"
-    md5: "npm:^2.2.1"
-    os-tmpdir: "npm:^1.0.1"
+    es6-promisify: "npm:^7.0.0"
+    md5: "npm:^2.3.0"
+    os-tmpdir: "npm:^1.0.2"
     which: "npm:^2.0.2"
-  checksum: e5975a3e958f9637c890ab15fe32364dd1667e6f4f5d9e70f7e5cdd1354fe6305372109e80caf3eaf516c0ca6aec356419d8bae1707ac42b4f3061a698f64569
+  checksum: d47bef66fd22d970b9d9c22ca6effe2aae3f28032f71e9ca67d112dbbcca2b30ebaa0eebcdd294dd766324fe79c7121a5261ecf31dbdcbf9bc6f6a48f2d59914
   languageName: node
   linkType: hard
 
@@ -23138,7 +23145,7 @@ __metadata:
     invariant: "npm:^2.2.4"
     klaw: "npm:^2.1.1"
     minimatch: "npm:^3.0.4"
-    pem: "npm:^1.14.4"
+    pem: dexus/pem
     pkg-tests-fixtures: "workspace:^"
     semver: "npm:^7.1.2"
     serve-static: "npm:^1.14.1"
@@ -28654,13 +28661,13 @@ __metadata:
   languageName: node
   linkType: hard
 
-"typescript@npm:4.9.2-rc":
-  version: 4.9.2-rc
-  resolution: "typescript@npm:4.9.2-rc"
+"typescript@npm:4.9.4":
+  version: 4.9.4
+  resolution: "typescript@npm:4.9.4"
   bin:
     tsc: bin/tsc
     tsserver: bin/tsserver
-  checksum: 4b469f029e38f6f41f9ee5506bc8565cf5eeb489bc2ebcb706c19c2977131b199f4520ae636b6902cf674ce8a4bd9209173ff560555e0ef8c501a94c660a6ae6
+  checksum: b142d5e50785d0e5055771e4d9e712b01be58985ff29be3d3acc64f0fddd5fd8ade8b28583ba502f2565783c23bd5b509c5abcc1a93a2d7d4f05b8e4ee731fc9
   languageName: node
   linkType: hard
 
@@ -29722,7 +29729,7 @@ __metadata:
     "@types/vscode": "npm:^1.54.0"
     "@yarnpkg/fslib": "workspace:^"
     "@yarnpkg/libzip": "workspace:^"
-    esbuild: "npm:esbuild-wasm@^0.15.7"
+    esbuild: "npm:esbuild-wasm@^0.15.15"
     rollup: "npm:^2.59.0"
     rollup-plugin-esbuild: "npm:^3.0.2"
     rollup-plugin-terser: "npm:^7.0.2"
