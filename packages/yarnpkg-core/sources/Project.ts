@@ -200,6 +200,7 @@ export class Project {
   public accessibleLocators: Set<LocatorHash> = new Set();
   public conditionalLocators: Set<LocatorHash> = new Set();
   public disabledLocators: Set<LocatorHash> = new Set();
+  public forcePluggedLocators: Set<LocatorHash> = new Set();
   public originalPackages: Map<LocatorHash, Package> = new Map();
   public optionalBuilds: Set<LocatorHash> = new Set();
 
@@ -903,6 +904,7 @@ export class Project {
 
     const conditionalLocators = new Set<LocatorHash>();
     const disabledLocators = new Set<LocatorHash>();
+    const forcePluggedLocators = new Set<LocatorHash>();
 
     for (const pkg of allPackages.values()) {
       if (pkg.conditions == null)
@@ -927,6 +929,9 @@ export class Project {
         disabledLocators.add(pkg.locatorHash);
       }
 
+      if (!structUtils.isPackageCompatible(pkg, currentArchitecture))
+        forcePluggedLocators.add(pkg.locatorHash);
+
       conditionalLocators.add(pkg.locatorHash);
     }
 
@@ -940,6 +945,7 @@ export class Project {
     this.accessibleLocators = accessibleLocators;
     this.conditionalLocators = conditionalLocators;
     this.disabledLocators = disabledLocators;
+    this.forcePluggedLocators = forcePluggedLocators;
     this.originalPackages = originalPackages;
     this.optionalBuilds = optionalBuilds;
     this.peerRequirements = peerRequirements;

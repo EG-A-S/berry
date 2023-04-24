@@ -49,7 +49,7 @@ export async function load(
 
   return {
     format,
-    source: await fs.promises.readFile(filePath, `utf8`),
+    source: await loaderUtils.readSource(url),
     shortCircuit: true,
   };
 }

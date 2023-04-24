@@ -1,7 +1,7 @@
 import {FakeFS, PosixFS, npath, patchFs, PortablePath, NativePath, VirtualFS} from '@yarnpkg/fslib';
 import fs                                                                     from 'fs';
 import {Module}                                                               from 'module';
-import {URL, fileURLToPath}                                                   from 'url';
+import {URL, fileURLToPath, pathToFileURL}                                    from 'url';
 
 import {PnpApi}                                                               from '../types';
 
@@ -411,11 +411,13 @@ export function applyPatch(pnpapi: PnpApi, opts: ApplyPatchOptions) {
     if (filename.endsWith(`.js`)) {
       const pkg = nodeUtils.readPackageScope(filename);
       if (pkg && pkg.data?.type === `module`) {
-        const err = nodeUtils.ERR_REQUIRE_ESM(filename, module.parent?.filename);
-        Error.captureStackTrace(err);
-        throw err;
+        transpile(module, filename, `js`);
+        return;
       }
     }
+
+    if (filename.endsWith(`.wasm`))
+      filename += `.js`;
 
     originalExtensionJSFunction.call(this, module, filename);
   };
@@ -431,6 +433,61 @@ export function applyPatch(pnpapi: PnpApi, opts: ApplyPatchOptions) {
     );
   };
 
+  Module._extensions[`.mjs`] = function (module: Module, filename: string) {
+    transpile(module, filename, `js`);
+  };
+
+  Module._extensions[`.ts`] = function (module: Module, filename: string) {
+    transpile(module, filename, `ts`);
+  };
+
+  Module._extensions[`.tsx`] = function (module: Module, filename: string) {
+    transpile(module, filename, `tsx`);
+  };
+
+  if (typeof process.env.VSCODE_PID !== `undefined`)
+    process.env.ESBUILD_WORKER_THREADS = `0`;
+
+  let esbuild;
+
+  function transpile(module: Module, filename: string, loader: string) {
+    esbuild ??= process.env.USE_ESBUILD_WASM === `true`
+      ? eval(`require("esbuild-wasm");`)
+      : eval(`require("esbuild");`);
+
+    const source = fs.readFileSync(filename, {encoding: `utf8`});
+
+    const importMetaURL = JSON.stringify(pathToFileURL(filename).href);
+
+    const {code} = esbuild.transformSync(source, {
+      loader,
+      format: `cjs`,
+      target: `esnext`,
+      jsx: `automatic`,
+      jsxDev: process.env.NODE_ENV === `development`,
+      jsxImportSource: `preact`,
+      define: {
+        'import.meta.url': importMetaURL,
+      },
+    });
+
+    module._compile(code, filename);
+
+    if ((`default` in module.exports)) {
+      const defaultExports = module.exports.default;
+      const originalModuleExports = module.exports;
+      module.exports = typeof defaultExports === `string` ? {} : defaultExports;
+
+      if (/[/\\]node_modules[/\\](?:chalk|clean-stack)[/\\]/.test(filename)) {
+        Object.defineProperty(module.exports, `default`, {value: defaultExports});
+      } else if (loader === `js`) {
+        for (const key in originalModuleExports) {
+          module.exports[key] = originalModuleExports[key];
+        }
+      }
+    }
+  }
+
   // When using the ESM loader Node.js prints either of the following warnings
   //
   // - ExperimentalWarning: --experimental-loader is an experimental feature. This feature could change at any time
@@ -445,9 +502,7 @@ export function applyPatch(pnpapi: PnpApi, opts: ApplyPatchOptions) {
     if (
       name === `warning` &&
       typeof data === `object` &&
-      data.name === `ExperimentalWarning` &&
-      (data.message.includes(`--experimental-loader`) ||
-        data.message.includes(`Custom ESM Loaders is an experimental feature`))
+      data.name === `ExperimentalWarning`
     )
       return false;
 

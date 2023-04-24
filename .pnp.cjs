@@ -270,6 +270,7 @@ const RAW_RUNTIME_STATE =
           ["@yarnpkg/libzip", "virtual:b73ceab179a3b4f89c4a5be81bd0c20a80eda623489cb284f304cc8104dbb771916bbc246d0ba809faebd8459cb6554cf114954badb021279ea7aee216456122#workspace:packages/yarnpkg-libzip"],\
           ["@yarnpkg/sdks", "workspace:packages/yarnpkg-sdks"],\
           ["clipanion", "virtual:576bf3e379b293160348e4cadfbd6541796e6f78477b0875c4437065090cec6f78b6ec2281b8e15d1c870d61578dc7dee16a5ae49a65701fec83e592ce2ebdeb#npm:3.2.0-rc.10"],\
+          ["esbuild", "npm:0.17.5"],\
           ["esbuild-wasm", "npm:0.17.5"],\
           ["eslint", "npm:8.2.0"],\
           ["jest", "virtual:e470d99b1e4fdf4c5db5d090ff5472cdeba0404b7ffd31cd2efab3493dd184c67bc45f60c2ef1c040e2c41afe38c6280bffc5df2fbe3aefaa2b6eacf685ab07c#npm:29.2.1"],\
@@ -6299,6 +6300,94 @@ const RAW_RUNTIME_STATE =
           ["@esbuild/android-arm", "npm:0.15.11"]\
         ],\
         "linkType": "HARD"\
+      }],\
+      ["npm:0.17.5", {\
+        "packageLocation": "./.yarn/unplugged/@esbuild-android-arm-npm-0.17.5-08fe60a8dd/node_modules/@esbuild/android-arm/",\
+        "packageDependencies": [\
+          ["@esbuild/android-arm", "npm:0.17.5"]\
+        ],\
+        "linkType": "HARD"\
+      }]\
+    ]],\
+    ["@esbuild/android-arm64", [\
+      ["npm:0.17.5", {\
+        "packageLocation": "./.yarn/unplugged/@esbuild-android-arm64-npm-0.17.5-143b296246/node_modules/@esbuild/android-arm64/",\
+        "packageDependencies": [\
+          ["@esbuild/android-arm64", "npm:0.17.5"]\
+        ],\
+        "linkType": "HARD"\
+      }]\
+    ]],\
+    ["@esbuild/android-x64", [\
+      ["npm:0.17.5", {\
+        "packageLocation": "./.yarn/unplugged/@esbuild-android-x64-npm-0.17.5-774b04697a/node_modules/@esbuild/android-x64/",\
+        "packageDependencies": [\
+          ["@esbuild/android-x64", "npm:0.17.5"]\
+        ],\
+        "linkType": "HARD"\
+      }]\
+    ]],\
+    ["@esbuild/darwin-arm64", [\
+      ["npm:0.17.5", {\
+        "packageLocation": "./.yarn/unplugged/@esbuild-darwin-arm64-npm-0.17.5-147d287e28/node_modules/@esbuild/darwin-arm64/",\
+        "packageDependencies": [\
+          ["@esbuild/darwin-arm64", "npm:0.17.5"]\
+        ],\
+        "linkType": "HARD"\
+      }]\
+    ]],\
+    ["@esbuild/darwin-x64", [\
+      ["npm:0.17.5", {\
+        "packageLocation": "./.yarn/unplugged/@esbuild-darwin-x64-npm-0.17.5-8fc6af3b97/node_modules/@esbuild/darwin-x64/",\
+        "packageDependencies": [\
+          ["@esbuild/darwin-x64", "npm:0.17.5"]\
+        ],\
+        "linkType": "HARD"\
+      }]\
+    ]],\
+    ["@esbuild/freebsd-arm64", [\
+      ["npm:0.17.5", {\
+        "packageLocation": "./.yarn/unplugged/@esbuild-freebsd-arm64-npm-0.17.5-87123710bd/node_modules/@esbuild/freebsd-arm64/",\
+        "packageDependencies": [\
+          ["@esbuild/freebsd-arm64", "npm:0.17.5"]\
+        ],\
+        "linkType": "HARD"\
+      }]\
+    ]],\
+    ["@esbuild/freebsd-x64", [\
+      ["npm:0.17.5", {\
+        "packageLocation": "./.yarn/unplugged/@esbuild-freebsd-x64-npm-0.17.5-4e9bfb0f12/node_modules/@esbuild/freebsd-x64/",\
+        "packageDependencies": [\
+          ["@esbuild/freebsd-x64", "npm:0.17.5"]\
+        ],\
+        "linkType": "HARD"\
+      }]\
+    ]],\
+    ["@esbuild/linux-arm", [\
+      ["npm:0.17.5", {\
+        "packageLocation": "./.yarn/unplugged/@esbuild-linux-arm-npm-0.17.5-81d09d47ec/node_modules/@esbuild/linux-arm/",\
+        "packageDependencies": [\
+          ["@esbuild/linux-arm", "npm:0.17.5"]\
+        ],\
+        "linkType": "HARD"\
+      }]\
+    ]],\
+    ["@esbuild/linux-arm64", [\
+      ["npm:0.17.5", {\
+        "packageLocation": "./.yarn/unplugged/@esbuild-linux-arm64-npm-0.17.5-a6917dc2de/node_modules/@esbuild/linux-arm64/",\
+        "packageDependencies": [\
+          ["@esbuild/linux-arm64", "npm:0.17.5"]\
+        ],\
+        "linkType": "HARD"\
+      }]\
+    ]],\
+    ["@esbuild/linux-ia32", [\
+      ["npm:0.17.5", {\
+        "packageLocation": "./.yarn/unplugged/@esbuild-linux-ia32-npm-0.17.5-eb3652dd75/node_modules/@esbuild/linux-ia32/",\
+        "packageDependencies": [\
+          ["@esbuild/linux-ia32", "npm:0.17.5"]\
+        ],\
+        "linkType": "HARD"\
       }]\
     ]],\
     ["@esbuild/linux-loong64", [\
@@ -6306,6 +6395,112 @@ const RAW_RUNTIME_STATE =
         "packageLocation": "./.yarn/unplugged/@esbuild-linux-loong64-npm-0.15.11-b380a37e51/node_modules/@esbuild/linux-loong64/",\
         "packageDependencies": [\
           ["@esbuild/linux-loong64", "npm:0.15.11"]\
+        ],\
+        "linkType": "HARD"\
+      }],\
+      ["npm:0.17.5", {\
+        "packageLocation": "./.yarn/unplugged/@esbuild-linux-loong64-npm-0.17.5-893127d731/node_modules/@esbuild/linux-loong64/",\
+        "packageDependencies": [\
+          ["@esbuild/linux-loong64", "npm:0.17.5"]\
+        ],\
+        "linkType": "HARD"\
+      }]\
+    ]],\
+    ["@esbuild/linux-mips64el", [\
+      ["npm:0.17.5", {\
+        "packageLocation": "./.yarn/unplugged/@esbuild-linux-mips64el-npm-0.17.5-d49c8b1c80/node_modules/@esbuild/linux-mips64el/",\
+        "packageDependencies": [\
+          ["@esbuild/linux-mips64el", "npm:0.17.5"]\
+        ],\
+        "linkType": "HARD"\
+      }]\
+    ]],\
+    ["@esbuild/linux-ppc64", [\
+      ["npm:0.17.5", {\
+        "packageLocation": "./.yarn/unplugged/@esbuild-linux-ppc64-npm-0.17.5-08cd192629/node_modules/@esbuild/linux-ppc64/",\
+        "packageDependencies": [\
+          ["@esbuild/linux-ppc64", "npm:0.17.5"]\
+        ],\
+        "linkType": "HARD"\
+      }]\
+    ]],\
+    ["@esbuild/linux-riscv64", [\
+      ["npm:0.17.5", {\
+        "packageLocation": "./.yarn/unplugged/@esbuild-linux-riscv64-npm-0.17.5-2e53c9f053/node_modules/@esbuild/linux-riscv64/",\
+        "packageDependencies": [\
+          ["@esbuild/linux-riscv64", "npm:0.17.5"]\
+        ],\
+        "linkType": "HARD"\
+      }]\
+    ]],\
+    ["@esbuild/linux-s390x", [\
+      ["npm:0.17.5", {\
+        "packageLocation": "./.yarn/unplugged/@esbuild-linux-s390x-npm-0.17.5-815b7b2a48/node_modules/@esbuild/linux-s390x/",\
+        "packageDependencies": [\
+          ["@esbuild/linux-s390x", "npm:0.17.5"]\
+        ],\
+        "linkType": "HARD"\
+      }]\
+    ]],\
+    ["@esbuild/linux-x64", [\
+      ["npm:0.17.5", {\
+        "packageLocation": "./.yarn/unplugged/@esbuild-linux-x64-npm-0.17.5-5c2ddd35c1/node_modules/@esbuild/linux-x64/",\
+        "packageDependencies": [\
+          ["@esbuild/linux-x64", "npm:0.17.5"]\
+        ],\
+        "linkType": "HARD"\
+      }]\
+    ]],\
+    ["@esbuild/netbsd-x64", [\
+      ["npm:0.17.5", {\
+        "packageLocation": "./.yarn/unplugged/@esbuild-netbsd-x64-npm-0.17.5-1fd84a3f16/node_modules/@esbuild/netbsd-x64/",\
+        "packageDependencies": [\
+          ["@esbuild/netbsd-x64", "npm:0.17.5"]\
+        ],\
+        "linkType": "HARD"\
+      }]\
+    ]],\
+    ["@esbuild/openbsd-x64", [\
+      ["npm:0.17.5", {\
+        "packageLocation": "./.yarn/unplugged/@esbuild-openbsd-x64-npm-0.17.5-4dae3fbf96/node_modules/@esbuild/openbsd-x64/",\
+        "packageDependencies": [\
+          ["@esbuild/openbsd-x64", "npm:0.17.5"]\
+        ],\
+        "linkType": "HARD"\
+      }]\
+    ]],\
+    ["@esbuild/sunos-x64", [\
+      ["npm:0.17.5", {\
+        "packageLocation": "./.yarn/unplugged/@esbuild-sunos-x64-npm-0.17.5-66ed36ac99/node_modules/@esbuild/sunos-x64/",\
+        "packageDependencies": [\
+          ["@esbuild/sunos-x64", "npm:0.17.5"]\
+        ],\
+        "linkType": "HARD"\
+      }]\
+    ]],\
+    ["@esbuild/win32-arm64", [\
+      ["npm:0.17.5", {\
+        "packageLocation": "./.yarn/unplugged/@esbuild-win32-arm64-npm-0.17.5-6a94e5f85f/node_modules/@esbuild/win32-arm64/",\
+        "packageDependencies": [\
+          ["@esbuild/win32-arm64", "npm:0.17.5"]\
+        ],\
+        "linkType": "HARD"\
+      }]\
+    ]],\
+    ["@esbuild/win32-ia32", [\
+      ["npm:0.17.5", {\
+        "packageLocation": "./.yarn/unplugged/@esbuild-win32-ia32-npm-0.17.5-3f2d90299c/node_modules/@esbuild/win32-ia32/",\
+        "packageDependencies": [\
+          ["@esbuild/win32-ia32", "npm:0.17.5"]\
+        ],\
+        "linkType": "HARD"\
+      }]\
+    ]],\
+    ["@esbuild/win32-x64", [\
+      ["npm:0.17.5", {\
+        "packageLocation": "./.yarn/unplugged/@esbuild-win32-x64-npm-0.17.5-865ae7e983/node_modules/@esbuild/win32-x64/",\
+        "packageDependencies": [\
+          ["@esbuild/win32-x64", "npm:0.17.5"]\
         ],\
         "linkType": "HARD"\
       }]\
@@ -13389,6 +13584,7 @@ const RAW_RUNTIME_STATE =
           ["@yarnpkg/libzip", "virtual:b73ceab179a3b4f89c4a5be81bd0c20a80eda623489cb284f304cc8104dbb771916bbc246d0ba809faebd8459cb6554cf114954badb021279ea7aee216456122#workspace:packages/yarnpkg-libzip"],\
           ["@yarnpkg/sdks", "workspace:packages/yarnpkg-sdks"],\
           ["clipanion", "virtual:576bf3e379b293160348e4cadfbd6541796e6f78477b0875c4437065090cec6f78b6ec2281b8e15d1c870d61578dc7dee16a5ae49a65701fec83e592ce2ebdeb#npm:3.2.0-rc.10"],\
+          ["esbuild", "npm:0.17.5"],\
           ["esbuild-wasm", "npm:0.17.5"],\
           ["eslint", "npm:8.2.0"],\
           ["jest", "virtual:e470d99b1e4fdf4c5db5d090ff5472cdeba0404b7ffd31cd2efab3493dd184c67bc45f60c2ef1c040e2c41afe38c6280bffc5df2fbe3aefaa2b6eacf685ab07c#npm:29.2.1"],\
@@ -28890,6 +29086,35 @@ const RAW_RUNTIME_STATE =
           ["esbuild-windows-32", "npm:0.15.11"],\
           ["esbuild-windows-64", "npm:0.15.11"],\
           ["esbuild-windows-arm64", "npm:0.15.11"]\
+        ],\
+        "linkType": "HARD"\
+      }],\
+      ["npm:0.17.5", {\
+        "packageLocation": "./.yarn/unplugged/esbuild-npm-0.17.5-ba581df653/node_modules/esbuild/",\
+        "packageDependencies": [\
+          ["esbuild", "npm:0.17.5"],\
+          ["@esbuild/android-arm", "npm:0.17.5"],\
+          ["@esbuild/android-arm64", "npm:0.17.5"],\
+          ["@esbuild/android-x64", "npm:0.17.5"],\
+          ["@esbuild/darwin-arm64", "npm:0.17.5"],\
+          ["@esbuild/darwin-x64", "npm:0.17.5"],\
+          ["@esbuild/freebsd-arm64", "npm:0.17.5"],\
+          ["@esbuild/freebsd-x64", "npm:0.17.5"],\
+          ["@esbuild/linux-arm", "npm:0.17.5"],\
+          ["@esbuild/linux-arm64", "npm:0.17.5"],\
+          ["@esbuild/linux-ia32", "npm:0.17.5"],\
+          ["@esbuild/linux-loong64", "npm:0.17.5"],\
+          ["@esbuild/linux-mips64el", "npm:0.17.5"],\
+          ["@esbuild/linux-ppc64", "npm:0.17.5"],\
+          ["@esbuild/linux-riscv64", "npm:0.17.5"],\
+          ["@esbuild/linux-s390x", "npm:0.17.5"],\
+          ["@esbuild/linux-x64", "npm:0.17.5"],\
+          ["@esbuild/netbsd-x64", "npm:0.17.5"],\
+          ["@esbuild/openbsd-x64", "npm:0.17.5"],\
+          ["@esbuild/sunos-x64", "npm:0.17.5"],\
+          ["@esbuild/win32-arm64", "npm:0.17.5"],\
+          ["@esbuild/win32-ia32", "npm:0.17.5"],\
+          ["@esbuild/win32-x64", "npm:0.17.5"]\
         ],\
         "linkType": "HARD"\
       }]\
@@ -51172,26 +51397,24 @@ function ERR_DIR_CLOSED() {
 
 const DEFAULT_MODE = S_IFREG | 420;
 class StatEntry {
-  constructor() {
-    this.uid = 0;
-    this.gid = 0;
-    this.size = 0;
-    this.blksize = 0;
-    this.atimeMs = 0;
-    this.mtimeMs = 0;
-    this.ctimeMs = 0;
-    this.birthtimeMs = 0;
-    this.atime = new Date(0);
-    this.mtime = new Date(0);
-    this.ctime = new Date(0);
-    this.birthtime = new Date(0);
-    this.dev = 0;
-    this.ino = 0;
-    this.mode = DEFAULT_MODE;
-    this.nlink = 1;
-    this.rdev = 0;
-    this.blocks = 1;
-  }
+  uid = 0;
+  gid = 0;
+  size = 0;
+  blksize = 0;
+  atimeMs = 0;
+  mtimeMs = 0;
+  ctimeMs = 0;
+  birthtimeMs = 0;
+  atime = new Date(0);
+  mtime = new Date(0);
+  ctime = new Date(0);
+  birthtime = new Date(0);
+  dev = 0;
+  ino = 0;
+  mode = DEFAULT_MODE;
+  nlink = 1;
+  rdev = 0;
+  blocks = 1;
   isBlockDevice() {
     return false;
   }
@@ -51215,30 +51438,28 @@ class StatEntry {
   }
 }
 class BigIntStatsEntry {
-  constructor() {
-    this.uid = BigInt(0);
-    this.gid = BigInt(0);
-    this.size = BigInt(0);
-    this.blksize = BigInt(0);
-    this.atimeMs = BigInt(0);
-    this.mtimeMs = BigInt(0);
-    this.ctimeMs = BigInt(0);
-    this.birthtimeMs = BigInt(0);
-    this.atimeNs = BigInt(0);
-    this.mtimeNs = BigInt(0);
-    this.ctimeNs = BigInt(0);
-    this.birthtimeNs = BigInt(0);
-    this.atime = new Date(0);
-    this.mtime = new Date(0);
-    this.ctime = new Date(0);
-    this.birthtime = new Date(0);
-    this.dev = BigInt(0);
-    this.ino = BigInt(0);
-    this.mode = BigInt(DEFAULT_MODE);
-    this.nlink = BigInt(1);
-    this.rdev = BigInt(0);
-    this.blocks = BigInt(1);
-  }
+  uid = BigInt(0);
+  gid = BigInt(0);
+  size = BigInt(0);
+  blksize = BigInt(0);
+  atimeMs = BigInt(0);
+  mtimeMs = BigInt(0);
+  ctimeMs = BigInt(0);
+  birthtimeMs = BigInt(0);
+  atimeNs = BigInt(0);
+  mtimeNs = BigInt(0);
+  ctimeNs = BigInt(0);
+  birthtimeNs = BigInt(0);
+  atime = new Date(0);
+  mtime = new Date(0);
+  ctime = new Date(0);
+  birthtime = new Date(0);
+  dev = BigInt(0);
+  ino = BigInt(0);
+  mode = BigInt(DEFAULT_MODE);
+  nlink = BigInt(1);
+  rdev = BigInt(0);
+  blocks = BigInt(1);
   isBlockDevice() {
     return false;
   }
@@ -51446,7 +51667,6 @@ async function copyPromise(destinationFs, destination, sourceFs, source, opts) {
   }));
 }
 async function copyImpl(prelayout, postlayout, destinationFs, destination, sourceFs, source, opts) {
-  var _a, _b, _c;
   const destinationStat = opts.didParentExist ? await maybeLStat(destinationFs, destination) : null;
   const sourceStat = await sourceFs.lstatPromise(source);
   const { atime, mtime } = opts.stableTime ? { atime: defaultTime, mtime: defaultTime } : sourceStat;
@@ -51472,8 +51692,8 @@ async function copyImpl(prelayout, postlayout, destinationFs, destination, sourc
         throw new Error(`Unsupported file type (${sourceStat.mode})`);
       }
   }
-  if (((_a = opts.linkStrategy) == null ? void 0 : _a.type) !== `HardlinkFromIndex` || !sourceStat.isFile()) {
-    if (updated || ((_b = destinationStat == null ? void 0 : destinationStat.mtime) == null ? void 0 : _b.getTime()) !== mtime.getTime() || ((_c = destinationStat == null ? void 0 : destinationStat.atime) == null ? void 0 : _c.getTime()) !== atime.getTime()) {
+  if (opts.linkStrategy?.type !== `HardlinkFromIndex` || !sourceStat.isFile()) {
+    if (updated || destinationStat?.mtime?.getTime() !== mtime.getTime() || destinationStat?.atime?.getTime() !== atime.getTime()) {
       postlayout.push(() => destinationFs.lutimesPromise(destination, atime, mtime));
       updated = true;
     }
@@ -51543,7 +51763,7 @@ async function copyFileViaIndex(prelayout, postlayout, destinationFs, destinatio
   let indexStat = await maybeLStat(destinationFs, indexPath);
   if (destinationStat) {
     const isDestinationHardlinkedFromIndex = indexStat && destinationStat.dev === indexStat.dev && destinationStat.ino === indexStat.ino;
-    const isIndexModified = (indexStat == null ? void 0 : indexStat.mtimeMs) !== defaultTimeMs;
+    const isIndexModified = indexStat?.mtimeMs !== defaultTimeMs;
     if (isDestinationHardlinkedFromIndex) {
       if (isIndexModified && linkStrategy.autoRepair) {
         atomicBehavior = 0 /* Lock */;
@@ -51613,8 +51833,7 @@ async function copyFileDirect(prelayout, postlayout, destinationFs, destination,
   return true;
 }
 async function copyFile(prelayout, postlayout, destinationFs, destination, destinationStat, sourceFs, source, sourceStat, opts) {
-  var _a;
-  if (((_a = opts.linkStrategy) == null ? void 0 : _a.type) === `HardlinkFromIndex`) {
+  if (opts.linkStrategy?.type === `HardlinkFromIndex`) {
     return copyFileViaIndex(prelayout, postlayout, destinationFs, destination, destinationStat, sourceFs, source, sourceStat, opts, opts.linkStrategy);
   } else {
     return copyFileDirect(prelayout, postlayout, destinationFs, destination, destinationStat, sourceFs, source, sourceStat, opts);
@@ -51640,8 +51859,8 @@ class CustomDir {
     this.path = path;
     this.nextDirent = nextDirent;
     this.opts = opts;
-    this.closed = false;
   }
+  closed = false;
   throwIfClosed() {
     if (this.closed) {
       throw ERR_DIR_CLOSED();
@@ -51674,9 +51893,8 @@ class CustomDir {
     return Promise.resolve();
   }
   closeSync() {
-    var _a, _b;
     this.throwIfClosed();
-    (_b = (_a = this.opts).onClose) == null ? void 0 : _b.call(_a);
+    this.opts.onClose?.();
     this.closed = true;
   }
 }
@@ -51698,20 +51916,24 @@ function assertStatus(current, expected) {
   }
 }
 class CustomStatWatcher extends events.EventEmitter {
-  constructor(fakeFs, path, { bigint = false } = {}) {
-    super();
-    this.status = "ready" /* Ready */;
-    this.changeListeners = /* @__PURE__ */ new Map();
-    this.startTimeout = null;
-    this.fakeFs = fakeFs;
-    this.path = path;
-    this.bigint = bigint;
-    this.lastStats = this.stat();
-  }
+  fakeFs;
+  path;
+  bigint;
+  status = "ready" /* Ready */;
+  changeListeners = /* @__PURE__ */ new Map();
+  lastStats;
+  startTimeout = null;
   static create(fakeFs, path, opts) {
     const statWatcher = new CustomStatWatcher(fakeFs, path, opts);
     statWatcher.start();
     return statWatcher;
+  }
+  constructor(fakeFs, path, { bigint = false } = {}) {
+    super();
+    this.fakeFs = fakeFs;
+    this.path = path;
+    this.bigint = bigint;
+    this.lastStats = this.stat();
   }
   start() {
     assertStatus(this.status, "ready" /* Ready */);
@@ -51845,6 +52067,7 @@ function unwatchAllFiles(fakeFs) {
 }
 
 class FakeFS {
+  pathUtils;
   constructor(pathUtils) {
     this.pathUtils = pathUtils;
   }
@@ -51953,7 +52176,7 @@ class FakeFS {
             throw error;
           }
         }
-        createdDirectory ?? (createdDirectory = subPath);
+        createdDirectory ??= subPath;
         if (chmod != null)
           await this.chmodPromise(subPath, chmod);
         if (utimes != null) {
@@ -51984,7 +52207,7 @@ class FakeFS {
             throw error;
           }
         }
-        createdDirectory ?? (createdDirectory = subPath);
+        createdDirectory ??= subPath;
         if (chmod != null)
           this.chmodSync(subPath, chmod);
         if (utimes != null) {
@@ -52469,6 +52692,7 @@ class ProxiedFS extends FakeFS {
 }
 
 class NodeFS extends BasePortableFakeFS {
+  realFs;
   constructor(realFs = fs__default.default) {
     super();
     this.realFs = realFs;
@@ -52781,7 +53005,7 @@ class NodeFS extends BasePortableFakeFS {
   }
   async readdirPromise(p, opts) {
     return await new Promise((resolve, reject) => {
-      if (opts == null ? void 0 : opts.withFileTypes) {
+      if (opts?.withFileTypes) {
         this.realFs.readdir(npath.fromPortablePath(p), { withFileTypes: true }, this.makeCallback(resolve, reject));
       } else {
         this.realFs.readdir(npath.fromPortablePath(p), this.makeCallback((value) => resolve(value), reject));
@@ -52789,7 +53013,7 @@ class NodeFS extends BasePortableFakeFS {
     });
   }
   readdirSync(p, opts) {
-    if (opts == null ? void 0 : opts.withFileTypes) {
+    if (opts?.withFileTypes) {
       return this.realFs.readdirSync(npath.fromPortablePath(p), { withFileTypes: true });
     } else {
       return this.realFs.readdirSync(npath.fromPortablePath(p));
@@ -52851,16 +53075,25 @@ class NodeFS extends BasePortableFakeFS {
 
 const MOUNT_MASK = 4278190080;
 class MountFS extends BasePortableFakeFS {
+  baseFs;
+  mountInstances;
+  fdMap = /* @__PURE__ */ new Map();
+  nextFd = 3;
+  factoryPromise;
+  factorySync;
+  filter;
+  getMountPoint;
+  magic;
+  maxAge;
+  maxOpenFiles;
+  typeCheck;
+  isMount = /* @__PURE__ */ new Set();
+  notMount = /* @__PURE__ */ new Set();
+  realPaths = /* @__PURE__ */ new Map();
   constructor({ baseFs = new NodeFS(), filter = null, magicByte = 42, maxOpenFiles = Infinity, useCache = true, maxAge = 5e3, typeCheck = fs.constants.S_IFREG, getMountPoint, factoryPromise, factorySync }) {
     if (Math.floor(magicByte) !== magicByte || !(magicByte > 1 && magicByte <= 127))
       throw new Error(`The magic byte must be set to a round value between 1 and 127 included`);
     super();
-    this.fdMap = /* @__PURE__ */ new Map();
-    this.nextFd = 3;
-    this.isMount = /* @__PURE__ */ new Set();
-    this.notMount = /* @__PURE__ */ new Set();
-    this.realPaths = /* @__PURE__ */ new Map();
-    this.limitOpenFilesTimeout = null;
     this.baseFs = baseFs;
     this.mountInstances = useCache ? /* @__PURE__ */ new Map() : null;
     this.factoryPromise = factoryPromise;
@@ -52879,21 +53112,19 @@ class MountFS extends BasePortableFakeFS {
     return this.baseFs.getRealPath();
   }
   saveAndClose() {
-    var _a;
     unwatchAllFiles(this);
     if (this.mountInstances) {
       for (const [path, { childFs }] of this.mountInstances.entries()) {
-        (_a = childFs.saveAndClose) == null ? void 0 : _a.call(childFs);
+        childFs.saveAndClose?.();
         this.mountInstances.delete(path);
       }
     }
   }
   discardAndClose() {
-    var _a;
     unwatchAllFiles(this);
     if (this.mountInstances) {
       for (const [path, { childFs }] of this.mountInstances.entries()) {
-        (_a = childFs.discardAndClose) == null ? void 0 : _a.call(childFs);
+        childFs.discardAndClose?.();
         this.mountInstances.delete(path);
       }
     }
@@ -53584,18 +53815,18 @@ class MountFS extends BasePortableFakeFS {
       };
     }
   }
+  limitOpenFilesTimeout = null;
   limitOpenFiles(max) {
-    var _a, _b, _c;
     if (this.mountInstances === null)
       return;
     const now = Date.now();
     let nextExpiresAt = now + this.maxAge;
     let closeCount = max === null ? 0 : this.mountInstances.size - max;
     for (const [path, { childFs, expiresAt, refCount }] of this.mountInstances.entries()) {
-      if (refCount !== 0 || ((_a = childFs.hasOpenFileHandles) == null ? void 0 : _a.call(childFs))) {
+      if (refCount !== 0 || childFs.hasOpenFileHandles?.()) {
         continue;
       } else if (now >= expiresAt) {
-        (_b = childFs.saveAndClose) == null ? void 0 : _b.call(childFs);
+        childFs.saveAndClose?.();
         this.mountInstances.delete(path);
         closeCount -= 1;
         continue;
@@ -53603,7 +53834,7 @@ class MountFS extends BasePortableFakeFS {
         nextExpiresAt = expiresAt;
         break;
       }
-      (_c = childFs.saveAndClose) == null ? void 0 : _c.call(childFs);
+      childFs.saveAndClose?.();
       this.mountInstances.delete(path);
       closeCount -= 1;
     }
@@ -53615,7 +53846,6 @@ class MountFS extends BasePortableFakeFS {
     }
   }
   async getMountPromise(p, accept) {
-    var _a;
     if (this.mountInstances) {
       let cachedMountFs = this.mountInstances.get(p);
       if (!cachedMountFs) {
@@ -53644,12 +53874,11 @@ class MountFS extends BasePortableFakeFS {
       try {
         return await accept(mountFs);
       } finally {
-        (_a = mountFs.saveAndClose) == null ? void 0 : _a.call(mountFs);
+        mountFs.saveAndClose?.();
       }
     }
   }
   getMountSync(p, accept) {
-    var _a;
     if (this.mountInstances) {
       let cachedMountFs = this.mountInstances.get(p);
       if (!cachedMountFs) {
@@ -53669,13 +53898,14 @@ class MountFS extends BasePortableFakeFS {
       try {
         return accept(childFs);
       } finally {
-        (_a = childFs.saveAndClose) == null ? void 0 : _a.call(childFs);
+        childFs.saveAndClose?.();
       }
     }
   }
 }
 
 class PosixFS extends ProxiedFS {
+  baseFs;
   constructor(baseFs) {
     super(npath);
     this.baseFs = baseFs;
@@ -53692,10 +53922,7 @@ const NUMBER_REGEXP = /^[0-9]+$/;
 const VIRTUAL_REGEXP = /^(\/(?:[^/]+\/)*?(?:\$\$virtual|__virtual__))((?:\/((?:[^/]+-)?[a-f0-9]+)(?:\/([^/]+))?)?((?:\/.*)?))$/;
 const VALID_COMPONENT = /^([^/]+-)?[a-f0-9]+$/;
 class VirtualFS extends ProxiedFS {
-  constructor({ baseFs = new NodeFS() } = {}) {
-    super(ppath);
-    this.baseFs = baseFs;
-  }
+  baseFs;
   static makeVirtualPath(base, component, to) {
     if (ppath.basename(base) !== `__virtual__`)
       throw new Error(`Assertion failed: Virtual folders must be named "__virtual__"`);
@@ -53724,6 +53951,10 @@ class VirtualFS extends ProxiedFS {
     const backstep = `../`.repeat(depth);
     const subpath = match[5] || `.`;
     return VirtualFS.resolveVirtual(ppath.join(target, backstep, subpath));
+  }
+  constructor({ baseFs = new NodeFS() } = {}) {
+    super(ppath);
+    this.baseFs = baseFs;
   }
   getExtractHint(hints) {
     return this.baseFs.getExtractHint(hints);
@@ -53764,6 +53995,7 @@ class VirtualFS extends ProxiedFS {
 }
 
 class NodePathFS extends ProxiedFS {
+  baseFs;
   constructor(baseFs) {
     super(npath);
     this.baseFs = baseFs;
@@ -53786,7 +54018,6 @@ class NodePathFS extends ProxiedFS {
   }
 }
 
-var _a, _b, _c, _d;
 const kBaseFs = Symbol(`kBaseFs`);
 const kFd = Symbol(`kFd`);
 const kClosePromise = Symbol(`kClosePromise`);
@@ -53796,11 +54027,13 @@ const kRefs = Symbol(`kRefs`);
 const kRef = Symbol(`kRef`);
 const kUnref = Symbol(`kUnref`);
 class FileHandle {
+  [kBaseFs];
+  [kFd];
+  [kRefs] = 1;
+  [kClosePromise] = void 0;
+  [kCloseResolve] = void 0;
+  [kCloseReject] = void 0;
   constructor(fd, baseFs) {
-    this[_a] = 1;
-    this[_b] = void 0;
-    this[_c] = void 0;
-    this[_d] = void 0;
     this[kBaseFs] = baseFs;
     this[kFd] = fd;
   }
@@ -53810,7 +54043,7 @@ class FileHandle {
   async appendFile(data, options) {
     try {
       this[kRef](this.appendFile);
-      const encoding = (typeof options === `string` ? options : options == null ? void 0 : options.encoding) ?? void 0;
+      const encoding = (typeof options === `string` ? options : options?.encoding) ?? void 0;
       return await this[kBaseFs].appendFilePromise(this.fd, data, encoding ? { encoding } : void 0);
     } finally {
       this[kUnref]();
@@ -53849,7 +54082,7 @@ class FileHandle {
       this[kRef](this.read);
       let buffer;
       if (!Buffer.isBuffer(bufferOrOptions)) {
-        bufferOrOptions ?? (bufferOrOptions = {});
+        bufferOrOptions ??= {};
         buffer = bufferOrOptions.buffer ?? Buffer.alloc(16384);
         offset = bufferOrOptions.offset || 0;
         length = bufferOrOptions.length ?? buffer.byteLength;
@@ -53857,8 +54090,8 @@ class FileHandle {
       } else {
         buffer = bufferOrOptions;
       }
-      offset ?? (offset = 0);
-      length ?? (length = 0);
+      offset ??= 0;
+      length ??= 0;
       if (length === 0) {
         return {
           bytesRead: length,
@@ -53877,7 +54110,7 @@ class FileHandle {
   async readFile(options) {
     try {
       this[kRef](this.readFile);
-      const encoding = (typeof options === `string` ? options : options == null ? void 0 : options.encoding) ?? void 0;
+      const encoding = (typeof options === `string` ? options : options?.encoding) ?? void 0;
       return await this[kBaseFs].readFilePromise(this.fd, encoding);
     } finally {
       this[kUnref]();
@@ -53911,7 +54144,7 @@ class FileHandle {
   async writeFile(data, options) {
     try {
       this[kRef](this.writeFile);
-      const encoding = (typeof options === `string` ? options : options == null ? void 0 : options.encoding) ?? void 0;
+      const encoding = (typeof options === `string` ? options : options?.encoding) ?? void 0;
       await this[kBaseFs].writeFilePromise(this.fd, data, encoding);
     } finally {
       this[kUnref]();
@@ -53984,7 +54217,7 @@ class FileHandle {
     }
     return this[kClosePromise];
   }
-  [(_a = kRefs, _b = kClosePromise, _c = kCloseResolve, _d = kCloseReject, kRef)](caller) {
+  [kRef](caller) {
     if (this[kFd] === -1) {
       const err = new Error(`file closed`);
       err.code = `EBADF`;
@@ -54077,7 +54310,7 @@ function patchFs(patchedFs, fakeFs) {
   const setupFn = (target, name, replacement) => {
     const orig = target[name];
     target[name] = replacement;
-    if (typeof (orig == null ? void 0 : orig[nodeUtils.promisify.custom]) !== `undefined`) {
+    if (typeof orig?.[nodeUtils.promisify.custom] !== `undefined`) {
       replacement[nodeUtils.promisify.custom] = orig[nodeUtils.promisify.custom];
     }
   };
@@ -55207,6 +55440,7 @@ function makeEmptyArchive() {
   ]);
 }
 class LibzipError extends Error {
+  code;
   constructor(message, code) {
     super(message);
     this.name = `Libzip Error`;
@@ -55214,18 +55448,26 @@ class LibzipError extends Error {
   }
 }
 class ZipFS extends BasePortableFakeFS {
+  libzip;
+  baseFs;
+  path;
+  stats;
+  zip;
+  lzSource;
+  level;
+  listings = /* @__PURE__ */ new Map();
+  entries = /* @__PURE__ */ new Map();
+  fileSources = /* @__PURE__ */ new Map();
+  symlinkCount;
+  fds = /* @__PURE__ */ new Map();
+  nextFd = 0;
+  ready = false;
+  readOnly = false;
   constructor(source, opts = {}) {
     super();
-    this.listings = /* @__PURE__ */ new Map();
-    this.entries = /* @__PURE__ */ new Map();
-    this.fileSources = /* @__PURE__ */ new Map();
-    this.fds = /* @__PURE__ */ new Map();
-    this.nextFd = 0;
-    this.ready = false;
-    this.readOnly = false;
     const pathOptions = opts;
     this.level = typeof pathOptions.level !== `undefined` ? pathOptions.level : DEFAULT_COMPRESSION_LEVEL;
-    source ?? (source = makeEmptyArchive());
+    source ??= makeEmptyArchive();
     if (typeof source === `string`) {
       const { baseFs = new NodeFS() } = pathOptions;
       this.baseFs = baseFs;
@@ -55691,7 +55933,7 @@ class ZipFS extends BasePortableFakeFS {
   unregisterListing(p) {
     this.listings.delete(p);
     const parentListing = this.listings.get(ppath.dirname(p));
-    parentListing == null ? void 0 : parentListing.delete(ppath.basename(p));
+    parentListing?.delete(ppath.basename(p));
   }
   unregisterEntry(p) {
     this.unregisterListing(p);
@@ -55968,8 +56210,7 @@ class ZipFS extends BasePortableFakeFS {
     return this.writeFileSync(p, content, opts);
   }
   fdToPath(fd, reason) {
-    var _a;
-    const path = (_a = this.fds.get(fd)) == null ? void 0 : _a.p;
+    const path = this.fds.get(fd)?.p;
     if (typeof path === `undefined`)
       throw EBADF(reason);
     return path;
@@ -56176,7 +56417,7 @@ class ZipFS extends BasePortableFakeFS {
     if (!directoryListing)
       throw ENOTDIR(`scandir '${p}'`);
     const entries = [...directoryListing];
-    if (!(opts == null ? void 0 : opts.withFileTypes))
+    if (!opts?.withFileTypes)
       return entries;
     return entries.map((name) => {
       return Object.assign(this.statImpl(`lstat`, ppath.join(p, name)), {
@@ -56295,7 +56536,7 @@ const MODULE_NOT_FOUND_ERRORS = /* @__PURE__ */ new Set([
   "UNDECLARED_DEPENDENCY" /* UNDECLARED_DEPENDENCY */
 ]);
 function makeError(pnpCode, message, data = {}, code) {
-  code ?? (code = MODULE_NOT_FOUND_ERRORS.has(pnpCode) ? `MODULE_NOT_FOUND` : pnpCode);
+  code ??= MODULE_NOT_FOUND_ERRORS.has(pnpCode) ? `MODULE_NOT_FOUND` : pnpCode;
   const propertySpec = {
     configurable: true,
     writable: true,
@@ -56354,14 +56595,6 @@ function readPackage(requestPath) {
   if (!fs__default.default.existsSync(jsonPath))
     return null;
   return JSON.parse(fs__default.default.readFileSync(jsonPath, `utf8`));
-}
-function ERR_REQUIRE_ESM(filename, parentPath = null) {
-  const basename = parentPath && path__default.default.basename(filename) === path__default.default.basename(parentPath) ? filename : path__default.default.basename(filename);
-  const msg = `require() of ES Module ${filename}${parentPath ? ` from ${parentPath}` : ``} not supported.
-Instead change the require of ${basename} in ${parentPath} to a dynamic import() which is available in all CommonJS modules.`;
-  const err = new Error(msg);
-  err.code = `ERR_REQUIRE_ESM`;
-  return err;
 }
 function reportRequiredFilesToWatchMode(files) {
   if (process.env.WATCH_REPORT_DEPENDENCIES && process.send) {
@@ -56433,26 +56666,26 @@ function applyPatch(pnpapi, opts) {
       }
       return cacheEntry.exports;
     }
-    const module = new require$$0.Module(modulePath, parent ?? void 0);
-    module.pnpApiPath = moduleApiPath;
+    const module2 = new require$$0.Module(modulePath, parent ?? void 0);
+    module2.pnpApiPath = moduleApiPath;
     reportRequiredFilesToWatchMode([modulePath]);
-    entry.cache[modulePath] = module;
+    entry.cache[modulePath] = module2;
     if (isMain) {
-      process.mainModule = module;
-      module.id = `.`;
+      process.mainModule = module2;
+      module2.id = `.`;
     }
     let hasThrown = true;
     try {
-      module.isLoading = true;
-      module.load(modulePath);
+      module2.isLoading = true;
+      module2.load(modulePath);
       hasThrown = false;
     } finally {
-      module.isLoading = false;
+      module2.isLoading = false;
       if (hasThrown) {
         delete require$$0.Module._cache[modulePath];
       }
     }
-    return module.exports;
+    return module2.exports;
   };
   function getIssuerSpecsFromPaths(paths) {
     return paths.map((path) => ({
@@ -56461,23 +56694,23 @@ function applyPatch(pnpapi, opts) {
       module: null
     }));
   }
-  function getIssuerSpecsFromModule(module) {
-    if (module && module.id !== `<repl>` && module.id !== `internal/preload` && !module.parent && !module.filename && module.paths.length > 0) {
+  function getIssuerSpecsFromModule(module2) {
+    if (module2 && module2.id !== `<repl>` && module2.id !== `internal/preload` && !module2.parent && !module2.filename && module2.paths.length > 0) {
       return [{
-        apiPath: opts.manager.findApiPathFor(module.paths[0]),
-        path: module.paths[0],
-        module
+        apiPath: opts.manager.findApiPathFor(module2.paths[0]),
+        path: module2.paths[0],
+        module: module2
       }];
     }
-    const issuer = getIssuerModule(module);
+    const issuer = getIssuerModule(module2);
     if (issuer !== null) {
       const path = npath.dirname(issuer.filename);
       const apiPath = opts.manager.getApiPathFromParent(issuer);
-      return [{ apiPath, path, module }];
+      return [{ apiPath, path, module: module2 }];
     } else {
       const path = process.cwd();
       const apiPath = opts.manager.findApiPathFor(npath.join(path, `[file]`)) ?? opts.manager.getApiPathFromParent(null);
-      return [{ apiPath, path, module }];
+      return [{ apiPath, path, module: module2 }];
     }
   }
   function makeFakeParent(path) {
@@ -56516,10 +56749,10 @@ function applyPatch(pnpapi, opts) {
     }
     const issuerSpecs = options && options.paths ? getIssuerSpecsFromPaths(options.paths) : getIssuerSpecsFromModule(parent);
     if (request.match(pathRegExp) === null) {
-      const parentDirectory = (parent == null ? void 0 : parent.filename) != null ? npath.dirname(parent.filename) : null;
+      const parentDirectory = parent?.filename != null ? npath.dirname(parent.filename) : null;
       const absoluteRequest = npath.isAbsolute(request) ? request : parentDirectory !== null ? npath.resolve(parentDirectory, request) : null;
       if (absoluteRequest !== null) {
-        const apiPath = parentDirectory === npath.dirname(absoluteRequest) && (parent == null ? void 0 : parent.pnpApiPath) ? parent.pnpApiPath : opts.manager.findApiPathFor(absoluteRequest);
+        const apiPath = parentDirectory === npath.dirname(absoluteRequest) && parent?.pnpApiPath ? parent.pnpApiPath : opts.manager.findApiPathFor(absoluteRequest);
         if (apiPath !== null) {
           issuerSpecs.unshift({
             apiPath,
@@ -56530,7 +56763,7 @@ function applyPatch(pnpapi, opts) {
       }
     }
     let firstError;
-    for (const { apiPath, path, module } of issuerSpecs) {
+    for (const { apiPath, path, module: module2 } of issuerSpecs) {
       let resolution;
       const issuerApi = apiPath !== null ? opts.manager.getApiEntry(apiPath, true).instance : null;
       try {
@@ -56539,7 +56772,7 @@ function applyPatch(pnpapi, opts) {
         } else {
           if (path === null)
             throw new Error(`Assertion failed: Expected the path to be set`);
-          resolution = originalModuleResolveFilename.call(require$$0.Module, request, module || makeFakeParent(path), isMain);
+          resolution = originalModuleResolveFilename.call(require$$0.Module, request, module2 || makeFakeParent(path), isMain);
         }
       } catch (error) {
         firstError = firstError || error;
@@ -56596,31 +56829,72 @@ Require stack:
     return false;
   };
   const originalExtensionJSFunction = require$$0.Module._extensions[`.js`];
-  require$$0.Module._extensions[`.js`] = function(module, filename) {
-    var _a, _b;
-    if (filename.endsWith(`.js`)) {
-      const pkg = readPackageScope(filename);
-      if (pkg && ((_a = pkg.data) == null ? void 0 : _a.type) === `module`) {
-        const err = ERR_REQUIRE_ESM(filename, (_b = module.parent) == null ? void 0 : _b.filename);
-        Error.captureStackTrace(err);
-        throw err;
+  require$$0.Module._extensions[`.js`] = function(module2, filename2) {
+    if (filename2.endsWith(`.js`)) {
+      const pkg = readPackageScope(filename2);
+      if (pkg && pkg.data?.type === `module`) {
+        transpile(module2, filename2, `js`);
+        return;
       }
     }
-    originalExtensionJSFunction.call(this, module, filename);
+    if (filename2.endsWith(`.wasm`))
+      filename2 += `.js`;
+    originalExtensionJSFunction.call(this, module2, filename2);
   };
   const originalDlopen = process.dlopen;
   process.dlopen = function(...args) {
-    const [module, filename, ...rest] = args;
+    const [module2, filename2, ...rest] = args;
     return originalDlopen.call(
       this,
-      module,
-      npath.fromPortablePath(VirtualFS.resolveVirtual(npath.toPortablePath(filename))),
+      module2,
+      npath.fromPortablePath(VirtualFS.resolveVirtual(npath.toPortablePath(filename2))),
       ...rest
     );
   };
+  require$$0.Module._extensions[`.mjs`] = function(module2, filename2) {
+    transpile(module2, filename2, `js`);
+  };
+  require$$0.Module._extensions[`.ts`] = function(module2, filename2) {
+    transpile(module2, filename2, `ts`);
+  };
+  require$$0.Module._extensions[`.tsx`] = function(module2, filename2) {
+    transpile(module2, filename2, `tsx`);
+  };
+  if (typeof process.env.VSCODE_PID !== `undefined`)
+    process.env.ESBUILD_WORKER_THREADS = `0`;
+  let esbuild;
+  function transpile(module, filename, loader) {
+    esbuild ??= process.env.USE_ESBUILD_WASM === `true` ? eval(`require("esbuild-wasm");`) : eval(`require("esbuild");`);
+    const source = fs__default.default.readFileSync(filename, { encoding: `utf8` });
+    const importMetaURL = JSON.stringify(url.pathToFileURL(filename).href);
+    const { code } = esbuild.transformSync(source, {
+      loader,
+      format: `cjs`,
+      target: `esnext`,
+      jsx: `automatic`,
+      jsxDev: process.env.NODE_ENV === `development`,
+      jsxImportSource: `preact`,
+      define: {
+        "import.meta.url": importMetaURL
+      }
+    });
+    module._compile(code, filename);
+    if (`default` in module.exports) {
+      const defaultExports = module.exports.default;
+      const originalModuleExports = module.exports;
+      module.exports = typeof defaultExports === `string` ? {} : defaultExports;
+      if (/[/\\]node_modules[/\\](?:chalk|clean-stack)[/\\]/.test(filename)) {
+        Object.defineProperty(module.exports, `default`, { value: defaultExports });
+      } else if (loader === `js`) {
+        for (const key in originalModuleExports) {
+          module.exports[key] = originalModuleExports[key];
+        }
+      }
+    }
+  }
   const originalEmit = process.emit;
   process.emit = function(name, data, ...args) {
-    if (name === `warning` && typeof data === `object` && data.name === `ExperimentalWarning` && (data.message.includes(`--experimental-loader`) || data.message.includes(`Custom ESM Loaders is an experimental feature`)))
+    if (name === `warning` && typeof data === `object` && data.name === `ExperimentalWarning`)
       return false;
     return originalEmit.apply(process, arguments);
   };
@@ -57573,12 +57847,11 @@ function makeApi(runtimeState, opts) {
     };
   }
   function trace(entry) {
-    var _a, _b, _c, _d;
-    const colors = ((_b = (_a = process.stderr) == null ? void 0 : _a.hasColors) == null ? void 0 : _b.call(_a)) ?? process.stdout.isTTY;
+    const colors = process.stderr?.hasColors?.() ?? process.stdout.isTTY;
     const c = (n, str) => `\x1B[${n}m${str}\x1B[0m`;
     const error = entry.error;
     if (error)
-      console.error(c(`31;1`, `\u2716 ${(_c = entry.error) == null ? void 0 : _c.message.replace(/\n.*/s, ``)}`));
+      console.error(c(`31;1`, `\u2716 ${entry.error?.message.replace(/\n.*/s, ``)}`));
     else
       console.error(c(`33;1`, `\u203C Resolution`));
     if (entry.args.length > 0)
@@ -57589,7 +57862,7 @@ function makeApi(runtimeState, opts) {
       console.error();
       console.error(`  ${c(`37;1`, `Out \u2192`)} ${nodeUtils.inspect(entry.result, { colors, compact: true })}`);
     }
-    const stack = ((_d = new Error().stack.match(/(?<=^ +)at.*/gm)) == null ? void 0 : _d.slice(2)) ?? [];
+    const stack = new Error().stack.match(/(?<=^ +)at.*/gm)?.slice(2) ?? [];
     if (stack.length > 0) {
       console.error();
       for (const line of stack) {
@@ -58081,7 +58354,7 @@ Required by: ${issuerLocator.name}@${issuerLocator.reference} (via ${issuerForDi
       return unqualifiedPath;
     }
   }
-  function resolveUnqualified(unqualifiedPath, { extensions = Object.keys(require$$0.Module._extensions) } = {}) {
+  function resolveUnqualified(unqualifiedPath, { extensions = Object.keys(require$$0.Module._extensions).concat(`.ts`, `.tsx`) } = {}) {
     const candidates = [];
     const qualifiedPath = applyNodeExtensionResolution(unqualifiedPath, candidates, { extensions });
     if (qualifiedPath) {
@@ -58096,10 +58369,10 @@ Required by: ${issuerLocator.name}@${issuerLocator.reference} (via ${issuerForDi
         try {
           opts.fakeFs.accessSync(packageLocation);
         } catch (err) {
-          if ((err == null ? void 0 : err.code) === `ENOENT`) {
+          if (err?.code === `ENOENT`) {
             exists = false;
           } else {
-            const readableError = ((err == null ? void 0 : err.message) ?? err ?? `empty exception thrown`).replace(/^[A-Z]/, ($0) => $0.toLowerCase());
+            const readableError = (err?.message ?? err ?? `empty exception thrown`).replace(/^[A-Z]/, ($0) => $0.toLowerCase());
             throw makeError(ErrorCode.QUALIFIED_PATH_RESOLUTION_FAILED, `Required package exists but could not be accessed (${readableError}).
 
 Missing package: ${containingPackage.name}@${containingPackage.reference}
@@ -58159,7 +58432,8 @@ ${candidates.map((candidate) => `Not found: ${getPathForDisplay(candidate)}
       if (unqualifiedPath === null)
         return null;
       const isIssuerIgnored = () => issuer !== null ? isPathIgnored(issuer) : false;
-      const remappedPath = (!considerBuiltins || !isBuiltinModule(request)) && !isIssuerIgnored() ? resolveUnqualifiedExport(request, unqualifiedPath, conditions, issuer) : unqualifiedPath;
+      let remappedPath = (!considerBuiltins || !isBuiltinModule(request)) && !isIssuerIgnored() ? resolveUnqualifiedExport(request, unqualifiedPath, conditions, issuer) : unqualifiedPath;
+      remappedPath = remappedPath.replace(/\.jsx?$/, ``);
       return resolveUnqualified(remappedPath, { extensions });
     } catch (error) {
       if (Object.prototype.hasOwnProperty.call(error, `pnpCode`))
@@ -58372,9 +58646,9 @@ const defaultFsLayer = new VirtualFS({
   })
 });
 class DynamicFS extends ProxiedFS {
+  baseFs = defaultFsLayer;
   constructor() {
     super(ppath);
-    this.baseFs = defaultFsLayer;
   }
   mapToBase(p) {
     return p;

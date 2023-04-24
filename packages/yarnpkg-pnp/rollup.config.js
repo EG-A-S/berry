@@ -33,6 +33,7 @@ export default defineConfig([
       strict: false,
       generatedCode: `es2015`,
     },
+    external: [`esbuild`, `esbuild-wasm`],
     plugins: [
       resolve({
         extensions: [`.mjs`, `.js`, `.ts`, `.tsx`, `.json`],
@@ -42,7 +43,7 @@ export default defineConfig([
       }),
       esbuild({
         tsconfig: false,
-        target: `node14`,
+        target: `esnext`,
         define: {
           document: `undefined`,
           XMLHttpRequest: `undefined`,
@@ -60,6 +61,7 @@ export default defineConfig([
       format: `esm`,
       generatedCode: `es2015`,
     },
+    external: [`esbuild`, `esbuild-wasm`],
     plugins: [
       resolve({
         extensions: [`.mjs`, `.js`, `.ts`, `.tsx`, `.json`],
@@ -69,7 +71,7 @@ export default defineConfig([
       }),
       esbuild({
         tsconfig: false,
-        target: `node14`,
+        target: `esnext`,
         define: {
           document: `undefined`,
           XMLHttpRequest: `undefined`,
@@ -97,7 +99,7 @@ export default defineConfig([
         }),
         esbuild({
           tsconfig: false,
-          target: `node14`,
+          target: `esnext`,
           define: {
             document: `undefined`,
             XMLHttpRequest: `undefined`,

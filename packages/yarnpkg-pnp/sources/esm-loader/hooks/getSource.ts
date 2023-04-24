@@ -1,6 +1,3 @@
-import fs               from 'fs';
-import {fileURLToPath}  from 'url';
-
 import * as loaderUtils from '../loaderUtils';
 
 // The default `getSource` doesn't support reading from zip files
@@ -14,6 +11,6 @@ export async function getSource(
     return defaultGetSource(urlString, context, defaultGetSource);
 
   return {
-    source: await fs.promises.readFile(fileURLToPath(url), `utf8`),
+    source: await loaderUtils.readSource(url),
   };
 }

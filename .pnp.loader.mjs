@@ -89,7 +89,6 @@ async function copyPromise(destinationFs, destination, sourceFs, source, opts) {
   }));
 }
 async function copyImpl(prelayout, postlayout, destinationFs, destination, sourceFs, source, opts) {
-  var _a, _b, _c;
   const destinationStat = opts.didParentExist ? await maybeLStat(destinationFs, destination) : null;
   const sourceStat = await sourceFs.lstatPromise(source);
   const { atime, mtime } = opts.stableTime ? { atime: defaultTime, mtime: defaultTime } : sourceStat;
@@ -115,8 +114,8 @@ async function copyImpl(prelayout, postlayout, destinationFs, destination, sourc
         throw new Error(`Unsupported file type (${sourceStat.mode})`);
       }
   }
-  if (((_a = opts.linkStrategy) == null ? void 0 : _a.type) !== `HardlinkFromIndex` || !sourceStat.isFile()) {
-    if (updated || ((_b = destinationStat == null ? void 0 : destinationStat.mtime) == null ? void 0 : _b.getTime()) !== mtime.getTime() || ((_c = destinationStat == null ? void 0 : destinationStat.atime) == null ? void 0 : _c.getTime()) !== atime.getTime()) {
+  if (opts.linkStrategy?.type !== `HardlinkFromIndex` || !sourceStat.isFile()) {
+    if (updated || destinationStat?.mtime?.getTime() !== mtime.getTime() || destinationStat?.atime?.getTime() !== atime.getTime()) {
       postlayout.push(() => destinationFs.lutimesPromise(destination, atime, mtime));
       updated = true;
     }
@@ -186,7 +185,7 @@ async function copyFileViaIndex(prelayout, postlayout, destinationFs, destinatio
   let indexStat = await maybeLStat(destinationFs, indexPath);
   if (destinationStat) {
     const isDestinationHardlinkedFromIndex = indexStat && destinationStat.dev === indexStat.dev && destinationStat.ino === indexStat.ino;
-    const isIndexModified = (indexStat == null ? void 0 : indexStat.mtimeMs) !== defaultTimeMs;
+    const isIndexModified = indexStat?.mtimeMs !== defaultTimeMs;
     if (isDestinationHardlinkedFromIndex) {
       if (isIndexModified && linkStrategy.autoRepair) {
         atomicBehavior = 0 /* Lock */;
@@ -256,8 +255,7 @@ async function copyFileDirect(prelayout, postlayout, destinationFs, destination,
   return true;
 }
 async function copyFile(prelayout, postlayout, destinationFs, destination, destinationStat, sourceFs, source, sourceStat, opts) {
-  var _a;
-  if (((_a = opts.linkStrategy) == null ? void 0 : _a.type) === `HardlinkFromIndex`) {
+  if (opts.linkStrategy?.type === `HardlinkFromIndex`) {
     return copyFileViaIndex(prelayout, postlayout, destinationFs, destination, destinationStat, sourceFs, source, sourceStat, opts, opts.linkStrategy);
   } else {
     return copyFileDirect(prelayout, postlayout, destinationFs, destination, destinationStat, sourceFs, source, sourceStat, opts);
@@ -279,6 +277,7 @@ async function copySymlink(prelayout, postlayout, destinationFs, destination, de
 }
 
 class FakeFS {
+  pathUtils;
   constructor(pathUtils) {
     this.pathUtils = pathUtils;
   }
@@ -387,7 +386,7 @@ class FakeFS {
             throw error;
           }
         }
-        createdDirectory ?? (createdDirectory = subPath);
+        createdDirectory ??= subPath;
         if (chmod != null)
           await this.chmodPromise(subPath, chmod);
         if (utimes != null) {
@@ -418,7 +417,7 @@ class FakeFS {
             throw error;
           }
         }
-        createdDirectory ?? (createdDirectory = subPath);
+        createdDirectory ??= subPath;
         if (chmod != null)
           this.chmodSync(subPath, chmod);
         if (utimes != null) {
@@ -903,6 +902,7 @@ class ProxiedFS extends FakeFS {
 }
 
 class NodeFS extends BasePortableFakeFS {
+  realFs;
   constructor(realFs = fs) {
     super();
     this.realFs = realFs;
@@ -1215,7 +1215,7 @@ class NodeFS extends BasePortableFakeFS {
   }
   async readdirPromise(p, opts) {
     return await new Promise((resolve, reject) => {
-      if (opts == null ? void 0 : opts.withFileTypes) {
+      if (opts?.withFileTypes) {
         this.realFs.readdir(npath.fromPortablePath(p), { withFileTypes: true }, this.makeCallback(resolve, reject));
       } else {
         this.realFs.readdir(npath.fromPortablePath(p), this.makeCallback((value) => resolve(value), reject));
@@ -1223,7 +1223,7 @@ class NodeFS extends BasePortableFakeFS {
     });
   }
   readdirSync(p, opts) {
-    if (opts == null ? void 0 : opts.withFileTypes) {
+    if (opts?.withFileTypes) {
       return this.realFs.readdirSync(npath.fromPortablePath(p), { withFileTypes: true });
     } else {
       return this.realFs.readdirSync(npath.fromPortablePath(p));
@@ -1287,10 +1287,7 @@ const NUMBER_REGEXP = /^[0-9]+$/;
 const VIRTUAL_REGEXP = /^(\/(?:[^/]+\/)*?(?:\$\$virtual|__virtual__))((?:\/((?:[^/]+-)?[a-f0-9]+)(?:\/([^/]+))?)?((?:\/.*)?))$/;
 const VALID_COMPONENT = /^([^/]+-)?[a-f0-9]+$/;
 class VirtualFS extends ProxiedFS {
-  constructor({ baseFs = new NodeFS() } = {}) {
-    super(ppath);
-    this.baseFs = baseFs;
-  }
+  baseFs;
   static makeVirtualPath(base, component, to) {
     if (ppath.basename(base) !== `__virtual__`)
       throw new Error(`Assertion failed: Virtual folders must be named "__virtual__"`);
@@ -1319,6 +1316,10 @@ class VirtualFS extends ProxiedFS {
     const backstep = `../`.repeat(depth);
     const subpath = match[5] || `.`;
     return VirtualFS.resolveVirtual(ppath.join(target, backstep, subpath));
+  }
+  constructor({ baseFs = new NodeFS() } = {}) {
+    super(ppath);
+    this.baseFs = baseFs;
   }
   getExtractHint(hints) {
     return this.baseFs.getExtractHint(hints);
@@ -1411,32 +1412,31 @@ let entrypointPath = null;
 function setEntrypointPath(file) {
   entrypointPath = file;
 }
+const forcedModulePackages = /* @__PURE__ */ new Set([`fp-ts`]);
 function getFileFormat(filepath) {
   const ext = path.extname(filepath);
   switch (ext) {
-    case `.mjs`: {
+    case `.mjs`:
+    case `.ts`:
+    case `.tsx`: {
       return `module`;
     }
     case `.cjs`: {
       return `commonjs`;
     }
     case `.wasm`: {
-      throw new Error(
-        `Unknown file extension ".wasm" for ${filepath}`
-      );
+      return `module`;
     }
     case `.json`: {
       if (HAS_UNFLAGGED_JSON_MODULES)
         return `json`;
-      throw new Error(
-        `Unknown file extension ".json" for ${filepath}`
-      );
+      return `module`;
     }
     case `.js`: {
       const pkg = readPackageScope(filepath);
       if (!pkg)
         return `commonjs`;
-      return pkg.data.type ?? `commonjs`;
+      return forcedModulePackages.has(pkg.data.name) ? `module` : pkg.data.type ?? `commonjs`;
     }
     default: {
       if (entrypointPath !== filepath)
@@ -1450,10 +1450,27 @@ function getFileFormat(filepath) {
     }
   }
 }
+let esbuild;
+async function readSource(url) {
+  const content = await fs.promises.readFile(fileURLToPath(url), `utf8`);
+  const ext = path.extname(fileURLToPath(url));
+  if (ext === `.ts` || ext === `.tsx`) {
+    esbuild ??= process.env.USE_ESBUILD_WASM === `true` ? await import('esbuild-wasm') : await import('esbuild');
+    return (await esbuild.transform(content, {
+      format: `esm`,
+      jsx: `automatic`,
+      jsxDev: process.env.NODE_ENV === `development`,
+      jsxImportSource: `preact`,
+      loader: ext === `.tsx` ? `tsx` : `ts`,
+      target: `esnext`
+    })).code;
+  }
+  return content;
+}
 
 async function getFormat$1(resolved, context, defaultGetFormat) {
   const url = tryParseURL(resolved);
-  if ((url == null ? void 0 : url.protocol) !== `file:`)
+  if (url?.protocol !== `file:`)
     return defaultGetFormat(resolved, context, defaultGetFormat);
   const format = getFileFormat(fileURLToPath(url));
   if (format) {
@@ -1466,23 +1483,22 @@ async function getFormat$1(resolved, context, defaultGetFormat) {
 
 async function getSource$1(urlString, context, defaultGetSource) {
   const url = tryParseURL(urlString);
-  if ((url == null ? void 0 : url.protocol) !== `file:`)
+  if (url?.protocol !== `file:`)
     return defaultGetSource(urlString, context, defaultGetSource);
   return {
-    source: await fs.promises.readFile(fileURLToPath(url), `utf8`)
+    source: await readSource(url)
   };
 }
 
 async function load$1(urlString, context, nextLoad) {
-  var _a;
   const url = tryParseURL(urlString);
-  if ((url == null ? void 0 : url.protocol) !== `file:`)
+  if (url?.protocol !== `file:`)
     return nextLoad(urlString, context, nextLoad);
   const filePath = fileURLToPath(url);
   const format = getFileFormat(filePath);
   if (!format)
     return nextLoad(urlString, context, nextLoad);
-  if (HAS_JSON_IMPORT_ASSERTION_REQUIREMENT && format === `json` && ((_a = context.importAssertions) == null ? void 0 : _a.type) !== `json`) {
+  if (HAS_JSON_IMPORT_ASSERTION_REQUIREMENT && format === `json` && context.importAssertions?.type !== `json`) {
     const err = new TypeError(`[ERR_IMPORT_ASSERTION_TYPE_MISSING]: Module "${urlString}" needs an import assertion of type "json"`);
     err.code = `ERR_IMPORT_ASSERTION_TYPE_MISSING`;
     throw err;
@@ -1499,7 +1515,7 @@ async function load$1(urlString, context, nextLoad) {
   }
   return {
     format,
-    source: await fs.promises.readFile(filePath, `utf8`),
+    source: await readSource(url),
     shortCircuit: true
   };
 }
@@ -1997,7 +2013,6 @@ async function resolve$1(originalSpecifier, context, nextResolve) {
   if (specifier.startsWith(`#`))
     return resolvePrivateRequest(specifier, issuer, context, nextResolve);
   const dependencyNameMatch = specifier.match(pathRegExp);
-  let allowLegacyResolve = false;
   if (dependencyNameMatch) {
     const [, dependencyName, subPath] = dependencyNameMatch;
     if (subPath === `` && dependencyName !== `pnpapi`) {
@@ -2006,14 +2021,14 @@ async function resolve$1(originalSpecifier, context, nextResolve) {
         const content = await tryReadFile$1(resolved);
         if (content) {
           const pkg = JSON.parse(content);
-          allowLegacyResolve = pkg.exports == null;
+          pkg.exports == null;
         }
       }
     }
   }
   const result = pnpapi.resolveRequest(specifier, issuer, {
     conditions: new Set(conditions),
-    extensions: allowLegacyResolve ? void 0 : []
+    extensions: [`.js`, `.ts`, `.tsx`, `.cjs`, `.mjs`, `.json`]
   });
   if (!result)
     throw new Error(`Resolving '${specifier}' from '${issuer}' failed`);

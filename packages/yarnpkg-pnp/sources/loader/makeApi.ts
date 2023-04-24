@@ -824,7 +824,7 @@ export function makeApi(runtimeState: RuntimeState, opts: MakeApiOptions): PnpAp
    * appends ".js" / ".json", and transforms directory accesses into "index.js").
    */
 
-  function resolveUnqualified(unqualifiedPath: PortablePath, {extensions = Object.keys(Module._extensions)}: ResolveUnqualifiedOptions = {}): PortablePath {
+  function resolveUnqualified(unqualifiedPath: PortablePath, {extensions = Object.keys(Module._extensions).concat(`.ts`, `.tsx`)}: ResolveUnqualifiedOptions = {}): PortablePath {
     const candidates: Array<PortablePath> = [];
     const qualifiedPath = applyNodeExtensionResolution(unqualifiedPath, candidates, {extensions});
 
@@ -926,9 +926,11 @@ export function makeApi(runtimeState: RuntimeState, opts: MakeApiOptions): PnpAp
           ? isPathIgnored(issuer)
           : false;
 
-      const remappedPath = (!considerBuiltins || !nodeUtils.isBuiltinModule(request)) && !isIssuerIgnored()
+      let remappedPath = (!considerBuiltins || !nodeUtils.isBuiltinModule(request)) && !isIssuerIgnored()
         ? resolveUnqualifiedExport(request, unqualifiedPath, conditions, issuer)
         : unqualifiedPath;
+
+      remappedPath = remappedPath.replace(/\.jsx?$/, ``);
 
       return resolveUnqualified(remappedPath, {extensions});
     } catch (error) {
