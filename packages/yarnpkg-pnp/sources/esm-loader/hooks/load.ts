@@ -1,5 +1,6 @@
 import {VirtualFS, npath}                                                      from '@yarnpkg/fslib';
 import fs                                                                      from 'fs';
+import path                                                                    from 'path';
 import {fileURLToPath, pathToFileURL}                                          from 'url';
 
 import {HAS_JSON_IMPORT_ASSERTION_REQUIREMENT, WATCH_MODE_MESSAGE_USES_ARRAYS} from '../loaderFlags';
@@ -26,6 +27,10 @@ export async function load(
   if (!format)
     return nextLoad(urlString, context, nextLoad);
 
+  const ext = path.extname(fileURLToPath(url));
+  if (ext === `.ts` || ext === `.tsx`)
+    return nextLoad(urlString, context, nextLoad);
+
   if (HAS_JSON_IMPORT_ASSERTION_REQUIREMENT && format === `json` && context.importAssertions?.type !== `json`) {
     const err = new TypeError(`[ERR_IMPORT_ASSERTION_TYPE_MISSING]: Module "${urlString}" needs an import assertion of type "json"`) as TypeError & { code: string };
     err.code = `ERR_IMPORT_ASSERTION_TYPE_MISSING`;
@@ -49,7 +54,7 @@ export async function load(
 
   return {
     format,
-    source: await loaderUtils.readSource(url),
+    source: await fs.promises.readFile(filePath, `utf8`),
     shortCircuit: true,
   };
 }

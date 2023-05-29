@@ -18,6 +18,7 @@ export const getPnpPath = (project: Project) => {
     cjs: ppath.join(project.cwd, Filename.pnpCjs),
     data: ppath.join(project.cwd, Filename.pnpData),
     esmLoader: ppath.join(project.cwd, Filename.pnpEsmLoader),
+    tsLoader: ppath.join(project.cwd, Filename.pnpTsLoader),
   };
 };
 
@@ -30,7 +31,7 @@ async function setupScriptEnvironment(project: Project, env: {[key: string]: str
   let pnpRequire = `--require ${quotePathIfNeeded(npath.fromPortablePath(pnpPath.cjs))}`;
 
   if (xfs.existsSync(pnpPath.esmLoader))
-    pnpRequire = `${pnpRequire} --experimental-loader ${pathToFileURL(npath.fromPortablePath(pnpPath.esmLoader)).href}`;
+    pnpRequire = `${pnpRequire} --loader ${pathToFileURL(npath.fromPortablePath(pnpPath.esmLoader)).href} --loader ${pathToFileURL(npath.fromPortablePath(pnpPath.tsLoader)).href}`;
 
   if (pnpPath.cjs.includes(` `) && semver.lt(process.versions.node, `12.0.0`))
     throw new Error(`Expected the build location to not include spaces when using Node < 12.0.0 (${process.versions.node})`);
@@ -41,8 +42,9 @@ async function setupScriptEnvironment(project: Project, env: {[key: string]: str
     // We still support .pnp.js files to improve multi-project compatibility.
     // TODO: Drop the question mark in the RegExp after .pnp.js files stop being used.
     const pnpRegularExpression = /\s*--require\s+\S*\.pnp\.c?js\s*/g;
-    const esmLoaderExpression = /\s*--experimental-loader\s+\S*\.pnp\.loader\.mjs\s*/;
-    nodeOptions = nodeOptions.replace(pnpRegularExpression, ` `).replace(esmLoaderExpression, ` `).trim();
+    const esmLoaderExpression = /\s*--loader\s+\S*\.pnp\.loader\.mjs\s*/;
+    const tsLoaderExpression = /\s*--loader\s+\S*\.ts\.loader\.mjs\s*/;
+    nodeOptions = nodeOptions.replace(pnpRegularExpression, ` `).replace(esmLoaderExpression, ` `).replace(tsLoaderExpression, ` `).trim();
 
     nodeOptions = nodeOptions ? `${pnpRequire} ${nodeOptions}` : pnpRequire;
 

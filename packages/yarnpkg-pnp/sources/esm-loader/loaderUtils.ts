@@ -1,7 +1,7 @@
 import {NativePath}                 from '@yarnpkg/fslib';
 import fs                           from 'fs';
 import path                         from 'path';
-import {URL, fileURLToPath}         from 'url';
+import {URL}                        from 'url';
 
 import * as nodeUtils               from '../loader/nodeUtils';
 
@@ -31,8 +31,6 @@ let entrypointPath: NativePath | null = null;
 export function setEntrypointPath(file: NativePath) {
   entrypointPath = file;
 }
-
-const forcedModulePackages = new Set([`fp-ts`]);
 
 export function getFileFormat(filepath: string): string | null {
   const ext = path.extname(filepath);
@@ -64,7 +62,7 @@ export function getFileFormat(filepath: string): string | null {
       // assume CJS for files outside of a package boundary
       if (!pkg)
         return `commonjs`;
-      return forcedModulePackages.has(pkg.data.name) ? `module` : pkg.data.type ?? `commonjs`;
+      return pkg.data.module ? `module` : pkg.data.type ?? `commonjs`;
     }
     // Matching files beyond those handled above deviates from Node's default
     // --experimental-loader behavior but is required to work around
@@ -81,28 +79,4 @@ export function getFileFormat(filepath: string): string | null {
       return pkg.data.type ?? `commonjs`;
     }
   }
-}
-
-let esbuild: typeof import('esbuild');
-
-export async function readSource(url: URL): Promise<string> {
-  const content = await fs.promises.readFile(fileURLToPath(url), `utf8`);
-
-  const ext = path.extname(fileURLToPath(url));
-  if (ext === `.ts` || ext === `.tsx`) {
-    esbuild ??= process.env.USE_ESBUILD_WASM === `true`
-      ? await import(`esbuild-wasm`)
-      : await import(`esbuild`);
-
-    return (await esbuild.transform(content, {
-      format: `esm`,
-      jsx: `automatic`,
-      jsxDev: process.env.NODE_ENV === `development`,
-      jsxImportSource: `preact`,
-      loader: ext === `.tsx` ? `tsx` : `ts`,
-      target: `esnext`,
-    })).code;
-  }
-
-  return content;
 }

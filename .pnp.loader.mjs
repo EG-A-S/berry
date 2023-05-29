@@ -1450,23 +1450,6 @@ function getFileFormat(filepath) {
     }
   }
 }
-let esbuild;
-async function readSource(url) {
-  const content = await fs.promises.readFile(fileURLToPath(url), `utf8`);
-  const ext = path.extname(fileURLToPath(url));
-  if (ext === `.ts` || ext === `.tsx`) {
-    esbuild ??= process.env.USE_ESBUILD_WASM === `true` ? await import('esbuild-wasm') : await import('esbuild');
-    return (await esbuild.transform(content, {
-      format: `esm`,
-      jsx: `automatic`,
-      jsxDev: process.env.NODE_ENV === `development`,
-      jsxImportSource: `preact`,
-      loader: ext === `.tsx` ? `tsx` : `ts`,
-      target: `esnext`
-    })).code;
-  }
-  return content;
-}
 
 async function getFormat$1(resolved, context, defaultGetFormat) {
   const url = tryParseURL(resolved);
@@ -1486,7 +1469,7 @@ async function getSource$1(urlString, context, defaultGetSource) {
   if (url?.protocol !== `file:`)
     return defaultGetSource(urlString, context, defaultGetSource);
   return {
-    source: await readSource(url)
+    source: await undefined(url)
   };
 }
 
@@ -1497,6 +1480,9 @@ async function load$1(urlString, context, nextLoad) {
   const filePath = fileURLToPath(url);
   const format = getFileFormat(filePath);
   if (!format)
+    return nextLoad(urlString, context, nextLoad);
+  const ext = path.extname(fileURLToPath(url));
+  if (ext === `.ts` || ext === `.tsx`)
     return nextLoad(urlString, context, nextLoad);
   if (HAS_JSON_IMPORT_ASSERTION_REQUIREMENT && format === `json` && context.importAssertions?.type !== `json`) {
     const err = new TypeError(`[ERR_IMPORT_ASSERTION_TYPE_MISSING]: Module "${urlString}" needs an import assertion of type "json"`);
@@ -1515,7 +1501,7 @@ async function load$1(urlString, context, nextLoad) {
   }
   return {
     format,
-    source: await readSource(url),
+    source: await fs.promises.readFile(filePath, `utf8`),
     shortCircuit: true
   };
 }

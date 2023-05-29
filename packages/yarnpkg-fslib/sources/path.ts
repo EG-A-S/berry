@@ -31,6 +31,7 @@ export const Filename = {
   pnpCjs: `.pnp.cjs` as Filename,
   pnpData: `.pnp.data.json` as Filename,
   pnpEsmLoader: `.pnp.loader.mjs` as Filename,
+  pnpTsLoader: `.ts.loader.mjs` as Filename,
   rc: `.yarnrc.yml` as Filename,
 };
 

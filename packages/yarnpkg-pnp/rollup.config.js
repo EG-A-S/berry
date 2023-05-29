@@ -61,7 +61,34 @@ export default defineConfig([
       format: `esm`,
       generatedCode: `es2015`,
     },
-    external: [`esbuild`, `esbuild-wasm`],
+    plugins: [
+      resolve({
+        extensions: [`.mjs`, `.js`, `.ts`, `.tsx`, `.json`],
+        rootDir: path.join(__dirname, `../../`),
+        jail: path.join(__dirname, `../../`),
+        preferBuiltins: true,
+      }),
+      esbuild({
+        tsconfig: false,
+        target: `esnext`,
+        define: {
+          document: `undefined`,
+          XMLHttpRequest: `undefined`,
+          crypto: `undefined`,
+        },
+      }),
+      cjs({requireReturnsDefault: `preferred`}),
+      wrapOutput(),
+    ],
+  },
+  {
+    input: `./sources/esm-loader/ts-loader.ts`,
+    output: {
+      file: `./sources/esm-loader/built-ts-loader.js`,
+      format: `esm`,
+      generatedCode: `es2015`,
+    },
+    external: [`esbuild`],
     plugins: [
       resolve({
         extensions: [`.mjs`, `.js`, `.ts`, `.tsx`, `.json`],

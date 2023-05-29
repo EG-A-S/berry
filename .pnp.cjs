@@ -51589,6 +51589,7 @@ const Filename = {
   pnpCjs: `.pnp.cjs`,
   pnpData: `.pnp.data.json`,
   pnpEsmLoader: `.pnp.loader.mjs`,
+  pnpTsLoader: `.ts.loader.mjs`,
   rc: `.yarnrc.yml`
 };
 const npath = Object.create(path__default.default);

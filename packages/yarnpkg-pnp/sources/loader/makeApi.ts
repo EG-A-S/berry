@@ -261,7 +261,7 @@ export function makeApi(runtimeState: RuntimeState, opts: MakeApiOptions): PnpAp
   /**
    * Implements the node resolution for folder access and extension selection
    */
-  function applyNodeExtensionResolution(unqualifiedPath: PortablePath, candidates: Array<PortablePath>, {extensions}: {extensions: Array<string>}): PortablePath | null {
+  function applyNodeExtensionResolution(unqualifiedPath: PortablePath, candidates: Array<PortablePath>, {conditions, extensions}: {conditions: Set<string> | undefined, extensions: Array<string>}): PortablePath | null {
     let stat;
 
     try {
@@ -285,13 +285,15 @@ export function makeApi(runtimeState: RuntimeState, opts: MakeApiOptions): PnpAp
 
       let nextUnqualifiedPath;
 
-      if (pkgJson && pkgJson.main)
+      if (pkgJson && conditions?.has(`import`) && pkgJson.module)
+        nextUnqualifiedPath = ppath.resolve(unqualifiedPath, pkgJson.module);
+      else if (pkgJson && pkgJson.main)
         nextUnqualifiedPath = ppath.resolve(unqualifiedPath, pkgJson.main);
 
       // If the "main" field changed the path, we start again from this new location
 
       if (nextUnqualifiedPath && nextUnqualifiedPath !== unqualifiedPath) {
-        const resolution = applyNodeExtensionResolution(nextUnqualifiedPath, candidates, {extensions});
+        const resolution = applyNodeExtensionResolution(nextUnqualifiedPath, candidates, {conditions, extensions});
 
         if (resolution !== null) {
           return resolution;
@@ -824,9 +826,9 @@ export function makeApi(runtimeState: RuntimeState, opts: MakeApiOptions): PnpAp
    * appends ".js" / ".json", and transforms directory accesses into "index.js").
    */
 
-  function resolveUnqualified(unqualifiedPath: PortablePath, {extensions = Object.keys(Module._extensions).concat(`.ts`, `.tsx`)}: ResolveUnqualifiedOptions = {}): PortablePath {
+  function resolveUnqualified(unqualifiedPath: PortablePath, {conditions, extensions = Object.keys(Module._extensions).concat(`.ts`, `.tsx`)}: ResolveUnqualifiedOptions = {}): PortablePath {
     const candidates: Array<PortablePath> = [];
-    const qualifiedPath = applyNodeExtensionResolution(unqualifiedPath, candidates, {extensions});
+    const qualifiedPath = applyNodeExtensionResolution(unqualifiedPath, candidates, {conditions, extensions});
 
     if (qualifiedPath) {
       return ppath.normalize(qualifiedPath);
@@ -932,7 +934,7 @@ export function makeApi(runtimeState: RuntimeState, opts: MakeApiOptions): PnpAp
 
       remappedPath = remappedPath.replace(/\.jsx?$/, ``);
 
-      return resolveUnqualified(remappedPath, {extensions});
+      return resolveUnqualified(remappedPath, {conditions, extensions});
     } catch (error) {
       if (Object.prototype.hasOwnProperty.call(error, `pnpCode`))
         Object.assign(error.data, {request: getPathForDisplay(request), issuer: issuer && getPathForDisplay(issuer)});
