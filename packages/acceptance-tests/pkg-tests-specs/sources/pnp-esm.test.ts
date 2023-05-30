@@ -1,5 +1,6 @@
-import {Filename, ppath, xfs} from '@yarnpkg/fslib';
-import * as loaderFlags       from '@yarnpkg/pnp/sources/esm-loader/loaderFlags';
+import {Filename, npath, ppath, xfs} from '@yarnpkg/fslib';
+import * as loaderFlags              from '@yarnpkg/pnp/sources/esm-loader/loaderFlags';
+import {pathToFileURL}               from 'url';
 
 describe(`Plug'n'Play - ESM`, () => {
   test(
@@ -654,6 +655,81 @@ describe(`Plug'n'Play - ESM`, () => {
     ),
   );
 
+  test(
+    `it should throw ERR_MODULE_NOT_FOUND when statically importing a nonexistent file`,
+    makeTemporaryEnv(
+      {
+        type: `module`,
+      },
+      async ({path, run, source}) => {
+        await expect(run(`install`)).resolves.toMatchObject({code: 0});
+
+        await xfs.writeFilePromise(ppath.join(path, `index.js`), `
+          import("./foo.js").catch((err) => {
+            console.log(err.code)
+          })
+        `);
+
+        await xfs.writeFilePromise(ppath.join(path, `foo.js`), `import './nonexistent.js'`);
+
+        await expect(run(`node`, `index.js`)).resolves.toMatchObject({
+          code: 0,
+          stdout: `ERR_MODULE_NOT_FOUND\n`,
+        });
+      },
+    ),
+  );
+
+  test(
+    `it should throw ERR_MODULE_NOT_FOUND when dynamically importing a nonexistent file`,
+    makeTemporaryEnv(
+      {
+        type: `module`,
+      },
+      async ({path, run, source}) => {
+        await expect(run(`install`)).resolves.toMatchObject({code: 0});
+
+        await xfs.writeFilePromise(ppath.join(path, `index.js`), `
+          import("./nonexistent.js").catch((err) => {
+            console.log(err.code)
+          })
+        `);
+
+        await expect(run(`node`, `index.js`)).resolves.toMatchObject({
+          code: 0,
+          stdout: `ERR_MODULE_NOT_FOUND\n`,
+        });
+      },
+    ),
+  );
+
+  test(
+    `it should throw ERR_PACKAGE_PATH_NOT_EXPORTED when subpath isn't exported`,
+    makeTemporaryEnv(
+      {
+        name: `foo`,
+        type: `module`,
+        exports: {
+          './package.json': `./package.json`,
+        },
+      },
+      async ({path, run, source}) => {
+        await expect(run(`install`)).resolves.toMatchObject({code: 0});
+
+        await xfs.writeFilePromise(ppath.join(path, `index.mjs`), `
+          import('foo/bar').catch(err => {
+            console.log(err.code)
+          });
+        `);
+
+        await expect(run(`node`, `./index.mjs`)).resolves.toMatchObject({
+          code: 0,
+          stdout: `ERR_PACKAGE_PATH_NOT_EXPORTED\n`,
+        });
+      },
+    ),
+  );
+
   // Tests /packages/yarnpkg-pnp/sources/esm-loader/fspatch.ts
   test(
     `it should support named exports in commonjs files`,
@@ -891,6 +967,62 @@ describe(`Plug'n'Play - ESM`, () => {
             code: 1,
             stdout: ``,
             stderr: expect.stringContaining(`Mapping from one private import to another isn't allowed`),
+          });
+        },
+      ),
+    );
+
+    (loaderFlags.HAS_CONSOLIDATED_HOOKS ? test : test.skip)(
+      `it should allow importing files regardless of parent URL`,
+      makeTemporaryEnv(
+        {
+          type: `module`,
+        },
+        async ({path, run, source}) => {
+          await expect(run(`install`)).resolves.toMatchObject({code: 0});
+
+          await xfs.writeFilePromise(
+            ppath.join(path, `loader.js`),
+            `
+            export function resolve(specifier, context, next) {
+              if (specifier !== 'custom:foo') {
+                return next(specifier, context);
+              }
+
+              return {
+                shortCircuit: true,
+                url: 'custom:foo',
+              };
+            }
+
+            export function load(url, context, next) {
+              if (url !== 'custom:foo') {
+                return next(url, context);
+              }
+
+              return {
+                format: 'module',
+                source: "import { foo } from '${pathToFileURL(npath.fromPortablePath(ppath.join(path, `foo.js`)))}'\\nconsole.log(foo);",
+                shortCircuit: true,
+              };
+            }
+            `,
+          );
+
+          await xfs.writeFilePromise(
+            ppath.join(path, `foo.js`),
+            `export const foo = 42;`,
+          );
+
+          await xfs.writeFilePromise(
+            ppath.join(path, `index.js`),
+            `import 'custom:foo'`,
+          );
+
+          await expect(run(`node`, `--loader`, `./loader.js`, `./index.js`)).resolves.toMatchObject({
+            code: 0,
+            stdout: `42\n`,
+            stderr: ``,
           });
         },
       ),
