@@ -1,3 +1,4 @@
+import esbuild from 'esbuild';
 import fs from 'fs';
 import path from 'path';
 import { URL, fileURLToPath } from 'url';
@@ -96,7 +97,6 @@ function tryParseURL(str, base) {
   }
 }
 let entrypointPath = null;
-const forcedModulePackages = /* @__PURE__ */ new Set([`fp-ts`]);
 function getFileFormat(filepath) {
   const ext = path.extname(filepath);
   switch (ext) {
@@ -120,7 +120,7 @@ function getFileFormat(filepath) {
       const pkg = readPackageScope(filepath);
       if (!pkg)
         return `commonjs`;
-      return forcedModulePackages.has(pkg.data.name) ? `module` : pkg.data.type ?? `commonjs`;
+      return pkg.data.module ? `module` : pkg.data.type ?? `commonjs`;
     }
     default: {
       if (entrypointPath !== filepath)
@@ -135,7 +135,6 @@ function getFileFormat(filepath) {
   }
 }
 
-let esbuild;
 async function resolve(originalSpecifier, context, nextResolve) {
   return nextResolve(originalSpecifier, context, nextResolve);
 }
@@ -151,7 +150,6 @@ async function load(urlString, context, nextLoad) {
   if (!(ext === `.ts` || ext === `.tsx`))
     return nextLoad(urlString, context, nextLoad);
   const content = await fs.promises.readFile(fileURLToPath(url), `utf8`);
-  esbuild ??= process.env.USE_ESBUILD_WASM === `true` ? await import('esbuild-wasm') : await import('esbuild');
   const { code: transformedSource } = await esbuild.transform(content, {
     format: `esm`,
     jsx: `automatic`,

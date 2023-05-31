@@ -1364,6 +1364,7 @@ const HAS_CONSOLIDATED_HOOKS = major > 16 || major === 16 && minor >= 12;
 const HAS_UNFLAGGED_JSON_MODULES = major > 17 || major === 17 && minor >= 5 || major === 16 && minor >= 15;
 const HAS_JSON_IMPORT_ASSERTION_REQUIREMENT = major > 17 || major === 17 && minor >= 1 || major === 16 && minor > 14;
 const WATCH_MODE_MESSAGE_USES_ARRAYS = major > 19 || major === 19 && minor >= 2 || major === 18 && minor >= 13;
+const HAS_LAZY_LOADED_TRANSLATORS = major > 19 || major === 19 && minor >= 3;
 
 const builtinModules = new Set(Module.builtinModules || Object.keys(process.binding(`natives`)));
 const isBuiltinModule = (request) => request.startsWith(`node:`) || builtinModules.has(request);
@@ -1412,7 +1413,6 @@ let entrypointPath = null;
 function setEntrypointPath(file) {
   entrypointPath = file;
 }
-const forcedModulePackages = /* @__PURE__ */ new Set([`fp-ts`]);
 function getFileFormat(filepath) {
   const ext = path.extname(filepath);
   switch (ext) {
@@ -1436,7 +1436,7 @@ function getFileFormat(filepath) {
       const pkg = readPackageScope(filepath);
       if (!pkg)
         return `commonjs`;
-      return forcedModulePackages.has(pkg.data.name) ? `module` : pkg.data.type ?? `commonjs`;
+      return pkg.data.module ? `module` : pkg.data.type ?? `commonjs`;
     }
     default: {
       if (entrypointPath !== filepath)
@@ -1954,6 +1954,11 @@ function packageImportsResolve({ name, base, conditions, readFileSyncFn }) {
   throwImportNotDefined(name, packageJSONUrl, base);
 }
 
+if (!moduleExports.findPnpApi) {
+  const pnpPath = `./.pnp.cjs`;
+  const { default: pnpApi } = await import(pnpPath);
+  pnpApi.setup();
+}
 const pathRegExp = /^(?![a-zA-Z]:[\\/]|\\\\|\.{0,2}(?:\/|$))((?:node:)?(?:@[^/]+\/)?[^/]+)\/*(.*|)$/;
 const isRelativeRegexp = /^\.{0,2}\//;
 function tryReadFile(filePath) {
@@ -1992,7 +1997,7 @@ async function resolve$1(originalSpecifier, context, nextResolve) {
     specifier = fileURLToPath(url);
   }
   const { parentURL, conditions = [] } = context;
-  const issuer = parentURL ? fileURLToPath(parentURL) : process.cwd();
+  const issuer = parentURL && tryParseURL(parentURL)?.protocol === `file:` ? fileURLToPath(parentURL) : process.cwd();
   const pnpapi = findPnpApi(issuer) ?? (url ? findPnpApi(specifier) : null);
   if (!pnpapi)
     return nextResolve(originalSpecifier, context, nextResolve);
@@ -2012,10 +2017,17 @@ async function resolve$1(originalSpecifier, context, nextResolve) {
       }
     }
   }
-  const result = pnpapi.resolveRequest(specifier, issuer, {
-    conditions: new Set(conditions),
-    extensions: [`.js`, `.ts`, `.tsx`, `.cjs`, `.mjs`, `.json`]
-  });
+  let result;
+  try {
+    result = pnpapi.resolveRequest(specifier, issuer, {
+      conditions: new Set(conditions),
+      extensions: [`.js`, `.ts`, `.tsx`, `.cjs`, `.mjs`, `.json`]
+    });
+  } catch (err) {
+    if (err instanceof Error && `code` in err && err.code === `MODULE_NOT_FOUND`)
+      err.code = `ERR_MODULE_NOT_FOUND`;
+    throw err;
+  }
   if (!result)
     throw new Error(`Resolving '${specifier}' from '${issuer}' failed`);
   const resultURL = pathToFileURL(result);
@@ -2031,32 +2043,34 @@ async function resolve$1(originalSpecifier, context, nextResolve) {
   };
 }
 
-const binding = process.binding(`fs`);
-const originalfstat = binding.fstat;
-const ZIP_MASK = 4278190080;
-const ZIP_MAGIC = 704643072;
-binding.fstat = function(...args) {
-  const [fd, useBigint, req] = args;
-  if ((fd & ZIP_MASK) === ZIP_MAGIC && useBigint === false && req === void 0) {
-    try {
-      const stats = fs.fstatSync(fd);
-      return new Float64Array([
-        stats.dev,
-        stats.mode,
-        stats.nlink,
-        stats.uid,
-        stats.gid,
-        stats.rdev,
-        stats.blksize,
-        stats.ino,
-        stats.size,
-        stats.blocks
-      ]);
-    } catch {
+if (!HAS_LAZY_LOADED_TRANSLATORS) {
+  const binding = process.binding(`fs`);
+  const originalfstat = binding.fstat;
+  const ZIP_MASK = 4278190080;
+  const ZIP_MAGIC = 704643072;
+  binding.fstat = function(...args) {
+    const [fd, useBigint, req] = args;
+    if ((fd & ZIP_MASK) === ZIP_MAGIC && useBigint === false && req === void 0) {
+      try {
+        const stats = fs.fstatSync(fd);
+        return new Float64Array([
+          stats.dev,
+          stats.mode,
+          stats.nlink,
+          stats.uid,
+          stats.gid,
+          stats.rdev,
+          stats.blksize,
+          stats.ino,
+          stats.size,
+          stats.blocks
+        ]);
+      } catch {
+      }
     }
-  }
-  return originalfstat.apply(this, args);
-};
+    return originalfstat.apply(this, args);
+  };
+}
 
 const resolve = resolve$1;
 const getFormat = HAS_CONSOLIDATED_HOOKS ? void 0 : getFormat$1;
