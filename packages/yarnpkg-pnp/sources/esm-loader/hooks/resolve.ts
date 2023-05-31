@@ -8,6 +8,12 @@ import {packageImportsResolve}        from '../../node/resolve';
 import {PnpApi}                       from '../../types';
 import * as loaderUtils               from '../loaderUtils';
 
+if (!moduleExports.findPnpApi) {
+  const pnpPath = `./.pn` + `p.cjs`;
+  const {default: pnpApi} = await import(pnpPath);
+  pnpApi.setup();
+}
+
 const pathRegExp = /^(?![a-zA-Z]:[\\/]|\\\\|\.{0,2}(?:\/|$))((?:node:)?(?:@[^/]+\/)?[^/]+)\/*(.*|)$/;
 const isRelativeRegexp = /^\.{0,2}\//;
 

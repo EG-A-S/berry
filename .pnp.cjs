@@ -39090,7 +39090,7 @@ const RAW_RUNTIME_STATE =
           ["react-dom", "virtual:118b26a6cee620b5aa3e7e8d8b8e34cd9e486f75b92701001168da9be550fadd8c9d9b12643c642e2d528c2624fd8fe7e128eec9d715340efac44400432a0e0c#npm:16.13.1"],\
           ["react-lifecycles-compat", "npm:3.0.4"],\
           ["shallowequal", "npm:1.1.0"],\
-          ["typescript", "patch:typescript@npm%3A3.9.10#optional!builtin<compat/typescript>::version=3.9.10&hash=3bd3d3"]\
+          ["typescript", "patch:typescript@npm%3A3.9.10#optional!builtin<compat/typescript>::version=3.9.10&hash=3bafbf"]\
         ],\
         "packagePeers": [\
           "@types/react-dom",\
@@ -48762,7 +48762,7 @@ const RAW_RUNTIME_STATE =
           ["typedoc-default-themes", "npm:0.8.0-0"],\
           ["typedoc-neo-theme", null],\
           ["typedoc-plugin-yarn", "portal:./typedoc-plugin-yarn::locator=%40yarnpkg%2Fgatsby%40workspace%3Apackages%2Fgatsby"],\
-          ["typescript", "patch:typescript@npm%3A3.9.10#optional!builtin<compat/typescript>::version=3.9.10&hash=3bd3d3"]\
+          ["typescript", "patch:typescript@npm%3A3.9.10#optional!builtin<compat/typescript>::version=3.9.10&hash=3bafbf"]\
         ],\
         "packagePeers": [\
           "@strictsoftware/typedoc-plugin-monorepo",\
@@ -48841,16 +48841,16 @@ const RAW_RUNTIME_STATE =
         "packageDependencies": [\
           ["typedoc-plugin-yarn", "portal:./typedoc-plugin-yarn::locator=%40yarnpkg%2Fgatsby%40workspace%3Apackages%2Fgatsby"],\
           ["typedoc", "virtual:258c95d7dd1da51c9c624f238593e0bc1c34b7bd8de0b85fefd9552f2220a4555cad458eb72d96f0c7b341784726b6a8e9c8b4e838a9d27aac3796b29de01981#patch:typedoc@npm%3A0.17.0-3#~/.yarn/patches/typedoc-npm-0.17.0-3-0ce05847cf.patch::version=0.17.0-3&hash=803669"],\
-          ["typescript", "patch:typescript@npm%3A3.9.10#optional!builtin<compat/typescript>::version=3.9.10&hash=3bd3d3"]\
+          ["typescript", "patch:typescript@npm%3A3.9.10#optional!builtin<compat/typescript>::version=3.9.10&hash=3bafbf"]\
         ],\
         "linkType": "SOFT"\
       }]\
     ]],\
     ["typescript", [\
-      ["patch:typescript@npm%3A3.9.10#optional!builtin<compat/typescript>::version=3.9.10&hash=3bd3d3", {\
-        "packageLocation": "./.yarn/cache/typescript-patch-24818892bd-060f1bcb5c.zip/node_modules/typescript/",\
+      ["patch:typescript@npm%3A3.9.10#optional!builtin<compat/typescript>::version=3.9.10&hash=3bafbf", {\
+        "packageLocation": "./.yarn/cache/typescript-patch-10c3ddb263-71216d908e.zip/node_modules/typescript/",\
         "packageDependencies": [\
-          ["typescript", "patch:typescript@npm%3A3.9.10#optional!builtin<compat/typescript>::version=3.9.10&hash=3bd3d3"]\
+          ["typescript", "patch:typescript@npm%3A3.9.10#optional!builtin<compat/typescript>::version=3.9.10&hash=3bafbf"]\
         ],\
         "linkType": "HARD"\
       }],\
@@ -51590,6 +51590,7 @@ const Filename = {
   pnpCjs: `.pnp.cjs`,
   pnpData: `.pnp.data.json`,
   pnpEsmLoader: `.pnp.loader.mjs`,
+  pnpTsLoader: `.ts.loader.mjs`,
   rc: `.yarnrc.yml`
 };
 const npath = Object.create(path__default.default);
@@ -57970,7 +57971,7 @@ function makeApi(runtimeState, opts) {
       );
     }
   }
-  function applyNodeExtensionResolution(unqualifiedPath, candidates, { extensions }) {
+  function applyNodeExtensionResolution(unqualifiedPath, candidates, { conditions, extensions }) {
     let stat;
     try {
       candidates.push(unqualifiedPath);
@@ -57986,10 +57987,12 @@ function makeApi(runtimeState, opts) {
       } catch (error) {
       }
       let nextUnqualifiedPath;
-      if (pkgJson && pkgJson.main)
+      if (pkgJson && conditions?.has(`import`) && pkgJson.module)
+        nextUnqualifiedPath = ppath.resolve(unqualifiedPath, pkgJson.module);
+      else if (pkgJson && pkgJson.main)
         nextUnqualifiedPath = ppath.resolve(unqualifiedPath, pkgJson.main);
       if (nextUnqualifiedPath && nextUnqualifiedPath !== unqualifiedPath) {
-        const resolution = applyNodeExtensionResolution(nextUnqualifiedPath, candidates, { extensions });
+        const resolution = applyNodeExtensionResolution(nextUnqualifiedPath, candidates, { conditions, extensions });
         if (resolution !== null) {
           return resolution;
         }
@@ -58355,9 +58358,9 @@ Required by: ${issuerLocator.name}@${issuerLocator.reference} (via ${issuerForDi
       return unqualifiedPath;
     }
   }
-  function resolveUnqualified(unqualifiedPath, { extensions = Object.keys(require$$0.Module._extensions).concat(`.ts`, `.tsx`) } = {}) {
+  function resolveUnqualified(unqualifiedPath, { conditions, extensions = Object.keys(require$$0.Module._extensions).concat(`.ts`, `.tsx`) } = {}) {
     const candidates = [];
-    const qualifiedPath = applyNodeExtensionResolution(unqualifiedPath, candidates, { extensions });
+    const qualifiedPath = applyNodeExtensionResolution(unqualifiedPath, candidates, { conditions, extensions });
     if (qualifiedPath) {
       return ppath.normalize(qualifiedPath);
     } else {
@@ -58435,7 +58438,7 @@ ${candidates.map((candidate) => `Not found: ${getPathForDisplay(candidate)}
       const isIssuerIgnored = () => issuer !== null ? isPathIgnored(issuer) : false;
       let remappedPath = (!considerBuiltins || !isBuiltinModule(request)) && !isIssuerIgnored() ? resolveUnqualifiedExport(request, unqualifiedPath, conditions, issuer) : unqualifiedPath;
       remappedPath = remappedPath.replace(/\.jsx?$/, ``);
-      return resolveUnqualified(remappedPath, { extensions });
+      return resolveUnqualified(remappedPath, { conditions, extensions });
     } catch (error) {
       if (Object.prototype.hasOwnProperty.call(error, `pnpCode`))
         Object.assign(error.data, { request: getPathForDisplay(request), issuer: issuer && getPathForDisplay(issuer) });
