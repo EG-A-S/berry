@@ -3,6 +3,7 @@ import type {ExtendOptions, RequestError, Response} from 'got';
 import {Agent as HttpsAgent}                        from 'https';
 import {Agent as HttpAgent}                         from 'http';
 import micromatch                                   from 'micromatch';
+import net                                          from 'net';
 import tunnel, {ProxyOptions}                       from 'tunnel';
 import {URL}                                        from 'url';
 
@@ -14,6 +15,9 @@ import {MapValue, MapValueToObjectValue}            from './miscUtils';
 import * as miscUtils                               from './miscUtils';
 
 export type {RequestError}                                   from 'got';
+
+// TODO: Temporary workaround for this bug in Node.JS v20 -- https://github.com/nodejs/node/issues/47822
+net.setDefaultAutoSelectFamilyAttemptTimeout(20000);
 
 const cache = new Map<string, Promise<Buffer> | Buffer>();
 const fileCache = new Map<PortablePath, Promise<Buffer> | Buffer>();
