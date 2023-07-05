@@ -86,6 +86,7 @@
         "@yarnpkg/plugin-github",
         "@yarnpkg/plugin-http",
         "@yarnpkg/plugin-npm",
+        "@yarnpkg/plugin-npm-cli",
         "@yarnpkg/plugin-patch",
         "@yarnpkg/plugin-pnp",
         "@yarnpkg/plugin-workspace-tools"
