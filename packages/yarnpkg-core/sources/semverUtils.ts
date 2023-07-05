@@ -197,6 +197,7 @@ export function stringifyComparator(comparator: Comparator) {
 }
 
 export function simplifyRanges(ranges: Array<string>) {
+  ranges = ranges.filter(range => range !== `*`);
   const parsedRanges = ranges.map(range => validRange(range)!.set.map(comparators => comparators.map(comparator => getComparator(comparator))));
 
   let alternatives = parsedRanges.shift()!.map(comparators => mergeComparators(comparators))
