@@ -4,7 +4,9 @@ import {Command, Option, Usage, UsageError}                                 from
 import {build, Plugin}                                                      from 'esbuild';
 import fs                                                                   from 'fs';
 import path                                                                 from 'path';
+import semver                                                               from 'semver';
 
+import pkg                                                                  from '../../../package.json';
 import {isDynamicLib}                                                       from '../../tools/isDynamicLib';
 
 const matchAll = /()/;
@@ -69,7 +71,6 @@ export default class BuildPluginCommand extends Command {
       configuration,
       includeFooter: false,
       stdout: this.context.stdout,
-      forgettableNames: new Set([MessageName.UNNAMED]),
     }, async report => {
       await report.startTimerPromise(`Building ${prettyName}`, async () => {
         const dynamicLibResolver: Plugin = {

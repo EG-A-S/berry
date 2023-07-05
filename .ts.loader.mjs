@@ -2,66 +2,10 @@ import esbuild from 'esbuild';
 import fs from 'fs';
 import path from 'path';
 import { URL, fileURLToPath } from 'url';
+import { npath } from '@yarnpkg/fslib';
 import { Module } from 'module';
 
-const npath = Object.create(path);
-const ppath = Object.create(path.posix);
-npath.cwd = () => process.cwd();
-ppath.cwd = () => toPortablePath(process.cwd());
-ppath.resolve = (...segments) => {
-  if (segments.length > 0 && ppath.isAbsolute(segments[0])) {
-    return path.posix.resolve(...segments);
-  } else {
-    return path.posix.resolve(ppath.cwd(), ...segments);
-  }
-};
-const contains = function(pathUtils, from, to) {
-  from = pathUtils.normalize(from);
-  to = pathUtils.normalize(to);
-  if (from === to)
-    return `.`;
-  if (!from.endsWith(pathUtils.sep))
-    from = from + pathUtils.sep;
-  if (to.startsWith(from)) {
-    return to.slice(from.length);
-  } else {
-    return null;
-  }
-};
-npath.fromPortablePath = fromPortablePath;
-npath.toPortablePath = toPortablePath;
-npath.contains = (from, to) => contains(npath, from, to);
-ppath.contains = (from, to) => contains(ppath, from, to);
-const WINDOWS_PATH_REGEXP = /^([a-zA-Z]:.*)$/;
-const UNC_WINDOWS_PATH_REGEXP = /^\/\/(\.\/)?(.*)$/;
-const PORTABLE_PATH_REGEXP = /^\/([a-zA-Z]:.*)$/;
-const UNC_PORTABLE_PATH_REGEXP = /^\/unc\/(\.dot\/)?(.*)$/;
-function fromPortablePath(p) {
-  if (process.platform !== `win32`)
-    return p;
-  let portablePathMatch, uncPortablePathMatch;
-  if (portablePathMatch = p.match(PORTABLE_PATH_REGEXP))
-    p = portablePathMatch[1];
-  else if (uncPortablePathMatch = p.match(UNC_PORTABLE_PATH_REGEXP))
-    p = `\\\\${uncPortablePathMatch[1] ? `.\\` : ``}${uncPortablePathMatch[2]}`;
-  else
-    return p;
-  return p.replace(/\//g, `\\`);
-}
-function toPortablePath(p) {
-  if (process.platform !== `win32`)
-    return p;
-  p = p.replace(/\\/g, `/`);
-  let windowsPathMatch, uncWindowsPathMatch;
-  if (windowsPathMatch = p.match(WINDOWS_PATH_REGEXP))
-    p = `/${windowsPathMatch[1]}`;
-  else if (uncWindowsPathMatch = p.match(UNC_WINDOWS_PATH_REGEXP))
-    p = `/unc/${uncWindowsPathMatch[1] ? `.dot/` : ``}${uncWindowsPathMatch[2]}`;
-  return p;
-}
-
-const [major, minor] = process.versions.node.split(`.`).map((value) => parseInt(value, 10));
-const HAS_UNFLAGGED_JSON_MODULES = major > 17 || major === 17 && minor >= 5 || major === 16 && minor >= 15;
+process.versions.node.split(`.`).map((value) => parseInt(value, 10));
 
 new Set(Module.builtinModules || Object.keys(process.binding(`natives`)));
 function readPackageScope(checkPath) {
@@ -112,9 +56,7 @@ function getFileFormat(filepath) {
       return `module`;
     }
     case `.json`: {
-      if (HAS_UNFLAGGED_JSON_MODULES)
-        return `json`;
-      return `module`;
+      return `json`;
     }
     case `.js`: {
       const pkg = readPackageScope(filepath);
