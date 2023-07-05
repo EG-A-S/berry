@@ -3,10 +3,7 @@ import resolve              from '@rollup/plugin-node-resolve';
 import path                 from 'path';
 import esbuild              from 'rollup-plugin-esbuild';
 import {defineConfig}       from 'rollup';
-import semver               from 'semver';
 import {brotliCompressSync} from 'zlib';
-
-import pkg                  from './package.json';
 
 function wrapOutput() {
   return {
