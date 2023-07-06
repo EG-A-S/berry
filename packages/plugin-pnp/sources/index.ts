@@ -48,7 +48,9 @@ async function setupScriptEnvironment(project: Project, env: {[key: string]: str
 
     nodeOptions = nodeOptions ? `${pnpRequire} ${nodeOptions}` : pnpRequire;
 
-    env.NODE_OPTIONS = nodeOptions;
+    const configuredNodeOptions = project.configuration.get(`nodeOptions`);
+
+    env.NODE_OPTIONS = nodeOptions + (configuredNodeOptions ? ` ${configuredNodeOptions}` : ``);
   }
 }
 
@@ -64,6 +66,7 @@ async function populateYarnPaths(project: Project, definePath: (path: PortablePa
 declare module '@yarnpkg/core' {
   interface ConfigurationValueMap {
     nodeLinker: string;
+    nodeOptions: string;
     winLinkType: string;
     pnpMode: string;
     pnpShebang: string;
@@ -85,6 +88,11 @@ const plugin: Plugin<CoreHooks & StageHooks> = {
       description: `The linker used for installing Node packages, one of: "pnp", "node-modules"`,
       type: SettingsType.STRING,
       default: `pnp`,
+    },
+    nodeOptions: {
+      description: `Node options to use when setting up the script environment`,
+      type: SettingsType.STRING,
+      default: ``,
     },
     winLinkType: {
       description: `Whether Yarn should use Windows Junctions or symlinks when creating links on Windows.`,
