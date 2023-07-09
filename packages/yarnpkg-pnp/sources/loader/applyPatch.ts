@@ -1,6 +1,6 @@
 import {FakeFS, PosixFS, npath, patchFs, PortablePath, NativePath, VirtualFS} from '@yarnpkg/fslib';
 import fs                                                                     from 'fs';
-import {Module}                                                               from 'module';
+import {Module, createRequire}                                                from 'module';
 import {URL, fileURLToPath, pathToFileURL}                                    from 'url';
 
 import {PnpApi}                                                               from '../types';
@@ -8,6 +8,8 @@ import {PnpApi}                                                               fr
 import {ErrorCode, makeError, getIssuerModule}                                from './internalTools';
 import {Manager}                                                              from './makeManager';
 import * as nodeUtils                                                         from './nodeUtils';
+
+const hiddenRequire = createRequire(pathToFileURL(__filename));
 
 export type ApplyPatchOptions = {
   fakeFs: FakeFS<PortablePath>;
@@ -328,8 +330,8 @@ export function applyPatch(pnpapi: PnpApi, opts: ApplyPatchOptions) {
 
   function transpile(module: Module, filename: string, loader: string) {
     esbuild ??= process.env.USE_ESBUILD_WASM === `true`
-      ? eval(`require("esbuild-wasm");`)
-      : eval(`require("esbuild");`);
+      ? hiddenRequire(`esbuild-wasm`)
+      : hiddenRequire(`esbuild`);
 
     const source = fs.readFileSync(filename, {encoding: `utf8`});
 
