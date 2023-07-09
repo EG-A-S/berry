@@ -727,6 +727,11 @@ export class Project {
         resolveOptions,
       });
 
+      if (!dependency) {
+        pkg.dependencies.delete(identHash);
+        continue;
+      }
+
       if (!structUtils.areIdentsEqual(descriptor, dependency))
         throw new Error(`Assertion failed: The descriptor ident cannot be changed through aliases`);
 
