@@ -15,7 +15,7 @@ export class NpmTagResolver implements Resolver {
     if (!TAG_REGEXP.test(descriptor.range.slice(PROTOCOL.length)))
       return false;
 
-    return true;
+    return descriptor.range.slice(PROTOCOL.length) !== `greatest`;
   }
 
   supportsLocator(locator: Locator, opts: MinimalResolveOptions) {
