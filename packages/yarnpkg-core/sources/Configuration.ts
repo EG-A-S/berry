@@ -49,6 +49,9 @@ const IGNORED_ENV_VARIABLES = new Set([
   `injectNpmUser`,
   `injectNpmPassword`,
   `injectNpm2FaToken`,
+  `cacheCheckpointOverride`,
+  `cacheVersionOverride`,
+  `lockfileVersionOverride`,
 
   // "binFolder" is the magic location where the parent process stored the
   // current binaries; not an actual configuration settings
@@ -81,6 +84,10 @@ const IGNORED_ENV_VARIABLES = new Set([
 
   // "YARN_REGISTRY", read by yarn 1.x, prevents yarn 2+ installations if set
   `registry`,
+
+  // "ignoreCwd" was previously used to skip extra chdir calls in Yarn Modern when `--cwd` was used.
+  // It needs to be ignored because it's set by the parent process which could be anything.
+  `ignoreCwd`,
 ]);
 
 export const TAG_REGEXP = /^(?!v)[a-z0-9._-]+$/i;
@@ -195,18 +202,8 @@ export const coreDefinitions: {[coreSettingName: string]: SettingsDefinition} = 
     type: SettingsType.BOOLEAN,
     default: false,
   },
-  ignoreCwd: {
-    description: `If true, the \`--cwd\` flag will be ignored`,
-    type: SettingsType.BOOLEAN,
-    default: false,
-  },
 
   // Settings related to the package manager internal names
-  cacheKeyOverride: {
-    description: `A global cache key override; used only for test purposes`,
-    type: SettingsType.STRING,
-    default: null,
-  },
   globalFolder: {
     description: `Folder where all system-global files are stored`,
     type: SettingsType.ABSOLUTE_PATH,
@@ -253,6 +250,12 @@ export const coreDefinitions: {[coreSettingName: string]: SettingsDefinition} = 
     description: `If true, the system-wide cache folder will be used regardless of \`cache-folder\``,
     type: SettingsType.BOOLEAN,
     default: true,
+  },
+  cacheMigrationMode: {
+    description: `Defines the conditions under which Yarn upgrades should cause the cache archives to be regenerated.`,
+    type: SettingsType.STRING,
+    values: [`always`, `match-spec`, `required-only`],
+    default: `always`,
   },
 
   // Settings related to the output style
@@ -593,9 +596,7 @@ export interface ConfigurationValueMap {
 
   yarnPath: PortablePath | null;
   ignorePath: boolean;
-  ignoreCwd: boolean;
 
-  cacheKeyOverride: string | null;
   globalFolder: PortablePath;
   cacheFolder: PortablePath;
   compressionLevel: `mixed` | 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9;
@@ -605,6 +606,7 @@ export interface ConfigurationValueMap {
   immutablePatterns: Array<string>;
   rcFilename: Filename;
   enableGlobalCache: boolean;
+  cacheMigrationMode: `always` | `match-spec` | `required-only`;
 
   enableColors: boolean;
   enableHyperlinks: boolean;
@@ -957,6 +959,32 @@ function getRcFilename() {
   return DEFAULT_RC_FILENAME as Filename;
 }
 
+async function checkYarnPath({configuration, selfPath}: {configuration: Configuration, selfPath: PortablePath}): Promise<PortablePath | null> {
+  const yarnPath = configuration.get(`yarnPath`);
+  const ignorePath = configuration.get(`ignorePath`);
+
+  const tryRead = (p: PortablePath) => xfs.readFilePromise(p).catch(() => {
+    return Buffer.of();
+  });
+
+  const isSameBinary = async () =>
+    yarnPath && (
+      yarnPath === selfPath ||
+        Buffer.compare(...await Promise.all([
+          tryRead(yarnPath),
+          tryRead(selfPath),
+        ])) === 0
+    );
+
+  if (!ignorePath && await isSameBinary()) {
+    return null;
+  } else if (yarnPath !== null && !ignorePath) {
+    return yarnPath;
+  } else {
+    return null;
+  }
+}
+
 export enum ProjectLookup {
   LOCKFILE,
   MANIFEST,
@@ -966,7 +994,7 @@ export enum ProjectLookup {
 export type FindProjectOptions = {
   lookup?: ProjectLookup;
   strict?: boolean;
-  usePath?: boolean;
+  usePathCheck?: PortablePath | null;
   useRc?: boolean;
 };
 
@@ -1048,7 +1076,7 @@ export class Configuration {
    * way around).
    */
 
-  static async find(startingCwd: PortablePath, pluginConfiguration: PluginConfiguration | null, {lookup = ProjectLookup.LOCKFILE, strict = true, usePath = false, useRc = true}: FindProjectOptions = {}) {
+  static async find(startingCwd: PortablePath, pluginConfiguration: PluginConfiguration | null, {lookup = ProjectLookup.LOCKFILE, strict = true, usePathCheck = null, useRc = true}: FindProjectOptions = {}) {
     const environmentSettings = getEnvironmentSettings();
     delete environmentSettings.rcFilename;
 
@@ -1075,8 +1103,8 @@ export class Configuration {
 
     const allCoreFieldKeys = new Set(Object.keys(coreDefinitions));
 
-    const pickPrimaryCoreFields = ({ignoreCwd, yarnPath, ignorePath, lockfileFilename, injectEnvironmentFiles}: CoreFields) => ({ignoreCwd, yarnPath, ignorePath, lockfileFilename, injectEnvironmentFiles});
-    const pickSecondaryCoreFields = ({ignoreCwd, yarnPath, ignorePath, lockfileFilename, injectEnvironmentFiles, ...rest}: CoreFields) => {
+    const pickPrimaryCoreFields = ({yarnPath, ignorePath, lockfileFilename, injectEnvironmentFiles}: CoreFields) => ({yarnPath, ignorePath, lockfileFilename, injectEnvironmentFiles});
+    const pickSecondaryCoreFields = ({yarnPath, ignorePath, lockfileFilename, injectEnvironmentFiles, ...rest}: CoreFields) => {
       const secondaryCoreFields: CoreFields = {};
       for (const [key, value] of Object.entries(rest))
         if (allCoreFieldKeys.has(key))
@@ -1085,7 +1113,7 @@ export class Configuration {
       return secondaryCoreFields;
     };
 
-    const pickPluginFields = ({ignoreCwd, yarnPath, ignorePath, lockfileFilename, ...rest}: CoreFields) => {
+    const pickPluginFields = ({yarnPath, ignorePath, lockfileFilename, ...rest}: CoreFields) => {
       const pluginFields: any = {};
       for (const [key, value] of Object.entries(rest))
         if (!allCoreFieldKeys.has(key))
@@ -1104,12 +1132,16 @@ export class Configuration {
       configuration.useWithSource(source, pickPrimaryCoreFields(data), resolvedRcFileCwd, {strict: false});
     }
 
-    if (usePath) {
-      const yarnPath = configuration.get(`yarnPath`);
-      const ignorePath = configuration.get(`ignorePath`);
+    if (usePathCheck) {
+      const yarnPath = await checkYarnPath({
+        configuration,
+        selfPath: usePathCheck,
+      });
 
-      if (yarnPath !== null && !ignorePath) {
+      if (yarnPath !== null) {
         return configuration;
+      } else {
+        configuration.useWithSource(`<override>`, {ignorePath: true}, startingCwd, {strict: false, overwrite: true});
       }
     }
 

@@ -56831,6 +56831,7 @@ function reportRequiredFilesToWatchMode(files) {
   }
 }
 
+const hiddenRequire = require$$0.createRequire(url.pathToFileURL(__filename));
 function applyPatch(pnpapi, opts) {
   let enableNativeHooks = true;
   process.versions.pnp = String(pnpapi.VERSIONS.std);
@@ -56866,23 +56867,23 @@ function applyPatch(pnpapi, opts) {
       module: null
     }));
   }
-  function getIssuerSpecsFromModule(module2) {
-    if (module2 && module2.id !== `<repl>` && module2.id !== `internal/preload` && !module2.parent && !module2.filename && module2.paths.length > 0) {
+  function getIssuerSpecsFromModule(module) {
+    if (module && module.id !== `<repl>` && module.id !== `internal/preload` && !module.parent && !module.filename && module.paths.length > 0) {
       return [{
-        apiPath: opts.manager.findApiPathFor(module2.paths[0]),
-        path: module2.paths[0],
-        module: module2
+        apiPath: opts.manager.findApiPathFor(module.paths[0]),
+        path: module.paths[0],
+        module
       }];
     }
-    const issuer = getIssuerModule(module2);
+    const issuer = getIssuerModule(module);
     if (issuer !== null) {
       const path = npath.dirname(issuer.filename);
       const apiPath = opts.manager.getApiPathFromParent(issuer);
-      return [{ apiPath, path, module: module2 }];
+      return [{ apiPath, path, module }];
     } else {
       const path = process.cwd();
       const apiPath = opts.manager.findApiPathFor(npath.join(path, `[file]`)) ?? opts.manager.getApiPathFromParent(null);
-      return [{ apiPath, path, module: module2 }];
+      return [{ apiPath, path, module }];
     }
   }
   function makeFakeParent(path) {
@@ -56935,7 +56936,7 @@ function applyPatch(pnpapi, opts) {
       }
     }
     let firstError;
-    for (const { apiPath, path, module: module2 } of issuerSpecs) {
+    for (const { apiPath, path, module } of issuerSpecs) {
       let resolution;
       const issuerApi = apiPath !== null ? opts.manager.getApiEntry(apiPath, true).instance : null;
       try {
@@ -56944,7 +56945,7 @@ function applyPatch(pnpapi, opts) {
         } else {
           if (path === null)
             throw new Error(`Assertion failed: Expected the path to be set`);
-          resolution = originalModuleResolveFilename.call(require$$0.Module, request, module2 || makeFakeParent(path), isMain);
+          resolution = originalModuleResolveFilename.call(require$$0.Module, request, module || makeFakeParent(path), isMain);
         }
       } catch (error) {
         firstError = firstError || error;
@@ -57001,42 +57002,42 @@ Require stack:
     return false;
   };
   const originalExtensionJSFunction = require$$0.Module._extensions[`.js`];
-  require$$0.Module._extensions[`.js`] = function(module2, filename2) {
-    if (filename2.endsWith(`.js`)) {
-      const pkg = readPackageScope(filename2);
+  require$$0.Module._extensions[`.js`] = function(module, filename) {
+    if (filename.endsWith(`.js`)) {
+      const pkg = readPackageScope(filename);
       if (pkg && pkg.data?.type === `module`) {
-        transpile(module2, filename2, `js`);
+        transpile(module, filename, `js`);
         return;
       }
     }
-    if (filename2.endsWith(`.wasm`))
-      filename2 += `.js`;
-    originalExtensionJSFunction.call(this, module2, filename2);
+    if (filename.endsWith(`.wasm`))
+      filename += `.js`;
+    originalExtensionJSFunction.call(this, module, filename);
   };
   const originalDlopen = process.dlopen;
   process.dlopen = function(...args) {
-    const [module2, filename2, ...rest] = args;
+    const [module, filename, ...rest] = args;
     return originalDlopen.call(
       this,
-      module2,
-      npath.fromPortablePath(VirtualFS.resolveVirtual(npath.toPortablePath(filename2))),
+      module,
+      npath.fromPortablePath(VirtualFS.resolveVirtual(npath.toPortablePath(filename))),
       ...rest
     );
   };
-  require$$0.Module._extensions[`.mjs`] = function(module2, filename2) {
-    transpile(module2, filename2, `js`);
+  require$$0.Module._extensions[`.mjs`] = function(module, filename) {
+    transpile(module, filename, `js`);
   };
-  require$$0.Module._extensions[`.ts`] = function(module2, filename2) {
-    transpile(module2, filename2, `ts`);
+  require$$0.Module._extensions[`.ts`] = function(module, filename) {
+    transpile(module, filename, `ts`);
   };
-  require$$0.Module._extensions[`.tsx`] = function(module2, filename2) {
-    transpile(module2, filename2, `tsx`);
+  require$$0.Module._extensions[`.tsx`] = function(module, filename) {
+    transpile(module, filename, `tsx`);
   };
   if (typeof process.env.VSCODE_PID !== `undefined`)
     process.env.ESBUILD_WORKER_THREADS = `0`;
   let esbuild;
   function transpile(module, filename, loader) {
-    esbuild ??= process.env.USE_ESBUILD_WASM === `true` ? eval(`require("esbuild-wasm");`) : eval(`require("esbuild");`);
+    esbuild ??= process.env.USE_ESBUILD_WASM === `true` ? hiddenRequire(`esbuild-wasm`) : hiddenRequire(`esbuild`);
     const source = fs__default.default.readFileSync(filename, { encoding: `utf8` });
     const importMetaURL = JSON.stringify(url.pathToFileURL(filename).href);
     const { code } = esbuild.transformSync(source, {
