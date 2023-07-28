@@ -936,7 +936,7 @@ export function makeApi(runtimeState: RuntimeState, opts: MakeApiOptions): PnpAp
 
       return resolveUnqualified(remappedPath, {conditions, extensions});
     } catch (error) {
-      if (Object.prototype.hasOwnProperty.call(error, `pnpCode`))
+      if (Object.hasOwn(error, `pnpCode`))
         Object.assign(error.data, {request: getPathForDisplay(request), issuer: issuer && getPathForDisplay(issuer)});
 
       throw error;
