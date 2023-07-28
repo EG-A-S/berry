@@ -30,7 +30,10 @@ async function setupScriptEnvironment(project: Project, env: {[key: string]: str
   let pnpRequire = `--require ${quotePathIfNeeded(npath.fromPortablePath(pnpPath.cjs))}`;
 
   if (xfs.existsSync(pnpPath.esmLoader))
-    pnpRequire = `${pnpRequire} --loader ${pathToFileURL(npath.fromPortablePath(pnpPath.esmLoader)).href} --loader ${pathToFileURL(npath.fromPortablePath(pnpPath.tsLoader)).href}`;
+    pnpRequire = `${pnpRequire} --loader ${pathToFileURL(npath.fromPortablePath(pnpPath.esmLoader)).href}`;
+
+  if (xfs.existsSync(pnpPath.tsLoader))
+    pnpRequire += ` --loader ${pathToFileURL(npath.fromPortablePath(pnpPath.tsLoader)).href}`;
 
   if (xfs.existsSync(pnpPath.cjs)) {
     let nodeOptions = env.NODE_OPTIONS || ``;
