@@ -1,5 +1,7 @@
 function makeError(code: string, message: string) {
-  return Object.assign(new Error(`${code}: ${message}`), {code});
+  const error = new Error(`${code}: ${message}`);
+  Object.defineProperty(error, 'code', { value: code, writable: true, enumerable: true, configurable: true });
+  return error;
 }
 
 export function EBUSY(message: string) {

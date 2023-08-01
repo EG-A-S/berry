@@ -111,7 +111,7 @@ export async function resolve(
     result = pnpapi.resolveRequest(specifier, issuer, {
       conditions: new Set(conditions),
       // TODO: Handle --experimental-specifier-resolution=node
-      extensions: [`.js`, `.ts`, `.tsx`, `.cjs`, `.mjs`, `.json`],
+      extensions: [`.js`, `.ts`, `.json`],
     });
   } catch (err) {
     if (err instanceof Error && `code` in err && err.code === `MODULE_NOT_FOUND`)
