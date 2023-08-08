@@ -23,11 +23,11 @@ export async function load(
 
   const filePath = fileURLToPath(url);
 
-  const format = loaderUtils.getFileFormat(filePath);
+  const format = await loaderUtils.getFileFormat(filePath);
   if (!format)
     return nextLoad(urlString, context, nextLoad);
 
-  const ext = path.extname(fileURLToPath(url));
+  const ext = path.extname(filePath);
   if (ext === `.ts` || ext === `.tsx`)
     return nextLoad(urlString, context, nextLoad);
 

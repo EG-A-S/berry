@@ -1,17 +1,13 @@
 import {NativePath, npath, VirtualFS}   from '@yarnpkg/fslib';
 import fs                               from 'fs';
-import {Module}                         from 'module';
 import path                             from 'path';
 
 import {WATCH_MODE_MESSAGE_USES_ARRAYS} from '../esm-loader/loaderFlags';
 
-// @ts-expect-error
-const builtinModules = new Set(Module.builtinModules || Object.keys(process.binding(`natives`)));
-
-export const isBuiltinModule = (request: string) => request.startsWith(`node:`) || builtinModules.has(request);
+const packageCache = new Map<string, unknown | false>();
 
 // https://github.com/nodejs/node/blob/e817ba70f56c4bfd5d4a68dce8b165142312e7b6/lib/internal/modules/cjs/loader.js#L315-L330
-export function readPackageScope(checkPath: NativePath) {
+export function readPackageScopeSync(checkPath: NativePath) {
   const rootSeparatorIndex = checkPath.indexOf(npath.sep);
   let separatorIndex;
   do {
@@ -19,7 +15,7 @@ export function readPackageScope(checkPath: NativePath) {
     checkPath = checkPath.slice(0, separatorIndex);
     if (checkPath.endsWith(`${npath.sep}node_modules`))
       return false;
-    const pjson = readPackage(checkPath + npath.sep);
+    const pjson = readPackageSync(checkPath + npath.sep);
     if (pjson) {
       return {
         data: pjson,
@@ -31,13 +27,63 @@ export function readPackageScope(checkPath: NativePath) {
 }
 
 // https://github.com/nodejs/node/blob/e817ba70f56c4bfd5d4a68dce8b165142312e7b6/lib/internal/modules/cjs/loader.js#L284-L313
-export function readPackage(requestPath: NativePath) {
+export function readPackageSync(requestPath: NativePath) {
   const jsonPath = npath.resolve(requestPath, `package.json`);
 
-  if (!fs.existsSync(jsonPath))
-    return null;
+  const cachedPackageData = packageCache.get(jsonPath);
+  if (cachedPackageData) return cachedPackageData;
+  if (cachedPackageData === false) return null;
 
-  return JSON.parse(fs.readFileSync(jsonPath, `utf8`));
+  let content: string;
+  try {
+    content = fs.readFileSync(jsonPath, `utf8`);
+  } catch {
+    packageCache.set(jsonPath, false);
+    return null;
+  }
+
+  const packageData = JSON.parse(content);
+  packageCache.set(jsonPath, packageData);
+  return packageData;
+}
+
+export async function readPackageScopeAsync(checkPath: NativePath) {
+  const rootSeparatorIndex = checkPath.indexOf(npath.sep);
+  let separatorIndex;
+  do {
+    separatorIndex = checkPath.lastIndexOf(npath.sep);
+    checkPath = checkPath.slice(0, separatorIndex);
+    if (checkPath.endsWith(`${npath.sep}node_modules`))
+      return false;
+    const pjson = await readPackageAsync(checkPath + npath.sep);
+    if (pjson) {
+      return {
+        data: pjson,
+        path: checkPath,
+      };
+    }
+  } while (separatorIndex > rootSeparatorIndex);
+  return false;
+}
+
+export async function readPackageAsync(requestPath: NativePath) {
+  const jsonPath = npath.resolve(requestPath, `package.json`);
+
+  const cachedPackageData = packageCache.get(jsonPath);
+  if (cachedPackageData) return cachedPackageData;
+  if (cachedPackageData === false) return null;
+
+  let content: string;
+  try {
+    content = await fs.promises.readFile(jsonPath, `utf8`);
+  } catch {
+    packageCache.set(jsonPath, false);
+    return null;
+  }
+
+  const packageData = JSON.parse(content);
+  packageCache.set(jsonPath, packageData);
+  return packageData;
 }
 
 // https://github.com/nodejs/node/blob/972d9218559877f7fff4bb6086afacac8933f8d1/lib/internal/errors.js#L1450-L1478

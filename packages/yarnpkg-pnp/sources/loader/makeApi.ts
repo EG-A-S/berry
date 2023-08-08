@@ -1,6 +1,6 @@
 import {ppath, Filename}                                                                                                                                                                   from '@yarnpkg/fslib';
 import {FakeFS, NativePath, PortablePath, VirtualFS, npath}                                                                                                                                from '@yarnpkg/fslib';
-import {Module}                                                                                                                                                                            from 'module';
+import {Module, isBuiltin}                                                                                                                                                                 from 'module';
 import {fileURLToPath, pathToFileURL}                                                                                                                                                      from 'url';
 import {inspect}                                                                                                                                                                           from 'util';
 
@@ -218,13 +218,9 @@ export function makeApi(runtimeState: RuntimeState, opts: MakeApiOptions): PnpAp
 
     const {packageLocation} = getPackageInformationSafe(locator);
 
-    const manifestPath = ppath.join(packageLocation, Filename.manifest);
-    if (!opts.fakeFs.existsSync(manifestPath))
-      return null;
+    const pkgJson = nodeUtils.readPackageSync(npath.fromPortablePath(packageLocation));
 
-    const pkgJson = JSON.parse(opts.fakeFs.readFileSync(manifestPath, `utf8`));
-
-    if (pkgJson.exports == null)
+    if (pkgJson?.exports == null)
       return null;
 
     let subpath = ppath.contains(packageLocation, unqualifiedPath);
@@ -237,6 +233,8 @@ export function makeApi(runtimeState: RuntimeState, opts: MakeApiOptions): PnpAp
 
     if (subpath !== `.` && !isRelativeRegexp.test(subpath))
       subpath = `./${subpath}` as PortablePath;
+
+    const manifestPath = ppath.join(packageLocation, Filename.manifest);
 
     try {
       const resolvedExport = packageExportsResolve({
@@ -277,11 +275,7 @@ export function makeApi(runtimeState: RuntimeState, opts: MakeApiOptions): PnpAp
     // If the file is a directory, we must check if it contains a package.json with a "main" entry
 
     if (stat && stat.isDirectory()) {
-      let pkgJson;
-
-      try {
-        pkgJson = JSON.parse(opts.fakeFs.readFileSync(ppath.join(unqualifiedPath, Filename.manifest), `utf8`));
-      } catch (error) {}
+      const pkgJson = nodeUtils.readPackageSync(npath.fromPortablePath(unqualifiedPath));
 
       let nextUnqualifiedPath;
 
@@ -559,7 +553,7 @@ export function makeApi(runtimeState: RuntimeState, opts: MakeApiOptions): PnpAp
       return npath.toPortablePath(opts.pnpapiResolution);
 
     // Bailout if the request is a native module
-    if (considerBuiltins && nodeUtils.isBuiltinModule(request))
+    if (considerBuiltins && isBuiltin(request))
       return null;
 
     const requestForDisplay = getPathForDisplay(request);
@@ -728,7 +722,7 @@ export function makeApi(runtimeState: RuntimeState, opts: MakeApiOptions): PnpAp
           }
         }
       } else if (dependencyReference === undefined) {
-        if (!considerBuiltins && nodeUtils.isBuiltinModule(request)) {
+        if (!considerBuiltins && isBuiltin(request)) {
           if (isDependencyTreeRoot(issuerLocator)) {
             error = makeError(
               ErrorCode.UNDECLARED_DEPENDENCY,
@@ -928,11 +922,9 @@ export function makeApi(runtimeState: RuntimeState, opts: MakeApiOptions): PnpAp
           ? isPathIgnored(issuer)
           : false;
 
-      let remappedPath = (!considerBuiltins || !nodeUtils.isBuiltinModule(request)) && !isIssuerIgnored()
+      const remappedPath = (!considerBuiltins || !isBuiltin(request)) && !isIssuerIgnored()
         ? resolveUnqualifiedExport(request, unqualifiedPath, conditions, issuer)
         : unqualifiedPath;
-
-      remappedPath = remappedPath.replace(/\.jsx?$/, ``);
 
       return resolveUnqualified(remappedPath, {conditions, extensions});
     } catch (error) {

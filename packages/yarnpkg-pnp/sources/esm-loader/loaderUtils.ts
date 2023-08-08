@@ -17,11 +17,7 @@ export async function tryReadFile(path: NativePath): Promise<string | null> {
 }
 
 export function tryParseURL(str: string, base?: string | URL | undefined) {
-  try {
-    return new URL(str, base);
-  } catch {
-    return null;
-  }
+  return URL.canParse(str, base) ? new URL(str, base) : null;
 }
 
 let entrypointPath: NativePath | null = null;
@@ -30,7 +26,7 @@ export function setEntrypointPath(file: NativePath) {
   entrypointPath = file;
 }
 
-export function getFileFormat(filepath: string): string | null {
+export async function getFileFormat(filepath: string): Promise<string | null> {
   const ext = path.extname(filepath);
 
   switch (ext) {
@@ -51,7 +47,7 @@ export function getFileFormat(filepath: string): string | null {
       return `json`;
     }
     case `.js`: {
-      const pkg = nodeUtils.readPackageScope(filepath);
+      const pkg = await nodeUtils.readPackageScopeAsync(filepath);
       // assume CJS for files outside of a package boundary
       if (!pkg)
         return `commonjs`;
@@ -63,7 +59,7 @@ export function getFileFormat(filepath: string): string | null {
     default: {
       if (entrypointPath !== filepath)
         return null;
-      const pkg = nodeUtils.readPackageScope(filepath);
+      const pkg = await nodeUtils.readPackageScopeAsync(filepath);
       if (!pkg)
         return `commonjs`;
       // prevent extensions beyond .mjs or .js from loading as ESM

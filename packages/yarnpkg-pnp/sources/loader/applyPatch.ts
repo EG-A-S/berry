@@ -1,6 +1,7 @@
 import {FakeFS, PosixFS, npath, patchFs, PortablePath, NativePath, VirtualFS} from '@yarnpkg/fslib';
 import fs                                                                     from 'fs';
-import {Module, createRequire}                                                from 'module';
+import {Module, createRequire, isBuiltin}                                     from 'module';
+import path                                                                   from 'path';
 import {URL, fileURLToPath, pathToFileURL}                                    from 'url';
 
 import {PnpApi}                                                               from '../types';
@@ -129,7 +130,7 @@ export function applyPatch(pnpapi: PnpApi, opts: ApplyPatchOptions) {
   const originalModuleResolveFilename = Module._resolveFilename;
 
   Module._resolveFilename = function(request: string, parent: (NodeModule & {pnpApiPath?: PortablePath}) | null | undefined, isMain: boolean, options?: {[key: string]: any}) {
-    if (nodeUtils.isBuiltinModule(request))
+    if (isBuiltin(request))
       return request;
 
     if (!enableNativeHooks)
@@ -281,9 +282,9 @@ export function applyPatch(pnpapi: PnpApi, opts: ApplyPatchOptions) {
   const originalExtensionJSFunction = Module._extensions[`.js`] as (module: NodeModule, filename: string) => void;
   Module._extensions[`.js`] = function (module: NodeModule, filename: string) {
     if (filename.endsWith(`.js`)) {
-      const pkg = nodeUtils.readPackageScope(filename);
-      if (pkg && pkg.data?.type === `module`) {
-        transpile(module, filename, `js`);
+      const pkg = nodeUtils.readPackageScopeSync(filename);
+      if (pkg && pkg.data.type === `module`) {
+        transpile(module, filename);
         return;
       }
     }
@@ -293,6 +294,11 @@ export function applyPatch(pnpapi: PnpApi, opts: ApplyPatchOptions) {
 
     originalExtensionJSFunction.call(this, module, filename);
   };
+
+  Module._extensions[`.mjs`] = Module._extensions[`.ts`] = Module._extensions[`.tsx`] =
+    function (module: NodeModule, filename: string) {
+      transpile(module, filename);
+    };
 
   const originalDlopen = process.dlopen;
   process.dlopen = function (...args) {
@@ -305,24 +311,12 @@ export function applyPatch(pnpapi: PnpApi, opts: ApplyPatchOptions) {
     );
   };
 
-  Module._extensions[`.mjs`] = function (module: Module, filename: string) {
-    transpile(module, filename, `js`);
-  };
-
-  Module._extensions[`.ts`] = function (module: Module, filename: string) {
-    transpile(module, filename, `ts`);
-  };
-
-  Module._extensions[`.tsx`] = function (module: Module, filename: string) {
-    transpile(module, filename, `tsx`);
-  };
-
   if (typeof process.env.VSCODE_PID !== `undefined`)
     process.env.ESBUILD_WORKER_THREADS = `0`;
 
   let esbuild;
 
-  function transpile(module: Module, filename: string, loader: string) {
+  function transpile(module: NodeModule, filename: string) {
     esbuild ??= process.env.USE_ESBUILD_WASM === `true`
       ? hiddenRequire(`esbuild-wasm`)
       : hiddenRequire(`esbuild`);
@@ -332,7 +326,8 @@ export function applyPatch(pnpapi: PnpApi, opts: ApplyPatchOptions) {
     const importMetaURL = JSON.stringify(pathToFileURL(filename).href);
 
     const {code} = esbuild.transformSync(source, {
-      loader,
+      sourcefile: filename,
+      loader: `default`,
       format: `cjs`,
       target: `esnext`,
       jsx: `automatic`,
@@ -352,7 +347,7 @@ export function applyPatch(pnpapi: PnpApi, opts: ApplyPatchOptions) {
 
       if (/[/\\]node_modules[/\\](?:chalk|clean-stack)[/\\]/.test(filename)) {
         Object.defineProperty(module.exports, `default`, {value: defaultExports});
-      } else if (loader === `js`) {
+      } else if (path.extname(filename) === `.js`) {
         for (const key in originalModuleExports) {
           module.exports[key] = originalModuleExports[key];
         }
