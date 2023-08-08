@@ -91,10 +91,12 @@ export abstract class ProxiedFS<P extends Path, IP extends Path> extends FakeFS<
   }
 
   async realpathPromise(p: P) {
+    if (p[0] !== `.`) return p;
     return this.mapFromBase(await this.baseFs.realpathPromise(this.mapToBase(p)));
   }
 
   realpathSync(p: P) {
+    if (p[0] !== `.`) return p;
     return this.mapFromBase(this.baseFs.realpathSync(this.mapToBase(p)));
   }
 
