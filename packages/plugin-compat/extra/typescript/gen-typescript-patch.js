@@ -2,8 +2,11 @@ const cp = require(`child_process`);
 const crypto = require(`crypto`);
 const fs = require(`fs`);
 const https = require(`https`);
-const path = require(`path`);
+const path = require(`path/posix`);
 const semver = require(`semver`);
+
+const POSIX_DIRNAME = process.platform === `win32` ? __dirname.replaceAll(`\\`, `/`) : __dirname;
+const platformDependentExecutableExtension = process.platform === `win32` ? `.cmd` : ``;
 
 const TS_REPO = `/tmp/ts-repo`;
 const TS_REPO_SPAWN = {cwd: TS_REPO};
@@ -22,12 +25,12 @@ const IGNORED_VERSIONS = new Set([
 ]);
 
 const SLICES = [
-  // https://github.com/merceyz/TypeScript/tree/merceyz/pnp-5.2
+  // https://github.com/mestro-se/TypeScript/tree/mestro
   {
-    from: `8781702c1b45bd2d5d437c0a138dd62b57b9b284`,
-    to: `8781702c1b45bd2d5d437c0a138dd62b57b9b284`,
-    onto: `d6e7eb6cf08a1cc8fb6d9888f74b0e694cc2a7b0`,
-    range: `=5.2.0-beta`,
+    from: `08d3e6e74c79908f41390ac3854f45484817f592`,
+    to: `08d3e6e74c79908f41390ac3854f45484817f592`,
+    onto: `c5281bf7003abc09164a093ce643ae8ba422c40f`,
+    range: `>=5.3.0`,
   },
 ];
 
@@ -135,9 +138,8 @@ async function fetchVersions(range) {
 
 async function cloneRepository() {
   if (!fs.existsSync(TS_REPO)) {
-    await execFile(`git`, [`clone`, `https://github.com/arcanis/typescript`, TS_REPO]);
-    await execFile(`git`, [`remote`, `add`, `upstream`, `https://github.com/microsoft/typescript`], TS_REPO_SPAWN);
-    await execFile(`git`, [`remote`, `add`, `upstream2`, `https://github.com/merceyz/typescript`], TS_REPO_SPAWN);
+    await execFile(`git`, [`clone`, `https://github.com/mestro-se/TypeScript`, TS_REPO]);
+    await execFile(`git`, [`remote`, `add`, `upstream`, `https://github.com/microsoft/TypeScript`], TS_REPO_SPAWN);
   }
 
   try {
@@ -149,7 +151,6 @@ async function cloneRepository() {
 
   await execFile(`git`, [`fetch`, `origin`], TS_REPO_SPAWN);
   await execFile(`git`, [`fetch`, `upstream`], TS_REPO_SPAWN);
-  await execFile(`git`, [`fetch`, `upstream2`], TS_REPO_SPAWN);
 }
 
 async function resetGit(hash) {
@@ -157,10 +158,10 @@ async function resetGit(hash) {
   await execFile(`git`, [`clean`, `-df`], TS_REPO_SPAWN);
 
   if (fs.existsSync(path.join(TS_REPO, `package-lock.json`))) {
-    await execFile(`npm`, [`install`], TS_REPO_SPAWN);
+    await execFile(`npm${platformDependentExecutableExtension}`, [`install`], TS_REPO_SPAWN);
   } else {
     const date = await execFile(`git`, [`show`, `-s`, `--format=%ci`], TS_REPO_SPAWN);
-    await execFile(`npm`, [`install`, `--before`, date.toString().trim()], TS_REPO_SPAWN);
+    await execFile(`npm${platformDependentExecutableExtension}`, [`install`, `--before`, date.toString().trim()], TS_REPO_SPAWN);
   }
 }
 
@@ -186,7 +187,13 @@ async function buildRepository({from, to, onto}) {
     }
   }
 
-  await execFile(fs.existsSync(`${TS_REPO}/node_modules/.bin/hereby`) ? `./node_modules/.bin/hereby` : `./node_modules/.bin/gulp`, [`local`, `LKG`], TS_REPO_SPAWN);
+  await execFile(
+    process.platform === `win32`
+      ? `node_modules\\.bin\\hereby${platformDependentExecutableExtension}`
+      : `./node_modules/.bin/hereby`,
+    [`local`, `LKG`],
+    TS_REPO_SPAWN,
+  );
 
   // It seems that in some circumstances the build can produce incorrect artifacts. When
   // that happens, the final binary is very small. We try to detect that.
@@ -195,9 +202,9 @@ async function buildRepository({from, to, onto}) {
     throw new Error(`Something is wrong; typescript.js got generated with a stupid size`);
 
   await fs.promises.mkdir(tmpDir, {recursive: true});
-  await execFile(`cp`, [`-r`, `lib`, tmpDir], TS_REPO_SPAWN);
+  await fs.promises.cp(path.join(TS_REPO, `lib`), path.join(tmpDir, `lib`), {recursive: true});
 
-  await execFile(`rm`, [`-rf`, `lib`], TS_REPO_SPAWN);
+  await fs.promises.rm(path.join(TS_REPO, `lib`), {recursive: true, force: true});
   await execFile(`git`, [`reset`, `--hard`], TS_REPO_SPAWN);
 
   return tmpDir;
@@ -209,7 +216,7 @@ async function run({from, to, onto, range}) {
     .update(JSON.stringify({from, to, onto}))
     .digest(`hex`);
 
-  const patchFile = path.join(__dirname, `patch-${hash}.diff`);
+  const patchFile = path.join(POSIX_DIRNAME, `patch-${hash}.diff`);
   if (fs.existsSync(patchFile)) {
     const originalContent = await fs.promises.readFile(patchFile, `utf8`);
     const updatedContent = originalContent.replace(/^semver exclusivity .*\n/gm, `semver exclusivity ${range}\n`);
@@ -253,7 +260,7 @@ async function validate(version, patch) {
   }
 
   if (!fs.existsSync(path.join(tmpDir, `package`)))
-    await execFile(`tar`, [`xvf`, tarball], {cwd: tmpDir});
+    await execFile(`tar`, [`xvf`, posixPathToNativePath(tarball)], {cwd: tmpDir});
 
   const patchContent = patch.content.replace(/^semver exclusivity .*\n/gm, ``);
   await fs.promises.writeFile(path.join(tmpDir, `patch.diff`), patchContent);
@@ -288,17 +295,21 @@ async function main() {
   const aggregatePatchFile = path.join(TMP_DIR, `patch.diff`);
   await fs.promises.writeFile(aggregatePatchFile, patches.map(patch => patch.content).join(``));
 
-  const jsPatchFile = path.join(__dirname, `../../sources/patches/typescript.patch.ts`);
-  await execFile(`node`, [path.join(__dirname, `../createPatch.js`), aggregatePatchFile, jsPatchFile]);
+  const jsPatchFile = path.join(POSIX_DIRNAME, `../../sources/patches/typescript.patch.ts`);
+  await execFile(`node`, [path.join(POSIX_DIRNAME, `../createPatch.js`), aggregatePatchFile, jsPatchFile]);
 
   // Remove old patches
   const patchFilesSet = new Set(patches.map(patch => patch.patchFile));
-  for await (const {name: patchName} of await fs.promises.opendir(__dirname)) {
-    if (patchName.endsWith(`.diff`) && !patchFilesSet.has(path.join(__dirname, patchName))) {
+  for await (const {name: patchName} of await fs.promises.opendir(POSIX_DIRNAME)) {
+    if (patchName.endsWith(`.diff`) && !patchFilesSet.has(path.join(POSIX_DIRNAME, patchName))) {
       console.log(`Cleanup; file ${patchName} not in use`);
-      await fs.promises.unlink(path.join(__dirname, patchName));
+      await fs.promises.unlink(path.join(POSIX_DIRNAME, patchName));
     }
   }
+}
+
+function posixPathToNativePath(posixPath) {
+  return process.platform === `win32` ? posixPath.replaceAll(`/`, `\\`) : posixPath;
 }
 
 main().catch(err => {
