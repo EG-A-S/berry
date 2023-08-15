@@ -1,6 +1,6 @@
 function makeError(code: string, message: string) {
   const error = new Error(`${code}: ${message}`);
-  Object.defineProperty(error, 'code', { value: code, writable: true, enumerable: true, configurable: true });
+  Object.defineProperty(error, `code`, {value: code, writable: true, enumerable: true, configurable: true});
   return error;
 }
 

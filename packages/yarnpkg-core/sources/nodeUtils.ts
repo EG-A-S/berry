@@ -22,13 +22,12 @@ export const openUrl = typeof openUrlBinary !== `undefined`
   }
   : undefined;
 
-  const BUILTINS = new Set([
-    ...(Module.builtinModules || []),
-    ...(Module.builtinModules || []).map(mod => `node:${mod}`)
-  ]);
+const BUILTINS = new Set([
+  ...(Module.builtinModules || []),
+  ...(Module.builtinModules || []).map(mod => `node:${mod}`),
+]);
 
 export function builtinModules(): Set<string> {
-  // @ts-expect-error
   return new Set(BUILTINS);
 }
 
