@@ -1,9 +1,9 @@
 import fs from 'fs';
 import path from 'path';
 import { URL as URL$1, fileURLToPath, pathToFileURL } from 'url';
-import moduleExports, { Module } from 'module';
 import { createHash } from 'crypto';
 import { EOL } from 'os';
+import moduleExports, { isBuiltin } from 'module';
 import assert from 'assert';
 
 const SAFE_TIME = 456789e3;
@@ -712,9 +712,13 @@ class ProxiedFS extends FakeFS {
     return this.baseFs.createWriteStream(p !== null ? this.mapToBase(p) : p, opts);
   }
   async realpathPromise(p) {
+    if (p[0] !== `.`)
+      return p;
     return this.mapFromBase(await this.baseFs.realpathPromise(this.mapToBase(p)));
   }
   realpathSync(p) {
+    if (p[0] !== `.`)
+      return p;
     return this.mapFromBase(this.baseFs.realpathSync(this.mapToBase(p)));
   }
   async existsPromise(p) {
@@ -1365,9 +1369,8 @@ const [major, minor] = process.versions.node.split(`.`).map((value) => parseInt(
 const WATCH_MODE_MESSAGE_USES_ARRAYS = major > 19 || major === 19 && minor >= 2 || major === 18 && minor >= 13;
 const HAS_LAZY_LOADED_TRANSLATORS = major > 19 || major === 19 && minor >= 3;
 
-const builtinModules = new Set(Module.builtinModules || Object.keys(process.binding(`natives`)));
-const isBuiltinModule = (request) => request.startsWith(`node:`) || builtinModules.has(request);
-function readPackageScope(checkPath) {
+const packageCache = /* @__PURE__ */ new Map();
+async function readPackageScopeAsync(checkPath) {
   const rootSeparatorIndex = checkPath.indexOf(npath.sep);
   let separatorIndex;
   do {
@@ -1375,7 +1378,7 @@ function readPackageScope(checkPath) {
     checkPath = checkPath.slice(0, separatorIndex);
     if (checkPath.endsWith(`${npath.sep}node_modules`))
       return false;
-    const pjson = readPackage(checkPath + npath.sep);
+    const pjson = await readPackageAsync(checkPath + npath.sep);
     if (pjson) {
       return {
         data: pjson,
@@ -1385,34 +1388,33 @@ function readPackageScope(checkPath) {
   } while (separatorIndex > rootSeparatorIndex);
   return false;
 }
-function readPackage(requestPath) {
+async function readPackageAsync(requestPath) {
   const jsonPath = npath.resolve(requestPath, `package.json`);
-  if (!fs.existsSync(jsonPath))
+  const cachedPackageData = packageCache.get(jsonPath);
+  if (cachedPackageData)
+    return cachedPackageData;
+  if (cachedPackageData === false)
     return null;
-  return JSON.parse(fs.readFileSync(jsonPath, `utf8`));
+  let content;
+  try {
+    content = await fs.promises.readFile(jsonPath, `utf8`);
+  } catch {
+    packageCache.set(jsonPath, false);
+    return null;
+  }
+  const packageData = JSON.parse(content);
+  packageCache.set(jsonPath, packageData);
+  return packageData;
 }
 
-async function tryReadFile$1(path2) {
-  try {
-    return await fs.promises.readFile(path2, `utf8`);
-  } catch (error) {
-    if (error.code === `ENOENT`)
-      return null;
-    throw error;
-  }
-}
 function tryParseURL(str, base) {
-  try {
-    return new URL$1(str, base);
-  } catch {
-    return null;
-  }
+  return URL$1.canParse(str, base) ? new URL$1(str, base) : null;
 }
 let entrypointPath = null;
 function setEntrypointPath(file) {
   entrypointPath = file;
 }
-function getFileFormat(filepath) {
+async function getFileFormat(filepath) {
   const ext = path.extname(filepath);
   switch (ext) {
     case `.mjs`:
@@ -1430,7 +1432,7 @@ function getFileFormat(filepath) {
       return `json`;
     }
     case `.js`: {
-      const pkg = readPackageScope(filepath);
+      const pkg = await readPackageScopeAsync(filepath);
       if (!pkg)
         return `commonjs`;
       return pkg.data.module ? `module` : pkg.data.type ?? `commonjs`;
@@ -1438,7 +1440,7 @@ function getFileFormat(filepath) {
     default: {
       if (entrypointPath !== filepath)
         return null;
-      const pkg = readPackageScope(filepath);
+      const pkg = await readPackageScopeAsync(filepath);
       if (!pkg)
         return `commonjs`;
       if (pkg.data.type === `module`)
@@ -1453,10 +1455,10 @@ async function load$1(urlString, context, nextLoad) {
   if (url?.protocol !== `file:`)
     return nextLoad(urlString, context, nextLoad);
   const filePath = fileURLToPath(url);
-  const format = getFileFormat(filePath);
+  const format = await getFileFormat(filePath);
   if (!format)
     return nextLoad(urlString, context, nextLoad);
-  const ext = path.extname(fileURLToPath(url));
+  const ext = path.extname(filePath);
   if (ext === `.ts` || ext === `.tsx`)
     return nextLoad(urlString, context, nextLoad);
   if (format === `json` && context.importAssertions?.type !== `json`) {
@@ -1476,7 +1478,7 @@ async function load$1(urlString, context, nextLoad) {
   }
   return {
     format,
-    source: await fs.promises.readFile(filePath, `utf8`),
+    source: format === `commonjs` ? void 0 : await fs.promises.readFile(filePath, `utf8`),
     shortCircuit: true
   };
 }
@@ -1934,7 +1936,6 @@ if (!moduleExports.findPnpApi) {
   const { default: pnpApi } = await import(pnpPath);
   pnpApi.setup();
 }
-const pathRegExp = /^(?![a-zA-Z]:[\\/]|\\\\|\.{0,2}(?:\/|$))((?:node:)?(?:@[^/]+\/)?[^/]+)\/*(.*|)$/;
 const isRelativeRegexp = /^\.{0,2}\//;
 function tryReadFile(filePath) {
   try {
@@ -1962,7 +1963,7 @@ async function resolvePrivateRequest(specifier, issuer, context, nextResolve) {
 }
 async function resolve$1(originalSpecifier, context, nextResolve) {
   const { findPnpApi } = moduleExports;
-  if (!findPnpApi || isBuiltinModule(originalSpecifier))
+  if (!findPnpApi || isBuiltin(originalSpecifier))
     return nextResolve(originalSpecifier, context, nextResolve);
   let specifier = originalSpecifier;
   const url = tryParseURL(specifier, isRelativeRegexp.test(specifier) ? context.parentURL : void 0);
@@ -1978,25 +1979,11 @@ async function resolve$1(originalSpecifier, context, nextResolve) {
     return nextResolve(originalSpecifier, context, nextResolve);
   if (specifier.startsWith(`#`))
     return resolvePrivateRequest(specifier, issuer, context, nextResolve);
-  const dependencyNameMatch = specifier.match(pathRegExp);
-  if (dependencyNameMatch) {
-    const [, dependencyName, subPath] = dependencyNameMatch;
-    if (subPath === `` && dependencyName !== `pnpapi`) {
-      const resolved = pnpapi.resolveToUnqualified(`${dependencyName}/package.json`, issuer);
-      if (resolved) {
-        const content = await tryReadFile$1(resolved);
-        if (content) {
-          const pkg = JSON.parse(content);
-          pkg.exports == null;
-        }
-      }
-    }
-  }
   let result;
   try {
     result = pnpapi.resolveRequest(specifier, issuer, {
       conditions: new Set(conditions),
-      extensions: [`.js`, `.ts`, `.tsx`, `.cjs`, `.mjs`, `.json`]
+      extensions: [`.js`, `.ts`, `.json`]
     });
   } catch (err) {
     if (err instanceof Error && `code` in err && err.code === `MODULE_NOT_FOUND`)

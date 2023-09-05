@@ -1,6 +1,6 @@
 import {Configuration, CommandContext, PluginConfiguration, TelemetryManager, semverUtils, miscUtils, YarnVersion} from '@yarnpkg/core';
 import {PortablePath, npath, ppath, xfs}                                                                           from '@yarnpkg/fslib';
-import {execFileSync}                                                                                              from 'child_process';
+import {execFileSync, type SpawnSyncReturns}                                                                       from 'child_process';
 import {isCI}                                                                                                      from 'ci-info';
 import {Cli, UsageError}                                                                                           from 'clipanion';
 
@@ -83,7 +83,7 @@ function runYarnPath(cli: YarnCli, argv: Array<string>, {yarnPath}: {yarnPath: P
   try {
     execFileSync(process.execPath, [npath.fromPortablePath(yarnPath), ...argv], yarnPathExecOptions);
   } catch (err) {
-    return (err.code as number) ?? 1;
+    return (err as SpawnSyncReturns<void>).status ?? 1;
   }
 
   return 0;
@@ -94,14 +94,17 @@ function checkCwd(cli: YarnCli, argv: Array<string>) {
 
   let postCwdArgv = argv;
   if (argv.length >= 2 && argv[0] === `--cwd`) {
-    cwd = xfs.realpathSync(npath.toPortablePath(argv[1]));
+    cwd = npath.toPortablePath(argv[1]);
     postCwdArgv = argv.slice(2);
   } else if (argv.length >= 1 && argv[0].startsWith(`--cwd=`)) {
-    cwd = xfs.realpathSync(npath.toPortablePath(argv[0].slice(6)));
+    cwd = npath.toPortablePath(argv[0].slice(6));
     postCwdArgv = argv.slice(1);
   }
 
-  cli.defaultContext.cwd = cwd ?? ppath.cwd();
+  cli.defaultContext.cwd = cwd !== null
+    ? ppath.resolve(cwd)
+    : ppath.cwd();
+
   return postCwdArgv;
 }
 
