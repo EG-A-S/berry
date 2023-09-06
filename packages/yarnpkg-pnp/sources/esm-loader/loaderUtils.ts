@@ -51,7 +51,9 @@ export async function getFileFormat(filepath: string): Promise<string | null> {
       // assume CJS for files outside of a package boundary
       if (!pkg)
         return `commonjs`;
-      return pkg.data.module ? `module` : pkg.data.type ?? `commonjs`;
+      return pkg.data.module && pkg.data.name !== `@cspell/cspell-types`
+        ? `module`
+        : pkg.data.type ?? `commonjs`;
     }
     // Matching files beyond those handled above deviates from Node's default
     // --experimental-loader behavior but is required to work around
