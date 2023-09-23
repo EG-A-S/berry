@@ -27,9 +27,9 @@ const IGNORED_VERSIONS = new Set([
 const SLICES = [
   // https://github.com/mestro-se/TypeScript/tree/mestro
   {
-    from: `08d3e6e74c79908f41390ac3854f45484817f592`,
-    to: `08d3e6e74c79908f41390ac3854f45484817f592`,
-    onto: `c5281bf7003abc09164a093ce643ae8ba422c40f`,
+    from: `11d2c51e8f7456876fd9df69056baf5b6c9c0015`,
+    to: `11d2c51e8f7456876fd9df69056baf5b6c9c0015`,
+    onto: `956a3630283f9e53ad53adca6c68487192c8701b`,
     range: `>=5.3.0`,
   },
 ];
