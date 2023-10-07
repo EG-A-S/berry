@@ -25,6 +25,15 @@ declare global {
   }
 }
 
+let ignoredPackageLookups: Set<string>;
+try {
+  const file = fs.readFileSync(path.join(__dirname, `package.extensions.json`), `utf8`);
+  const parsed = JSON.parse(file);
+  ignoredPackageLookups = new Set(parsed.ignoredPackageLookups);
+} catch {
+  ignoredPackageLookups = new Set();
+}
+
 export function applyPatch(pnpapi: PnpApi, opts: ApplyPatchOptions) {
   /**
    * Used to disable the resolution hooks (for when we want to fallback to the previous resolution - we then need
@@ -70,6 +79,8 @@ export function applyPatch(pnpapi: PnpApi, opts: ApplyPatchOptions) {
         return opts.manager.getApiEntry(parentApiPath, true).instance;
       }
     }
+
+    if (ignoredPackageLookups.has(request)) return;
 
     return originalModuleLoad.call(Module, request, parent, isMain);
   };
@@ -220,6 +231,8 @@ export function applyPatch(pnpapi: PnpApi, opts: ApplyPatchOptions) {
         return resolution;
       }
     }
+
+    if (ignoredPackageLookups.has(request)) return;
 
     const requireStack = getRequireStack(parent);
 
