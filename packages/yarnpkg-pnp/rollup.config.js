@@ -33,7 +33,7 @@ export default defineConfig([
       strict: false,
       generatedCode: `es2015`,
     },
-    external: [`esbuild`, `esbuild-wasm`],
+    external: [`esbuild`, `esbuild-wasm`, `@swc/core`, `@swc/wasm`],
     plugins: [
       resolve({
         extensions: [`.mjs`, `.js`, `.ts`, `.tsx`, `.json`],

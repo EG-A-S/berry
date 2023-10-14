@@ -291,6 +291,8 @@ export function applyPatch(pnpapi: PnpApi, opts: ApplyPatchOptions) {
     return false;
   };
 
+  let transpile: (module: NodeModule, filename: string) => void;
+
   // https://github.com/nodejs/node/blob/3743406b0a44e13de491c8590386a964dbe327bb/lib/internal/modules/cjs/loader.js#L1110-L1154
   const originalExtensionJSFunction = Module._extensions[`.js`] as (module: NodeModule, filename: string) => void;
   Module._extensions[`.js`] = function (module: NodeModule, filename: string) {
@@ -324,13 +326,17 @@ export function applyPatch(pnpapi: PnpApi, opts: ApplyPatchOptions) {
     );
   };
 
+  transpile = process.env.ESBUILD_TRANSPILER === `true`
+    ? esbuildTranspile
+    : swcTranspile;
+
   if (typeof process.env.VSCODE_PID !== `undefined`)
     process.env.ESBUILD_WORKER_THREADS = `0`;
 
   let esbuild;
 
-  function transpile(module: NodeModule, filename: string) {
-    esbuild ??= process.env.USE_ESBUILD_WASM === `true`
+  function esbuildTranspile(module: NodeModule, filename: string) {
+    esbuild ??= process.env.USE_WASM_TRANSPILER === `true`
       ? hiddenRequire(`esbuild-wasm`)
       : hiddenRequire(`esbuild`);
 
@@ -348,6 +354,72 @@ export function applyPatch(pnpapi: PnpApi, opts: ApplyPatchOptions) {
       jsxImportSource: `preact`,
       define: {
         'import.meta.url': importMetaURL,
+      },
+    });
+
+    module._compile(code, filename);
+
+    if ((`default` in module.exports)) {
+      const defaultExports = module.exports.default;
+      const originalModuleExports = module.exports;
+      module.exports = typeof defaultExports === `string` ? {} : defaultExports;
+
+      if (/[/\\]node_modules[/\\](?:chalk|clean-stack)[/\\]/.test(filename)) {
+        Object.defineProperty(module.exports, `default`, {value: defaultExports});
+      } else if (path.extname(filename) === `.js`) {
+        for (const key in originalModuleExports) {
+          module.exports[key] = originalModuleExports[key];
+        }
+      }
+    }
+  }
+
+  let swc;
+
+  function swcTranspile(module: NodeModule, filename: string) {
+    swc ??= process.env.USE_WASM_TRANSPILER === `true`
+      ? hiddenRequire(`@swc/wasm`)
+      : hiddenRequire(`@swc/core`);
+
+    const extname = path.extname(filename);
+
+    const source = fs.readFileSync(filename, {encoding: `utf8`});
+
+    const {code} = swc.transformSync(source, {
+      filename,
+      configFile: false,
+      swcrc: false,
+      inputSourceMap: false,
+      sourceMaps: false,
+      inlineSourcesContent: false,
+      isModule: true,
+      env: {
+        targets: {
+          node: process.versions.node,
+        },
+      },
+      jsc: {
+        parser: {
+          syntax: extname.startsWith(`.ts`) ? `typescript` : `ecmascript`,
+          tsx: extname === `.tsx`,
+          dynamicImport: true,
+          importMeta: true,
+        },
+        transform: {
+          react: {
+            importSource: `preact`,
+            runtime: `automatic`,
+            pragma: `h`,
+            pragmaFrag: `Fragment`,
+          },
+        },
+        experimental: {
+          keepImportAttributes: true,
+          emitAssertForImportAttributes: true,
+        },
+      },
+      module: {
+        type: `commonjs`,
       },
     });
 
