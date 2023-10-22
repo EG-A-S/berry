@@ -1265,6 +1265,8 @@ export class Configuration {
         const pluginRequire = (request: string) => {
           if (pluginRequireEntries.has(request)) {
             return pluginRequireEntries.get(request)();
+          } else if (request.startsWith(`node:`)) {
+            return miscUtils.dynamicRequire(request);
           } else {
             throw new UsageError(`This plugin cannot access the package referenced via ${request} which is neither a builtin, nor an exposed entry`);
           }
