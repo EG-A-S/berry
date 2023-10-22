@@ -1435,7 +1435,7 @@ async function getFileFormat(filepath) {
       const pkg = await readPackageScopeAsync(filepath);
       if (!pkg)
         return `commonjs`;
-      return pkg.data.module ? `module` : pkg.data.type ?? `commonjs`;
+      return pkg.data.module && pkg.data.name !== `@cspell/cspell-types` ? `module` : pkg.data.type ?? `commonjs`;
     }
     default: {
       if (entrypointPath !== filepath)

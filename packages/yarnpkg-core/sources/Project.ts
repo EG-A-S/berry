@@ -712,7 +712,7 @@ export class Project {
   }
 
   async loadUserConfig() {
-    const configPath = ppath.join(this.cwd, `yarn.config.js`);
+    const configPath = ppath.join(this.cwd, `yarn.config.cjs`);
     if (!await xfs.existsPromise(configPath))
       return null;
 
@@ -720,7 +720,9 @@ export class Project {
   }
 
   async preparePackage(originalPkg: Package, {resolver, resolveOptions}: {resolver: Resolver, resolveOptions: ResolveOptions}) {
-    const pkg = this.configuration.normalizePackage(originalPkg);
+    const packageExtensions = await this.configuration.getPackageExtensions();
+
+    const pkg = this.configuration.normalizePackage(originalPkg, {packageExtensions});
 
     for (const [identHash, descriptor] of pkg.dependencies) {
       const dependency = await this.configuration.reduceHook(hooks => {
@@ -1147,10 +1149,10 @@ export class Project {
         const locator = this.storedPackages.get(locatorHash);
         const checksum = this.storedChecksums.get(locatorHash) ?? null;
 
-        const p = cache.getLocatorPath(locator!, checksum, cacheOptions);
-        const stat = p ? await xfs.statPromise(p) : null;
+        const p = cache.getLocatorPath(locator!, checksum);
+        const stat = await xfs.statPromise(p);
 
-        return stat?.size ?? 0;
+        return stat.size;
       }));
 
       const finalSizeChange = addedSizes.reduce((sum, size) => sum + size, 0) - (cleanInfo?.size ?? 0);
@@ -1162,7 +1164,7 @@ export class Project {
         zero: `No new packages`,
         one: `A package was`,
         more: `${formatUtils.pretty(this.configuration, addedCount, formatUtils.Type.NUMBER)} packages were`,
-      })} added to the cache`;
+      })} added to the project`;
 
       const removedLine = `${miscUtils.plural(removedCount, {
         zero: `none were`,
@@ -1738,6 +1740,9 @@ export class Project {
     await opts.report.startTimerPromise(`Project validation`, {
       skipIfEmpty: true,
     }, async () => {
+      if (this.configuration.get(`enableOfflineMode`))
+        opts.report.reportWarning(MessageName.OFFLINE_MODE_ENABLED, `Offline work is enabled; Yarn won't fetch packages from the remote registry if it can avoid it`);
+
       await this.configuration.triggerHook(hooks => {
         return hooks.validateProject;
       }, this, {
@@ -1754,7 +1759,9 @@ export class Project {
     if (hasPreErrors)
       return;
 
-    for (const extensionsByIdent of this.configuration.packageExtensions.values())
+    const packageExtensions = await this.configuration.getPackageExtensions();
+
+    for (const extensionsByIdent of packageExtensions.values())
       for (const [, extensionsByRange] of extensionsByIdent)
         for (const extension of extensionsByRange)
           extension.status = PackageExtensionStatus.Inactive;
@@ -1784,7 +1791,7 @@ export class Project {
     }, async () => {
       emitPeerDependencyWarnings(this, opts.report);
 
-      for (const [, extensionsPerRange] of this.configuration.packageExtensions) {
+      for (const [, extensionsPerRange] of packageExtensions) {
         for (const [, extensions] of extensionsPerRange) {
           for (const extension of extensions) {
             if (extension.userProvided) {
@@ -1835,7 +1842,7 @@ export class Project {
       }
     });
 
-    for (const extensionsByIdent of this.configuration.packageExtensions.values())
+    for (const extensionsByIdent of packageExtensions.values())
       for (const [, extensionsByRange] of extensionsByIdent)
         for (const extension of extensionsByRange)
           if (extension.userProvided && extension.status === PackageExtensionStatus.Active)
@@ -2701,7 +2708,7 @@ function emitPeerDependencyWarnings(project: Project, report: Report) {
       formatUtils.pretty(project.configuration, warning.hash, formatUtils.Type.CODE)
     }), requested by ${
       structUtils.prettyIdent(project.configuration, warning.requester)
-    }`;
+    }.`;
   }) ?? [];
 
   report.startSectionSync({

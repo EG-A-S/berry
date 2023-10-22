@@ -37,7 +37,7 @@ semver exclusivity >=5.3.0
 @@ -36782,6 +36792,46 @@ function getDefaultValueForOption(option) {
    }
  }
- 
+
 +// src/compiler/pnp.ts
 +function getPnpApi(path) {
 +  if (typeof process.versions.pnp === "undefined") {
@@ -189,7 +189,7 @@ semver exclusivity >=5.3.0
 +  const packageResolution = loadPnpPackageResolution(packageName, containingDirectory);
 +  return packageResolution ? loadModuleFromPnpResolution(extensions, packageResolution, rest, state, cache, redirectedReference) : void 0;
 +}
- 
+
  // src/compiler/binder.ts
  function getModuleInstanceState(node, visited) {
 @@ -42494,7 +42610,15 @@ function getAllModulePathsWorker(importingFileName, importedFileName, host) {
@@ -445,7 +445,7 @@ semver exclusivity >=5.3.0
 @@ -41251,6 +41261,67 @@ function getDefaultValueForOption(option) {
    }
  }
- 
+
 +// src/compiler/pnp.ts
 +function getPnpApi(path) {
 +  if (typeof process.versions.pnp === "undefined") {
@@ -640,7 +640,7 @@ semver exclusivity >=5.3.0
 +  const packageResolution = loadPnpPackageResolution(packageName, containingDirectory);
 +  return packageResolution ? loadModuleFromPnpResolution(extensions, packageResolution, rest, state, cache, redirectedReference) : void 0;
 +}
- 
+
  // src/compiler/binder.ts
  var ModuleInstanceState = /* @__PURE__ */ ((ModuleInstanceState2) => {
 @@ -47198,7 +47350,15 @@ function getAllModulePathsWorker(importingFileName, importedFileName, host) {
@@ -1177,7 +1177,7 @@ semver exclusivity >=5.3.0
 @@ -39112,6 +39122,73 @@ ${lanes.join("\n")}
      }
    });
- 
+
 +  // src/compiler/pnp.ts
 +  function getPnpApi(path) {
 +    if (typeof process.versions.pnp === "undefined") {
@@ -1394,7 +1394,7 @@ semver exclusivity >=5.3.0
 +      failedLookups = /* @__PURE__ */ new Set();
      }
    });
- 
+
 @@ -45064,7 +45223,15 @@ ${lanes.join("\n")}
        /*preferSymlinks*/
        true,
@@ -1498,7 +1498,7 @@ semver exclusivity >=5.3.0
 +      init_pnp();
      }
    });
- 
+
 @@ -47944,7 +48148,7 @@ ${lanes.join("\n")}
        }
      }
@@ -1632,7 +1632,7 @@ semver exclusivity >=5.3.0
 +      init_pnp();
      }
    });
- 
+
 @@ -131435,7 +131664,14 @@ ${lanes.join("\n")}
        return false;
      }
@@ -1948,7 +1948,7 @@ semver exclusivity >=5.3.0
 @@ -27280,6 +27290,17 @@ function specToDiagnostic(spec, disallowTrailingRecursion) {
    }
  }
- 
+
 +// src/compiler/pnp.ts
 +function getPnpApi(path2) {
 +  if (typeof process.versions.pnp === "undefined") {
@@ -2046,6 +2046,6 @@ semver exclusivity >=5.3.0
 +  const packageResolution = loadPnpPackageResolution(packageName, containingDirectory);
 +  return packageResolution ? loadModuleFromPnpResolution(extensions, packageResolution, rest, state, cache, redirectedReference) : void 0;
 +}
- 
+
  // src/compiler/checker.ts
  var nextNodeId = 1;

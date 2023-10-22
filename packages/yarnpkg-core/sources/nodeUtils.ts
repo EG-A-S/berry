@@ -1,5 +1,4 @@
 import {ppath}        from '@yarnpkg/fslib';
-import Module         from 'module';
 import os             from 'os';
 
 import * as execUtils from './execUtils';
@@ -22,19 +21,10 @@ export const openUrl = typeof openUrlBinary !== `undefined`
   }
   : undefined;
 
-const BUILTINS = new Set([
-  ...(Module.builtinModules || []),
-  ...(Module.builtinModules || []).map(mod => `node:${mod}`),
-]);
-
-export function builtinModules(): Set<string> {
-  return new Set(BUILTINS);
-}
-
 function getLibc() {
-  // It seems that Node randomly crashes with no output under some circumstances when running a getReport() on Windows.
-  // Since Windows has no libc anyway, shortcut this path.
-  if (process.platform === `win32`)
+  // Darwin and Windows have their own standard libraries, and the getReport() call is costly.
+  // It also seems that Node randomly crashes with no output under some circumstances when running a getReport() on Windows.
+  if (process.platform === `darwin` || process.platform === `win32`)
     return null;
 
   const report: any = process.report?.getReport() ?? {};

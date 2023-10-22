@@ -144,7 +144,7 @@ This error is usually caused by a Yarn plugin being missing.
 
 A package cannot be found in the cache for the given package and will be fetched from its remote location.
 
-When a package is downloaded from whatever its remote location is, Yarn stores it in a specific folder called then cache. Then, the next time this package was to be downloaded, Yarn simply check this directory and use the stored package if available. This message simply means that the package couldn't be found there. It's not a huge issue, but you probably should try to limit it as much as possible - for example by using [Zero-Installs](/features/zero-installs).
+When a package is downloaded from whatever its remote location is, Yarn stores it in a specific folder called then cache. Then, the next time this package was to be downloaded, Yarn simply check this directory and use the stored package if available. This message simply means that the package couldn't be found there. It's not a huge issue, but you probably should try to limit it as much as possible - for example by using [Zero-Installs](/features/caching#zero-installs).
 
 ## YN0014 - `YARN_IMPORT_FAILED`
 
@@ -438,3 +438,9 @@ You don't have to upgrade if you don't wish to - but keeping Yarn up-to-date is 
 ## YN0089 - `TIPS_NOTICE`
 
 Our research showed that even our power users aren't always aware of some of the less obvious features in Yarn. To improve discoverability, on local machines, Yarn will display every day a tip about some of the nuggets it contains. Perhaps one of them will help you improve your infrastructure someday?
+
+## YN0090 - `OFFLINE_MODE_ENABLED`
+
+When enabled, the `enableOfflineMode` flag tells Yarn to ignore remote registries and only pull data from its internal caches. This is a handy mode when working from within network-constrained environments such as planes or trains.
+
+To leave the offline work mode, check how it got enabled by running `yarn config --why`. If `<environment>`, run `unset YARN_ENABLE_OFFLINE_MODE` in your terminal. Otherwise, remove the `enableOfflineMode` flag from the relevant `.yarnrc.yml` files.
