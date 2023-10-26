@@ -35256,14 +35256,16 @@ const Filename = {
 const npath = Object.create(path__default.default);
 const ppath = Object.create(path__default.default.posix);
 npath.cwd = () => process.cwd();
-ppath.cwd = () => toPortablePath(process.cwd());
-ppath.resolve = (...segments) => {
-  if (segments.length > 0 && ppath.isAbsolute(segments[0])) {
-    return path__default.default.posix.resolve(...segments);
-  } else {
-    return path__default.default.posix.resolve(ppath.cwd(), ...segments);
-  }
-};
+ppath.cwd = process.platform === `win32` ? () => toPortablePath(process.cwd()) : process.cwd;
+if (process.platform === `win32`) {
+  ppath.resolve = (...segments) => {
+    if (segments.length > 0 && ppath.isAbsolute(segments[0])) {
+      return path__default.default.posix.resolve(...segments);
+    } else {
+      return path__default.default.posix.resolve(ppath.cwd(), ...segments);
+    }
+  };
+}
 const contains = function(pathUtils, from, to) {
   from = pathUtils.normalize(from);
   to = pathUtils.normalize(to);
@@ -35277,17 +35279,13 @@ const contains = function(pathUtils, from, to) {
     return null;
   }
 };
-npath.fromPortablePath = fromPortablePath;
-npath.toPortablePath = toPortablePath;
 npath.contains = (from, to) => contains(npath, from, to);
 ppath.contains = (from, to) => contains(ppath, from, to);
 const WINDOWS_PATH_REGEXP = /^([a-zA-Z]:.*)$/;
 const UNC_WINDOWS_PATH_REGEXP = /^\/\/(\.\/)?(.*)$/;
 const PORTABLE_PATH_REGEXP = /^\/([a-zA-Z]:.*)$/;
 const UNC_PORTABLE_PATH_REGEXP = /^\/unc\/(\.dot\/)?(.*)$/;
-function fromPortablePath(p) {
-  if (process.platform !== `win32`)
-    return p;
+function fromPortablePathWin32(p) {
   let portablePathMatch, uncPortablePathMatch;
   if (portablePathMatch = p.match(PORTABLE_PATH_REGEXP))
     p = portablePathMatch[1];
@@ -35297,9 +35295,7 @@ function fromPortablePath(p) {
     return p;
   return p.replace(/\//g, `\\`);
 }
-function toPortablePath(p) {
-  if (process.platform !== `win32`)
-    return p;
+function toPortablePathWin32(p) {
   p = p.replace(/\\/g, `/`);
   let windowsPathMatch, uncWindowsPathMatch;
   if (windowsPathMatch = p.match(WINDOWS_PATH_REGEXP))
@@ -35308,6 +35304,10 @@ function toPortablePath(p) {
     p = `/unc/${uncWindowsPathMatch[1] ? `.dot/` : ``}${uncWindowsPathMatch[2]}`;
   return p;
 }
+const toPortablePath = process.platform === `win32` ? toPortablePathWin32 : (p) => p;
+const fromPortablePath = process.platform === `win32` ? fromPortablePathWin32 : (p) => p;
+npath.fromPortablePath = fromPortablePath;
+npath.toPortablePath = toPortablePath;
 function convertPath(targetPathUtils, sourcePath) {
   return targetPathUtils === npath ? fromPortablePath(sourcePath) : toPortablePath(sourcePath);
 }
@@ -35565,7 +35565,8 @@ function opendir(fakeFs, path, entries, opts) {
     const filename = entries.shift();
     if (typeof filename === `undefined`)
       return null;
-    return Object.assign(fakeFs.statSync(fakeFs.pathUtils.join(path, filename)), {
+    const entryPath = fakeFs.pathUtils.join(path, filename);
+    return Object.assign(fakeFs.statSync(entryPath), {
       name: filename,
       path: void 0
     });
@@ -36391,12 +36392,24 @@ class NodeFS extends BasePortableFakeFS {
         this.realFs.opendir(npath.fromPortablePath(p), this.makeCallback(resolve, reject));
       }
     }).then((dir) => {
-      return Object.defineProperty(dir, `path`, { value: p, configurable: true, writable: true });
+      const dirWithFixedPath = dir;
+      Object.defineProperty(dirWithFixedPath, `path`, {
+        value: p,
+        configurable: true,
+        writable: true
+      });
+      return dirWithFixedPath;
     });
   }
   opendirSync(p, opts) {
     const dir = typeof opts !== `undefined` ? this.realFs.opendirSync(npath.fromPortablePath(p), opts) : this.realFs.opendirSync(npath.fromPortablePath(p));
-    return Object.defineProperty(dir, `path`, { value: p, configurable: true, writable: true });
+    const dirWithFixedPath = dir;
+    Object.defineProperty(dirWithFixedPath, `path`, {
+      value: p,
+      configurable: true,
+      writable: true
+    });
+    return dirWithFixedPath;
   }
   async readPromise(fd, buffer, offset = 0, length = 0, position = -1) {
     return await new Promise((resolve, reject) => {
