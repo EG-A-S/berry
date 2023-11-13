@@ -56,23 +56,26 @@ export class Workspace {
     const relativeCwds = await fastGlob(patterns, {
       cwd: npath.fromPortablePath(this.cwd),
       onlyDirectories: true,
-      ignore: [`**/node_modules`, `**/.git`, `**/.yarn`],
+      followSymbolicLinks: false,
     });
 
     // fast-glob returns results in arbitrary order
     relativeCwds.sort();
 
-    await relativeCwds.reduce(async (previousTask, relativeCwd) => {
-      const candidateCwd = ppath.resolve(this.cwd, npath.toPortablePath(relativeCwd));
+    const candidateCwds = await Promise.all(
+      relativeCwds.map(async relativeCwd => {
+        const candidateCwd = ppath.resolve(this.cwd, npath.toPortablePath(relativeCwd));
+        const exists = await xfs.existsPromise(ppath.join(candidateCwd, `package.json`));
 
-      const exists = await xfs.existsPromise(ppath.join(candidateCwd, `package.json`));
+        return exists ? candidateCwd : undefined;
+      }),
+    );
 
-      // Ensure candidateCwds are added in order
-      await previousTask;
-      if (exists) {
+    for (const candidateCwd of candidateCwds) {
+      if (candidateCwd) {
         this.workspacesCwds.add(candidateCwd);
       }
-    }, Promise.resolve());
+    }
   }
 
   get anchoredPackage() {

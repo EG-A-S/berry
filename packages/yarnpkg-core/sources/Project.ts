@@ -424,7 +424,7 @@ export class Project {
     this.workspacesByIdent = new Map();
 
     const pathsChecked = new Set<PortablePath>();
-    const limitSetup = pLimit(4);
+    const limitSetup = pLimit(500);
 
     const loadWorkspaceReducer = async (previousTask: Promise<void>, workspaceCwd: PortablePath): Promise<void> => {
       if (pathsChecked.has(workspaceCwd))
