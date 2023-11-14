@@ -1,7 +1,6 @@
 {
   "name": "@yarnpkg/eslint-config",
-  "version": "1.0.0-rc.7",
-  "stableVersion": "0.5.1",
+  "version": "1.0.0",
   "license": "BSD-2-Clause",
   "exports": {
     ".": "./index.js",
@@ -33,5 +32,6 @@
   },
   "devDependencies": {
     "eslint": "^8.45.0"
-  }
+  },
+  "stableVersion": "1.0.0"
 }

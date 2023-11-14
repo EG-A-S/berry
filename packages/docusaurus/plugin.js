@@ -7,10 +7,17 @@ module.exports = function(context, options) {
     name: `docusaurus-plugin`,
     configureWebpack(config, isServer, utils) {
       return {
+        module: {
+          rules: [{
+            test: /\.term\.dat$/,
+            use: [require.resolve(`./src/webpack/ansi-loader.js`)],
+          }],
+        },
         resolve: {
           fallback: {
             fs: false,
             module: false,
+            buffer: false,
             os: require.resolve(`os-browserify`),
             path: require.resolve(`path-browserify`),
           },

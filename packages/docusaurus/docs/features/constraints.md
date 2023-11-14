@@ -6,7 +6,7 @@ description: An in-depth guide to Yarn's constraints, a feature that provides an
 ---
 
 :::info
-This page documents the new JavaScript-based constraints. The older constraints, based on Prolog, are still supported but should be considered deprecated. Their documentation can be found [here](/features/constraints-prolog).
+This page documents the new JavaScript-based constraints. The older constraints, based on Prolog, are still supported but should be considered deprecated. Their documentation can be found [here](https://v3.yarnpkg.com/features/constraints).
 :::
 
 ## Overview
@@ -114,4 +114,45 @@ You can alias the types to make them a little easier to use:
 function expectMyCustomRule(dependency) {
   // ...
 }
+```
+
+## Putting it all together
+
+This section regroups a couple of constraint examples. We are thinking to provide some of them as builtin helpers later on, although they tend to often contain some logic unique to each team / company.
+
+### Restrict dependencies between workspaces
+
+This code ensures that no two workspaces in your project can list the same packages in their `dependencies` or `devDependencies` fields but with different associated references.
+
+```ts
+// @ts-check
+
+/** @type {import('@yarnpkg/types')} */
+const {defineConfig} = require(`@yarnpkg/types`);
+
+/**
+ * This rule will enforce that a workspace MUST depend on the same version of
+ * a dependency as the one used by the other workspaces.
+ * 
+ * @param {Context} context
+ */
+function enforceConsistentDependenciesAcrossTheProject({Yarn}) {
+  for (const dependency of Yarn.dependencies()) {
+    if (dependency.type === `peerDependencies`)
+      continue;
+
+    for (const otherDependency of Yarn.dependencies({ident: dependency.ident})) {
+      if (otherDependency.type === `peerDependencies`)
+        continue;
+
+      dependency.update(otherDependency.range);
+    }
+  }
+}
+
+module.exports = defineConfig({
+  constraints: async ctx => {
+    enforceConsistentDependenciesAcrossTheProject(ctx);
+  },
+});
 ```

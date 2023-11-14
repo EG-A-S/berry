@@ -109,6 +109,27 @@ describe(`Commands`, () => {
     );
 
     test(
+      `should support self referencing workspaces field`,
+      makeTemporaryEnv(
+        {
+          private: true,
+          workspaces: [`.`],
+        },
+        async ({path, run}) => {
+          await run(`install`);
+
+          await expect(run(`workspaces`, `foreach`, `--worktree`, `exec`, `echo`, `42`)).resolves.toMatchObject(
+            {
+              code: 0,
+              stdout: `42\nDone\n`,
+              stderr: ``,
+            },
+          );
+        },
+      ),
+    );
+
+    test(
       `should execute 'node' command`,
       makeTemporaryEnv(
         {
@@ -424,6 +445,26 @@ describe(`Commands`, () => {
           await run(`install`);
 
           await expect(run(`workspaces`, `foreach`, `--all`, `--topological`, `run`, `test:colon`)).resolves.toMatchSnapshot();
+        },
+      ),
+    );
+
+    test(
+      `should run set INIT_CWD to each individual workspace cwd even with global scripts`,
+      makeTemporaryEnv(
+        {
+          private: true,
+          workspaces: [`packages/*`],
+          scripts: {
+            [`test:foo`]: `yarn workspaces foreach --all run test:bar`,
+            [`test:bar`]: `node -p 'require("path").relative(process.cwd(), process.argv[1]).replace(/\\\\/g, "/")' "$INIT_CWD"`,
+          },
+        },
+        async ({path, run}) => {
+          await setupWorkspaces(path);
+          await run(`install`);
+
+          await expect(run(`test:foo`)).resolves.toMatchSnapshot();
         },
       ),
     );
