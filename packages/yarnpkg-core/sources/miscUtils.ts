@@ -340,6 +340,8 @@ function dynamicRequireNode(path: string) {
  * Requires a module without using the module cache
  */
 function dynamicRequireNoCache(path: string) {
+  if (!require.cache) return dynamicRequireNode(path);
+
   const physicalPath = npath.fromPortablePath(path);
 
   const currentCacheEntry = realRequire.cache[physicalPath];

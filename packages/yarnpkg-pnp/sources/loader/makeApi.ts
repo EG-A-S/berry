@@ -218,7 +218,7 @@ export function makeApi(runtimeState: RuntimeState, opts: MakeApiOptions): PnpAp
 
     const {packageLocation} = getPackageInformationSafe(locator);
 
-    const pkgJson = nodeUtils.readPackageSync(npath.fromPortablePath(packageLocation));
+    const pkgJson = nodeUtils.readPackage(npath.fromPortablePath(packageLocation));
 
     if (pkgJson?.exports == null)
       return null;
@@ -275,7 +275,7 @@ export function makeApi(runtimeState: RuntimeState, opts: MakeApiOptions): PnpAp
     // If the file is a directory, we must check if it contains a package.json with a "main" entry
 
     if (stat && stat.isDirectory()) {
-      const pkgJson = nodeUtils.readPackageSync(npath.fromPortablePath(unqualifiedPath));
+      const pkgJson = nodeUtils.readPackage(npath.fromPortablePath(unqualifiedPath));
 
       let nextUnqualifiedPath;
 

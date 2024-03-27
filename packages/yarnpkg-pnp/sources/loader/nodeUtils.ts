@@ -7,7 +7,7 @@ import {WATCH_MODE_MESSAGE_USES_ARRAYS} from '../esm-loader/loaderFlags';
 const packageCache = new Map<string, unknown | false>();
 
 // https://github.com/nodejs/node/blob/e817ba70f56c4bfd5d4a68dce8b165142312e7b6/lib/internal/modules/cjs/loader.js#L315-L330
-export function readPackageScopeSync(checkPath: NativePath) {
+export function readPackageScope(checkPath: NativePath) {
   const rootSeparatorIndex = checkPath.indexOf(npath.sep);
   let separatorIndex;
   do {
@@ -15,7 +15,7 @@ export function readPackageScopeSync(checkPath: NativePath) {
     checkPath = checkPath.slice(0, separatorIndex);
     if (checkPath.endsWith(`${npath.sep}node_modules`))
       return false;
-    const pjson = readPackageSync(checkPath + npath.sep);
+    const pjson = readPackage(checkPath + npath.sep);
     if (pjson) {
       return {
         data: pjson,
@@ -27,7 +27,7 @@ export function readPackageScopeSync(checkPath: NativePath) {
 }
 
 // https://github.com/nodejs/node/blob/e817ba70f56c4bfd5d4a68dce8b165142312e7b6/lib/internal/modules/cjs/loader.js#L284-L313
-export function readPackageSync(requestPath: NativePath) {
+export function readPackage(requestPath: NativePath) {
   const jsonPath = npath.resolve(requestPath, `package.json`);
 
   const cachedPackageData = packageCache.get(jsonPath);
@@ -37,45 +37,6 @@ export function readPackageSync(requestPath: NativePath) {
   let content: string;
   try {
     content = fs.readFileSync(jsonPath, `utf8`);
-  } catch {
-    packageCache.set(jsonPath, false);
-    return null;
-  }
-
-  const packageData = JSON.parse(content);
-  packageCache.set(jsonPath, packageData);
-  return packageData;
-}
-
-export async function readPackageScopeAsync(checkPath: NativePath) {
-  const rootSeparatorIndex = checkPath.indexOf(npath.sep);
-  let separatorIndex;
-  do {
-    separatorIndex = checkPath.lastIndexOf(npath.sep);
-    checkPath = checkPath.slice(0, separatorIndex);
-    if (checkPath.endsWith(`${npath.sep}node_modules`))
-      return false;
-    const pjson = await readPackageAsync(checkPath + npath.sep);
-    if (pjson) {
-      return {
-        data: pjson,
-        path: checkPath,
-      };
-    }
-  } while (separatorIndex > rootSeparatorIndex);
-  return false;
-}
-
-export async function readPackageAsync(requestPath: NativePath) {
-  const jsonPath = npath.resolve(requestPath, `package.json`);
-
-  const cachedPackageData = packageCache.get(jsonPath);
-  if (cachedPackageData) return cachedPackageData;
-  if (cachedPackageData === false) return null;
-
-  let content: string;
-  try {
-    content = await fs.promises.readFile(jsonPath, `utf8`);
   } catch {
     packageCache.set(jsonPath, false);
     return null;

@@ -76,10 +76,9 @@
   "@yarnpkg/builder": {
     "bundles": {
       "standard": [
-        "@yarnpkg/plugin-essentials",
-        "@yarnpkg/plugin-compat",
         "@yarnpkg/plugin-constraints",
         "@yarnpkg/plugin-dlx",
+        "@yarnpkg/plugin-essentials",
         "@yarnpkg/plugin-file",
         "@yarnpkg/plugin-git",
         "@yarnpkg/plugin-github",

@@ -8011,7 +8011,7 @@ const RAW_RUNTIME_STATE =
           ["clipanion", "virtual:576bf3e379b293160348e4cadfbd6541796e6f78477b0875c4437065090cec6f78b6ec2281b8e15d1c870d61578dc7dee16a5ae49a65701fec83e592ce2ebdeb#npm:4.0.0-rc.2"],\
           ["esbuild", [\
             "esbuild-wasm",\
-            "npm:0.15.15"\
+            "npm:0.20.2"\
           ]],\
           ["semver", "npm:7.5.4"],\
           ["tslib", "npm:2.4.0"],\
@@ -22621,6 +22621,13 @@ const RAW_RUNTIME_STATE =
         "packageLocation": "./.yarn/cache/esbuild-wasm-npm-0.17.5-9d427259bd-94e32490fe.zip/node_modules/esbuild-wasm/",\
         "packageDependencies": [\
           ["esbuild-wasm", "npm:0.17.5"]\
+        ],\
+        "linkType": "HARD"\
+      }],\
+      ["npm:0.20.2", {\
+        "packageLocation": "./.yarn/cache/esbuild-wasm-npm-0.20.2-0bec975bd3-6e7ab49e57.zip/node_modules/esbuild-wasm/",\
+        "packageDependencies": [\
+          ["esbuild-wasm", "npm:0.20.2"]\
         ],\
         "linkType": "HARD"\
       }]\
@@ -40538,7 +40545,7 @@ const [major, minor] = process.versions.node.split(`.`).map((value) => parseInt(
 const WATCH_MODE_MESSAGE_USES_ARRAYS = major > 19 || major === 19 && minor >= 2 || major === 18 && minor >= 13;
 
 const packageCache = /* @__PURE__ */ new Map();
-function readPackageScopeSync(checkPath) {
+function readPackageScope(checkPath) {
   const rootSeparatorIndex = checkPath.indexOf(npath.sep);
   let separatorIndex;
   do {
@@ -40546,7 +40553,7 @@ function readPackageScopeSync(checkPath) {
     checkPath = checkPath.slice(0, separatorIndex);
     if (checkPath.endsWith(`${npath.sep}node_modules`))
       return false;
-    const pjson = readPackageSync(checkPath + npath.sep);
+    const pjson = readPackage(checkPath + npath.sep);
     if (pjson) {
       return {
         data: pjson,
@@ -40556,7 +40563,7 @@ function readPackageScopeSync(checkPath) {
   } while (separatorIndex > rootSeparatorIndex);
   return false;
 }
-function readPackageSync(requestPath) {
+function readPackage(requestPath) {
   const jsonPath = npath.resolve(requestPath, `package.json`);
   const cachedPackageData = packageCache.get(jsonPath);
   if (cachedPackageData)
@@ -40588,14 +40595,6 @@ function reportRequiredFilesToWatchMode(files) {
 }
 
 const hiddenRequire = require$$0.createRequire(url.pathToFileURL(__filename));
-let ignoredPackageLookups;
-try {
-  const file = fs__default.default.readFileSync(path__default.default.join(__dirname, `package.extensions.json`), `utf8`);
-  const parsed = JSON.parse(file);
-  ignoredPackageLookups = new Set(parsed.ignoredPackageLookups);
-} catch {
-  ignoredPackageLookups = /* @__PURE__ */ new Set();
-}
 function applyPatch(pnpapi, opts) {
   let enableNativeHooks = true;
   process.versions.pnp = String(pnpapi.VERSIONS.std);
@@ -40622,8 +40621,6 @@ function applyPatch(pnpapi, opts) {
         return opts.manager.getApiEntry(parentApiPath, true).instance;
       }
     }
-    if (ignoredPackageLookups.has(request))
-      return;
     return originalModuleLoad.call(require$$0.Module, request, parent, isMain);
   };
   function getIssuerSpecsFromPaths(paths) {
@@ -40720,8 +40717,6 @@ function applyPatch(pnpapi, opts) {
         return resolution;
       }
     }
-    if (ignoredPackageLookups.has(request))
-      return;
     const requireStack = getRequireStack(parent);
     Object.defineProperty(firstError, `requireStack`, {
       configurable: true,
@@ -40772,7 +40767,7 @@ Require stack:
   const originalExtensionJSFunction = require$$0.Module._extensions[`.js`];
   require$$0.Module._extensions[`.js`] = function(module, filename) {
     if (filename.endsWith(`.js`)) {
-      const pkg = readPackageScopeSync(filename);
+      const pkg = readPackageScope(filename);
       if (pkg && pkg.data.type === `module`) {
         transpile(module, filename);
         return;
@@ -41929,7 +41924,7 @@ function makeApi(runtimeState, opts) {
       );
     }
     const { packageLocation } = getPackageInformationSafe(locator);
-    const pkgJson = readPackageSync(npath.fromPortablePath(packageLocation));
+    const pkgJson = readPackage(npath.fromPortablePath(packageLocation));
     if (pkgJson?.exports == null)
       return null;
     let subpath = ppath.contains(packageLocation, unqualifiedPath);
@@ -41970,7 +41965,7 @@ function makeApi(runtimeState, opts) {
     if (stat && !stat.isDirectory())
       return opts.fakeFs.realpathSync(unqualifiedPath);
     if (stat && stat.isDirectory()) {
-      const pkgJson = readPackageSync(npath.fromPortablePath(unqualifiedPath));
+      const pkgJson = readPackage(npath.fromPortablePath(unqualifiedPath));
       let nextUnqualifiedPath;
       if (pkgJson && conditions?.has(`import`) && pkgJson.module)
         nextUnqualifiedPath = ppath.resolve(unqualifiedPath, pkgJson.module);

@@ -17,7 +17,7 @@ export const getPnpPath = (project: Project) => {
     cjs: ppath.join(project.cwd, Filename.pnpCjs),
     data: ppath.join(project.cwd, Filename.pnpData),
     esmLoader: ppath.join(project.cwd, Filename.pnpEsmLoader),
-    registerHooks: ppath.join(project.cwd, Filename.registerHooks),
+    registerHooks: ppath.join(project.cwd, `hooks`, Filename.registerHooks),
   };
 };
 

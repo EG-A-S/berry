@@ -141,9 +141,6 @@ function initCommands(cli: YarnCli, {configuration}: {configuration: Configurati
 }
 
 async function run(cli: YarnCli, argv: Array<string>, {selfPath, pluginConfiguration}: {selfPath: PortablePath | null, pluginConfiguration: PluginConfiguration}) {
-  if (!validateNodejsVersion(cli))
-    return 1;
-
   const configuration = await getCoreConfiguration({
     selfPath,
     pluginConfiguration,

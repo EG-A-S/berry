@@ -1,6 +1,5 @@
 import {VirtualFS, npath}               from '@yarnpkg/fslib';
 import fs                               from 'fs';
-import path                             from 'path';
 import {fileURLToPath, pathToFileURL}   from 'url';
 
 import {WATCH_MODE_MESSAGE_USES_ARRAYS} from '../loaderFlags';
@@ -23,12 +22,8 @@ export async function load(
 
   const filePath = fileURLToPath(url);
 
-  const format = await loaderUtils.getFileFormat(filePath);
+  const format = loaderUtils.getFileFormat(filePath);
   if (!format)
-    return nextLoad(urlString, context, nextLoad);
-
-  const ext = path.extname(filePath);
-  if (ext === `.ts` || ext === `.tsx`)
     return nextLoad(urlString, context, nextLoad);
 
   if (format === `json` && context.importAssertions?.type !== `json`) {

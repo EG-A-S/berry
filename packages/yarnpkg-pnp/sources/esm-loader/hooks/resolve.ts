@@ -1,4 +1,4 @@
-import {NativePath}                   from '@yarnpkg/fslib';
+import {NativePath, PortablePath}     from '@yarnpkg/fslib';
 import fs                             from 'fs';
 import moduleExports, {isBuiltin}     from 'module';
 import {fileURLToPath, pathToFileURL} from 'url';
@@ -7,12 +7,7 @@ import {packageImportsResolve}        from '../../node/resolve';
 import {PnpApi}                       from '../../types';
 import * as loaderUtils               from '../loaderUtils';
 
-if (!moduleExports.findPnpApi) {
-  const pnpPath = `./.pn` + `p.cjs`;
-  const {default: pnpApi} = await import(pnpPath);
-  pnpApi.setup();
-}
-
+const pathRegExp = /^(?![a-zA-Z]:[\\/]|\\\\|\.{0,2}(?:\/|$))((?:node:)?(?:@[^/]+\/)?[^/]+)\/*(.*|)$/;
 const isRelativeRegexp = /^\.{0,2}\//;
 
 type ResolveContext = {
@@ -83,12 +78,33 @@ export async function resolve(
   if (specifier.startsWith(`#`))
     return resolvePrivateRequest(specifier, issuer, context, nextResolve);
 
+  const dependencyNameMatch = specifier.match(pathRegExp);
+
+  let allowLegacyResolve = false;
+
+  if (dependencyNameMatch) {
+    const [, dependencyName, subPath] = dependencyNameMatch as [unknown, string, PortablePath];
+
+    // If the package.json doesn't list an `exports` field, Node will tolerate omitting the extension
+    // https://github.com/nodejs/node/blob/0996eb71edbd47d9f9ec6153331255993fd6f0d1/lib/internal/modules/esm/resolve.js#L686-L691
+    if (subPath === `` && dependencyName !== `pnpapi`) {
+      const resolved = pnpapi.resolveToUnqualified(`${dependencyName}/package.json`, issuer);
+      if (resolved) {
+        const content = await loaderUtils.tryReadFile(resolved);
+        if (content) {
+          const pkg = JSON.parse(content);
+          allowLegacyResolve = pkg.exports == null;
+        }
+      }
+    }
+  }
+
   let result;
   try {
     result = pnpapi.resolveRequest(specifier, issuer, {
       conditions: new Set(conditions),
       // TODO: Handle --experimental-specifier-resolution=node
-      extensions: [`.js`, `.ts`, `.json`],
+      extensions: allowLegacyResolve ? undefined : [],
     });
   } catch (err) {
     if (err instanceof Error && `code` in err && err.code === `MODULE_NOT_FOUND`)

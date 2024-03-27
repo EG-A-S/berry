@@ -1,7 +1,6 @@
 import {NativePath}   from '@yarnpkg/fslib';
 import fs             from 'fs';
 import path           from 'path';
-import {URL}          from 'url';
 
 import * as nodeUtils from '../loader/nodeUtils';
 
@@ -17,7 +16,11 @@ export async function tryReadFile(path: NativePath): Promise<string | null> {
 }
 
 export function tryParseURL(str: string, base?: string | URL | undefined) {
-  return URL.canParse(str, base) ? new URL(str, base) : null;
+  try {
+    return new URL(str, base);
+  } catch {
+    return null;
+  }
 }
 
 let entrypointPath: NativePath | null = null;
@@ -26,13 +29,11 @@ export function setEntrypointPath(file: NativePath) {
   entrypointPath = file;
 }
 
-export async function getFileFormat(filepath: string): Promise<string | null> {
+export function getFileFormat(filepath: string): string | null {
   const ext = path.extname(filepath);
 
   switch (ext) {
-    case `.mjs`:
-    case `.ts`:
-    case `.tsx`: {
+    case `.mjs`: {
       return `module`;
     }
     case `.cjs`: {
@@ -41,19 +42,19 @@ export async function getFileFormat(filepath: string): Promise<string | null> {
     case `.wasm`: {
       // TODO: Enable if --experimental-wasm-modules is present
       // Waiting on https://github.com/nodejs/node/issues/36935
-      return `module`;
+      throw new Error(
+        `Unknown file extension ".wasm" for ${filepath}`,
+      );
     }
     case `.json`: {
       return `json`;
     }
     case `.js`: {
-      const pkg = await nodeUtils.readPackageScopeAsync(filepath);
+      const pkg = nodeUtils.readPackageScope(filepath);
       // assume CJS for files outside of a package boundary
       if (!pkg)
         return `commonjs`;
-      return pkg.data.module && pkg.data.name !== `@cspell/cspell-types`
-        ? `module`
-        : pkg.data.type ?? `commonjs`;
+      return pkg.data.type ?? `commonjs`;
     }
     // Matching files beyond those handled above deviates from Node's default
     // --experimental-loader behavior but is required to work around
@@ -61,7 +62,7 @@ export async function getFileFormat(filepath: string): Promise<string | null> {
     default: {
       if (entrypointPath !== filepath)
         return null;
-      const pkg = await nodeUtils.readPackageScopeAsync(filepath);
+      const pkg = nodeUtils.readPackageScope(filepath);
       if (!pkg)
         return `commonjs`;
       // prevent extensions beyond .mjs or .js from loading as ESM

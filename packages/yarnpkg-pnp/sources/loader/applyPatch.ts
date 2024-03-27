@@ -25,15 +25,6 @@ declare global {
   }
 }
 
-let ignoredPackageLookups: Set<string>;
-try {
-  const file = fs.readFileSync(path.join(__dirname, `package.extensions.json`), `utf8`);
-  const parsed = JSON.parse(file);
-  ignoredPackageLookups = new Set(parsed.ignoredPackageLookups);
-} catch {
-  ignoredPackageLookups = new Set();
-}
-
 export function applyPatch(pnpapi: PnpApi, opts: ApplyPatchOptions) {
   /**
    * Used to disable the resolution hooks (for when we want to fallback to the previous resolution - we then need
@@ -79,8 +70,6 @@ export function applyPatch(pnpapi: PnpApi, opts: ApplyPatchOptions) {
         return opts.manager.getApiEntry(parentApiPath, true).instance;
       }
     }
-
-    if (ignoredPackageLookups.has(request)) return;
 
     return originalModuleLoad.call(Module, request, parent, isMain);
   };
@@ -232,8 +221,6 @@ export function applyPatch(pnpapi: PnpApi, opts: ApplyPatchOptions) {
       }
     }
 
-    if (ignoredPackageLookups.has(request)) return;
-
     const requireStack = getRequireStack(parent);
 
     Object.defineProperty(firstError, `requireStack`, {
@@ -297,7 +284,7 @@ export function applyPatch(pnpapi: PnpApi, opts: ApplyPatchOptions) {
   const originalExtensionJSFunction = Module._extensions[`.js`] as (module: NodeModule, filename: string) => void;
   Module._extensions[`.js`] = function (module: NodeModule, filename: string) {
     if (filename.endsWith(`.js`)) {
-      const pkg = nodeUtils.readPackageScopeSync(filename);
+      const pkg = nodeUtils.readPackageScope(filename);
       if (pkg && pkg.data.type === `module`) {
         transpile(module, filename);
         return;
