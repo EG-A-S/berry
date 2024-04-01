@@ -19,6 +19,9 @@ const VIRTUAL_ABBREVIATE = 5;
 const CONDITION_REGEX = /(os|cpu|libc)=([a-z0-9_-]+)/;
 const conditionParser = makeParser(CONDITION_REGEX);
 
+const identCache = new Map<string, IdentHash>();
+const descriptorCache = new Map<string, DescriptorHash>();
+
 /**
  * Creates a package ident.
  *
@@ -28,8 +31,13 @@ const conditionParser = makeParser(CONDITION_REGEX);
 export function makeIdent(scope: string | null, name: string): Ident {
   if (scope?.startsWith(`@`))
     throw new Error(`Invalid scope: don't prefix it with '@'`);
-
-  return {identHash: hashUtils.makeHash<IdentHash>(scope, name), scope, name};
+  const cacheKey = scope ? `${scope}${name}` : name;
+  let identHash = identCache.get(cacheKey);
+  if (identHash === undefined) {
+    identHash = hashUtils.makeHashFrom<IdentHash>(cacheKey);
+    identCache.set(cacheKey, identHash);
+  }
+  return {identHash, scope, name};
 }
 
 /**
@@ -39,7 +47,13 @@ export function makeIdent(scope: string | null, name: string): Ident {
  * @param range The range to attach (eg. `^1.0.0`)
  */
 export function makeDescriptor(ident: Ident, range: string): Descriptor {
-  return {identHash: ident.identHash, scope: ident.scope, name: ident.name, descriptorHash: hashUtils.makeHash<DescriptorHash>(ident.identHash, range), range};
+  const cacheKey = `${ident.identHash}${range}`;
+  let descriptorHash = descriptorCache.get(cacheKey);
+  if (descriptorHash === undefined) {
+    descriptorHash = hashUtils.makeHashFrom<DescriptorHash>(cacheKey);
+    descriptorCache.set(cacheKey, descriptorHash);
+  }
+  return {identHash: ident.identHash, scope: ident.scope, name: ident.name, descriptorHash, range};
 }
 
 /**
@@ -49,7 +63,7 @@ export function makeDescriptor(ident: Ident, range: string): Descriptor {
  * @param reference The reference to attach (eg. `1.0.0`)
  */
 export function makeLocator(ident: Ident, reference: string): Locator {
-  return {identHash: ident.identHash, scope: ident.scope, name: ident.name, locatorHash: hashUtils.makeHash<LocatorHash>(ident.identHash, reference), reference};
+  return {identHash: ident.identHash, scope: ident.scope, name: ident.name, locatorHash: hashUtils.makeHashFromStrings<LocatorHash>(ident.identHash, reference), reference};
 }
 
 /**

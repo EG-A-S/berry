@@ -1341,7 +1341,7 @@ export class Configuration {
             }
 
             const pluginBuffer = await httpUtils.get(userProvidedSpec, {configuration});
-            const pluginChecksum = hashUtils.makeHash(pluginBuffer);
+            const pluginChecksum = hashUtils.makeHashFrom(pluginBuffer);
 
             // if there is no checksum, this means that the user used --no-checksum and does not need to check this plugin
             if (userProvidedChecksum && userProvidedChecksum !== pluginChecksum) {

@@ -197,7 +197,7 @@ export class TelemetryManager {
   }
 
   private reportEnumerator(metric: MetricName, value: string) {
-    miscUtils.getSetWithDefault(this.enumerators, metric).add(hashUtils.makeHash(value));
+    miscUtils.getSetWithDefault(this.enumerators, metric).add(hashUtils.makeHashFrom(value));
   }
 
   private reportHit(metric: MetricName, extra: string = `*`) {

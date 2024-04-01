@@ -55,7 +55,7 @@ export class ExecResolver implements Resolver {
         locator: structUtils.stringifyLocator(parentLocator),
       },
     }), PROTOCOL, opts.fetchOptions);
-    const generatorHash = hashUtils.makeHash(`${CACHE_VERSION}`, generatorFile).slice(0, 6);
+    const generatorHash = hashUtils.makeHashFromStrings(`${CACHE_VERSION}`, generatorFile).slice(0, 6);
 
     return [execUtils.makeLocator(descriptor, {parentLocator, path, generatorHash, protocol: PROTOCOL})];
   }

@@ -205,7 +205,7 @@ export type PeerWarning = {
 };
 
 const makeLockfileChecksum = (normalizedContent: string) =>
-  hashUtils.makeHash(`${INSTALL_STATE_VERSION}`, normalizedContent);
+  hashUtils.makeHashFromStrings(`${INSTALL_STATE_VERSION}`, normalizedContent);
 
 export class Project {
   public readonly configuration: Configuration;
@@ -2047,7 +2047,7 @@ export class Project {
 
     const installState = pick(this, fields) as InstallState;
     const serializedState = v8.serialize(installState);
-    const newInstallStateChecksum = hashUtils.makeHash(serializedState);
+    const newInstallStateChecksum = hashUtils.makeHashFrom(serializedState);
     if (this.installStateChecksum === newInstallStateChecksum)
       return;
 
@@ -2066,7 +2066,7 @@ export class Project {
     try {
       const installStateBuffer = await gunzip(await xfs.readFilePromise(installStatePath)) as Buffer;
       installState = v8.deserialize(installStateBuffer);
-      this.installStateChecksum = hashUtils.makeHash(installStateBuffer);
+      this.installStateChecksum = hashUtils.makeHashFrom(installStateBuffer);
     } catch {
       // If for whatever reason the install state can't be restored
       // carry on as if it doesn't exist.
@@ -2581,7 +2581,7 @@ function applyVirtualResolutionMutations({
         if (dependent.peerDependencies.has(ident.identHash))
           continue;
 
-        const hash = `p${hashUtils.makeHash(dependentHash, identStr, rootHash).slice(0, 5)}`;
+        const hash = `p${hashUtils.makeHashFrom(`${dependentHash}${identStr}${rootHash}`).slice(0, 5)}`;
 
         peerRequirements.set(hash, {
           subject: dependentHash,

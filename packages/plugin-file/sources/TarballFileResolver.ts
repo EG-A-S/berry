@@ -57,7 +57,7 @@ export class TarballFileResolver implements Resolver {
 
     const temporaryLocator = fileUtils.makeLocator(descriptor, {parentLocator, path, hash: ``, protocol: PROTOCOL});
     const buffer = await fileUtils.fetchArchiveFromLocator(temporaryLocator, opts.fetchOptions);
-    const hash = hashUtils.makeHash(buffer).slice(0, 6);
+    const hash = hashUtils.makeHashFrom(buffer).slice(0, 6);
 
     return [fileUtils.makeLocator(descriptor, {parentLocator, path, hash, protocol: PROTOCOL})];
   }

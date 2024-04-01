@@ -45,7 +45,7 @@ export default class PluginCheckCommand extends BaseCommand {
             continue;
 
           const newBuffer = await httpUtils.get(plugin.spec, {configuration});
-          const newChecksum = hashUtils.makeHash(newBuffer);
+          const newChecksum = hashUtils.makeHashFrom(newBuffer);
           if (plugin.checksum === newChecksum)
             continue;
 

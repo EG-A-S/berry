@@ -1,9 +1,12 @@
 import {PortablePath, xfs, npath, FakeFS} from '@yarnpkg/fslib';
-import {createHash, BinaryLike}           from 'crypto';
+import crypto, {createHash, BinaryLike}   from 'crypto';
 import fastGlob                           from 'fast-glob';
 
+const algorithm = `sha512`;
+const digest = `hex`;
+
 export function makeHash<T extends string = string>(...args: Array<BinaryLike | null>): T {
-  const hash = createHash(`sha512`);
+  const hash = createHash(algorithm);
 
   let acc = ``;
   for (const arg of args) {
@@ -22,7 +25,15 @@ export function makeHash<T extends string = string>(...args: Array<BinaryLike | 
   if (acc)
     hash.update(acc);
 
-  return hash.digest(`hex`) as T;
+  return hash.digest(digest) as T;
+}
+
+export function makeHashFrom<T extends string = string>(value: BinaryLike): T {
+  return crypto.hash(algorithm, value, digest) as T;
+}
+
+export function makeHashFromStrings<T extends string = string>(first: string, second: string): T {
+  return crypto.hash(algorithm, `${first}${second}`, digest) as T;
 }
 
 export async function checksumFile(path: PortablePath, {baseFs, algorithm}: {baseFs: FakeFS<PortablePath>, algorithm: string} = {baseFs: xfs, algorithm: `sha512`}) {
@@ -38,7 +49,7 @@ export async function checksumFile(path: PortablePath, {baseFs, algorithm}: {bas
     while ((bytesRead = await baseFs.readPromise(fd, chunk, 0, CHUNK_SIZE)) !== 0)
       hash.update(bytesRead === CHUNK_SIZE ? chunk : chunk.slice(0, bytesRead));
 
-    return hash.digest(`hex`);
+    return hash.digest(digest);
   } finally {
     await baseFs.closePromise(fd);
   }
@@ -81,9 +92,9 @@ export async function checksumPattern(pattern: string, {cwd}: {cwd: PortablePath
     return parts.join(`\u0000`);
   }));
 
-  const hash = createHash(`sha512`);
+  const hash = createHash(algorithm);
   for (const sub of hashes)
     hash.update(sub);
 
-  return hash.digest(`hex`);
+  return hash.digest(digest);
 }
