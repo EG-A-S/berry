@@ -1,6 +1,7 @@
 import {FakeFS, PosixFS, npath, patchFs, PortablePath, NativePath, VirtualFS} from '@yarnpkg/fslib';
 import fs                                                                     from 'fs';
 import {Module, createRequire, isBuiltin}                                     from 'module';
+import os                                                                     from 'os';
 import path                                                                   from 'path';
 import {URL, fileURLToPath, pathToFileURL}                                    from 'url';
 
@@ -305,10 +306,25 @@ export function applyPatch(pnpapi: PnpApi, opts: ApplyPatchOptions) {
   const originalDlopen = process.dlopen;
   process.dlopen = function (...args) {
     const [module, filename, ...rest] = args;
+    const filePath = npath.fromPortablePath(VirtualFS.resolveVirtual(npath.toPortablePath(filename)));
+    let binaryPath = filePath;
+    if (!/[/\\]unplugged[/\\]/.test(filePath)) {
+      const tmpDir = path.join(os.tmpdir(), `yarn-unplugged`);
+      const fileName = /[/\\]([^/\\]+)[/\\]node_modules/.exec(filePath)?.[1];
+      binaryPath = path.join(tmpDir, `${fileName}-${path.basename(filePath)}`);
+      const stats = fs.statSync(binaryPath, {throwIfNoEntry: false});
+      if (!stats?.isFile()) {
+        try {
+          fs.mkdirSync(tmpDir);
+        } catch {}
+
+        fs.copyFileSync(filePath, binaryPath);
+      }
+    }
     return originalDlopen.call(
       this,
       module,
-      npath.fromPortablePath(VirtualFS.resolveVirtual(npath.toPortablePath(filename))),
+      binaryPath,
       ...rest,
     );
   };
