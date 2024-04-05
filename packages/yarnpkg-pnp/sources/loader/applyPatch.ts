@@ -308,7 +308,7 @@ export function applyPatch(pnpapi: PnpApi, opts: ApplyPatchOptions) {
     const [module, filename, ...rest] = args;
     const filePath = npath.fromPortablePath(VirtualFS.resolveVirtual(npath.toPortablePath(filename)));
     let binaryPath = filePath;
-    if (!/[/\\]unplugged[/\\]/.test(filePath)) {
+    if (/\.zip[/\\]/.test(filePath)) {
       const tmpDir = path.join(os.tmpdir(), `yarn-unplugged`);
       const fileName = /[/\\]([^/\\]+)[/\\]node_modules/.exec(filePath)?.[1];
       binaryPath = path.join(tmpDir, `${fileName}-${path.basename(filePath)}`);

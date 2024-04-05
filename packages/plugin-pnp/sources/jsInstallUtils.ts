@@ -50,8 +50,8 @@ const FORCED_EXTRACT_FILETYPES = new Set([
   `.h`, `.hh`, `.hpp`, `.c`, `.cc`, `.cpp`,
   // The java runtime can't read files from zip archives
   `.java`, `.jar`,
-  // Required data files
-  `.dat`,
+  // Node opens these through dlopen
+  `.node`,
 ]);
 
 export function getExtractHint(fetchResult: FetchResult) {
