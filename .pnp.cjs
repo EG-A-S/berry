@@ -6372,7 +6372,7 @@ const RAW_RUNTIME_STATE =
     ]],\
     ["@swc/core-darwin-arm64", [\
       ["npm:1.3.94", {\
-        "packageLocation": "./.yarn/cache/@swc-core-darwin-arm64-npm-1.3.94-473247f562-10.zip/node_modules/@swc/core-darwin-arm64/",\
+        "packageLocation": "./.yarn/unplugged/@swc-core-darwin-arm64-npm-1.3.94-473247f562/node_modules/@swc/core-darwin-arm64/",\
         "packageDependencies": [\
           ["@swc/core-darwin-arm64", "npm:1.3.94"]\
         ],\
@@ -6381,7 +6381,7 @@ const RAW_RUNTIME_STATE =
     ]],\
     ["@swc/core-darwin-x64", [\
       ["npm:1.3.94", {\
-        "packageLocation": "./.yarn/cache/@swc-core-darwin-x64-npm-1.3.94-61b2a5c548-10.zip/node_modules/@swc/core-darwin-x64/",\
+        "packageLocation": "./.yarn/unplugged/@swc-core-darwin-x64-npm-1.3.94-61b2a5c548/node_modules/@swc/core-darwin-x64/",\
         "packageDependencies": [\
           ["@swc/core-darwin-x64", "npm:1.3.94"]\
         ],\
@@ -6435,7 +6435,7 @@ const RAW_RUNTIME_STATE =
     ]],\
     ["@swc/core-win32-arm64-msvc", [\
       ["npm:1.3.94", {\
-        "packageLocation": "./.yarn/cache/@swc-core-win32-arm64-msvc-npm-1.3.94-b8a2ee6527-10.zip/node_modules/@swc/core-win32-arm64-msvc/",\
+        "packageLocation": "./.yarn/unplugged/@swc-core-win32-arm64-msvc-npm-1.3.94-b8a2ee6527/node_modules/@swc/core-win32-arm64-msvc/",\
         "packageDependencies": [\
           ["@swc/core-win32-arm64-msvc", "npm:1.3.94"]\
         ],\
@@ -6453,7 +6453,7 @@ const RAW_RUNTIME_STATE =
     ]],\
     ["@swc/core-win32-x64-msvc", [\
       ["npm:1.3.94", {\
-        "packageLocation": "./.yarn/cache/@swc-core-win32-x64-msvc-npm-1.3.94-14ce04eea5-10.zip/node_modules/@swc/core-win32-x64-msvc/",\
+        "packageLocation": "./.yarn/unplugged/@swc-core-win32-x64-msvc-npm-1.3.94-14ce04eea5/node_modules/@swc/core-win32-x64-msvc/",\
         "packageDependencies": [\
           ["@swc/core-win32-x64-msvc", "npm:1.3.94"]\
         ],\
@@ -22643,7 +22643,7 @@ const RAW_RUNTIME_STATE =
     ]],\
     ["esbuild-windows-64", [\
       ["npm:0.15.11", {\
-        "packageLocation": "./.yarn/cache/esbuild-windows-64-npm-0.15.11-a6a42a35c8-10.zip/node_modules/esbuild-windows-64/",\
+        "packageLocation": "./.yarn/unplugged/esbuild-windows-64-npm-0.15.11-a6a42a35c8/node_modules/esbuild-windows-64/",\
         "packageDependencies": [\
           ["esbuild-windows-64", "npm:0.15.11"]\
         ],\
@@ -22652,7 +22652,7 @@ const RAW_RUNTIME_STATE =
     ]],\
     ["esbuild-windows-arm64", [\
       ["npm:0.15.11", {\
-        "packageLocation": "./.yarn/cache/esbuild-windows-arm64-npm-0.15.11-d36b5e4f06-10.zip/node_modules/esbuild-windows-arm64/",\
+        "packageLocation": "./.yarn/unplugged/esbuild-windows-arm64-npm-0.15.11-d36b5e4f06/node_modules/esbuild-windows-arm64/",\
         "packageDependencies": [\
           ["esbuild-windows-arm64", "npm:0.15.11"]\
         ],\
@@ -23679,7 +23679,7 @@ const RAW_RUNTIME_STATE =
     ]],\
     ["fsevents", [\
       ["npm:2.3.2", {\
-        "packageLocation": "./.yarn/cache/fsevents-npm-2.3.2-a881d6ac9f-10.zip/node_modules/fsevents/",\
+        "packageLocation": "./.yarn/unplugged/fsevents-npm-2.3.2-a881d6ac9f/node_modules/fsevents/",\
         "packageDependencies": [\
           ["fsevents", "npm:2.3.2"],\
           ["node-gyp", "npm:9.1.0"]\
