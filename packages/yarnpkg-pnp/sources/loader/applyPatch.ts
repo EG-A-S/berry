@@ -1,9 +1,7 @@
 import {FakeFS, PosixFS, npath, patchFs, PortablePath, NativePath, VirtualFS} from '@yarnpkg/fslib';
 import fs                                                                     from 'fs';
-import {Module, createRequire, isBuiltin}                                     from 'module';
-import os                                                                     from 'os';
-import path                                                                   from 'path';
-import {URL, fileURLToPath, pathToFileURL}                                    from 'url';
+import {Module, isBuiltin}                                                    from 'module';
+import {fileURLToPath}                                                        from 'url';
 
 import {PnpApi}                                                               from '../types';
 

@@ -1,10 +1,6 @@
-import {nodeUtils}                     from '@yarnpkg/core';
-import {Filename, npath, ppath, xfs}   from '@yarnpkg/fslib';
-import {HAS_LOADERS_AFFECTING_LOADERS} from '@yarnpkg/pnp/sources/esm-loader/loaderFlags';
-import {pathToFileURL}                 from 'url';
-
-const ifAtLeastNode21It = nodeUtils.major >= 21 ? it : it.skip;
-const ifAtMostNode20It = nodeUtils.major <= 20 ? it : it.skip;
+import {Filename, npath, ppath, xfs}                                                                                            from '@yarnpkg/fslib';
+import {ALLOWS_EXTENSIONLESS_FILES, HAS_LOADERS_AFFECTING_LOADERS, SUPPORTS_IMPORT_ATTRIBUTES, SUPPORTS_IMPORT_ATTRIBUTES_ONLY} from '@yarnpkg/pnp/sources/esm-loader/loaderFlags';
+import {pathToFileURL}                                                                                                          from 'url';
 
 describe(`Plug'n'Play - ESM`, () => {
   test(
@@ -224,7 +220,7 @@ describe(`Plug'n'Play - ESM`, () => {
   );
 
   test(
-    `it should not resolve JSON modules without an import assertion`,
+    `it should not resolve JSON modules without an import assertion/attribute`,
     makeTemporaryEnv(
       {
         type: `module`,
@@ -240,14 +236,14 @@ describe(`Plug'n'Play - ESM`, () => {
 
         await expect(run(`node`, `./index.js`)).rejects.toMatchObject({
           code: 1,
-          stderr: expect.stringContaining(`ERR_IMPORT_ASSERTION_TYPE_MISSING`),
+          stderr: expect.stringContaining(SUPPORTS_IMPORT_ATTRIBUTES_ONLY ? `ERR_IMPORT_ATTRIBUTE_MISSING` : `ERR_IMPORT_ASSERTION_TYPE_MISSING`),
         });
       },
     ),
   );
 
   test(
-    `it should resolve JSON modules with an import assertion`,
+    `it should resolve JSON modules with an import assertion/attribute`,
     makeTemporaryEnv(
       {
         type: `module`,
@@ -258,7 +254,7 @@ describe(`Plug'n'Play - ESM`, () => {
         await xfs.writeFilePromise(
           ppath.join(path, `index.js`),
           `
-          import foo from './foo.json' assert { type: 'json' };
+          import foo from './foo.json' ${SUPPORTS_IMPORT_ATTRIBUTES ? `with` : `assert`} { type: 'json' };
           console.log(foo.name);
           `,
         );
@@ -404,7 +400,7 @@ describe(`Plug'n'Play - ESM`, () => {
     ),
   );
 
-  ifAtMostNode20It(
+  (ALLOWS_EXTENSIONLESS_FILES ? it.skip : it)(
     `it should not allow extensionless commonjs imports`,
     makeTemporaryEnv(
       { },
@@ -425,7 +421,7 @@ describe(`Plug'n'Play - ESM`, () => {
     ),
   );
 
-  ifAtLeastNode21It(
+  (ALLOWS_EXTENSIONLESS_FILES ? it : it.skip)(
     `it should allow extensionless commonjs imports`,
     makeTemporaryEnv(
       { },
@@ -445,7 +441,7 @@ describe(`Plug'n'Play - ESM`, () => {
     ),
   );
 
-  ifAtMostNode20It(
+  (ALLOWS_EXTENSIONLESS_FILES ? it.skip : it)(
     `it should not allow extensionless files with {"type": "module"}`,
     makeTemporaryEnv(
       {
@@ -467,7 +463,7 @@ describe(`Plug'n'Play - ESM`, () => {
     ),
   );
 
-  ifAtLeastNode21It(
+  (ALLOWS_EXTENSIONLESS_FILES ? it : it.skip)(
     `it should allow extensionless files with {"type": "module"}`,
     makeTemporaryEnv(
       {

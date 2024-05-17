@@ -1,3 +1,4 @@
+const assert = require(`assert`);
 const cp = require(`child_process`);
 const crypto = require(`crypto`);
 const fs = require(`fs`);
@@ -6,10 +7,9 @@ const path = require(`path/posix`);
 const semver = require(`semver`);
 
 const POSIX_DIRNAME = process.platform === `win32` ? __dirname.replaceAll(`\\`, `/`) : __dirname;
-const platformDependentExecutableExtension = process.platform === `win32` ? `.cmd` : ``;
 
-const TS_REPO = `/tmp/ts-repo`;
-const TS_REPO_SPAWN = {cwd: TS_REPO};
+const TS_REPO = `/tmp/ts-repo-treeless`;
+const TS_REPO_SPAWN = {cwd: TS_REPO, shell: process.platform === `win32`};
 
 const TMP_DIR = `/tmp/ts-builds`;
 
@@ -27,10 +27,10 @@ const IGNORED_VERSIONS = new Set([
 const SLICES = [
   // https://github.com/mestro-se/TypeScript/tree/mestro
   {
-    from: `3f28e5818a746c6be89d942ff871f48c2335bcc8`,
-    to: `3f28e5818a746c6be89d942ff871f48c2335bcc8`,
-    onto: `10a3872de4c8ed8f68633d29066862b292851df9`,
-    range: `>=5.5.0`,
+    from: `b8809faeb8545d0eeca0432de4655cab12ece158`,
+    to: `b8809faeb8545d0eeca0432de4655cab12ece158`,
+    onto: `79a851426c514a12a75b342e8dd2460ee6615f73`,
+    range: `>=5.6.0`,
   },
 ];
 
@@ -137,10 +137,8 @@ async function fetchVersions(range) {
 }
 
 async function cloneRepository() {
-  if (!fs.existsSync(TS_REPO)) {
-    await execFile(`git`, [`clone`, `https://github.com/mestro-se/TypeScript`, TS_REPO]);
-    await execFile(`git`, [`remote`, `add`, `upstream`, `https://github.com/microsoft/TypeScript`], TS_REPO_SPAWN);
-  }
+  if (!fs.existsSync(TS_REPO))
+    await execFile(`git`, [`clone`, `--filter=tree:0`, `https://github.com/mestro-se/TypeScript`, TS_REPO]);
 
   try {
     await execFile(`git`, [`cherry-pick`, `--abort`], TS_REPO_SPAWN);
@@ -150,26 +148,20 @@ async function cloneRepository() {
   await execFile(`git`, [`config`, `user.name`, `Your Name`], TS_REPO_SPAWN);
 
   await execFile(`git`, [`fetch`, `origin`], TS_REPO_SPAWN);
-  await execFile(`git`, [`fetch`, `upstream`], TS_REPO_SPAWN);
 }
 
 async function resetGit(hash) {
   await execFile(`git`, [`reset`, `--hard`, hash], TS_REPO_SPAWN);
   await execFile(`git`, [`clean`, `-df`], TS_REPO_SPAWN);
-
-  if (fs.existsSync(path.join(TS_REPO, `package-lock.json`))) {
-    await execFile(`npm${platformDependentExecutableExtension}`, [`install`], TS_REPO_SPAWN);
-  } else {
-    const date = await execFile(`git`, [`show`, `-s`, `--format=%ci`], TS_REPO_SPAWN);
-    await execFile(`npm${platformDependentExecutableExtension}`, [`install`, `--before`, date.toString().trim()], TS_REPO_SPAWN);
-  }
 }
 
-async function buildRepository({from, to, onto}) {
+async function buildRepository({from, to, onto, volta}) {
   const code = Math.floor(Math.random() * 0x100000000).toString(16).padStart(8, `0`);
   const tmpDir = path.join(TMP_DIR, `${code}`);
 
   await resetGit(onto);
+
+  const date = await execFile(`git`, [`show`, `-s`, `--format=%ci`], TS_REPO_SPAWN);
 
   if (to) {
     let isAncestor;
@@ -187,13 +179,31 @@ async function buildRepository({from, to, onto}) {
     }
   }
 
-  await execFile(
-    process.platform === `win32`
-      ? `node_modules\\.bin\\hereby${platformDependentExecutableExtension}`
-      : `./node_modules/.bin/hereby`,
-    [`local`, `LKG`],
-    TS_REPO_SPAWN,
-  );
+  {
+    const pkgPath = path.join(TS_REPO, `package.json`);
+    const pkg = JSON.parse(await fs.promises.readFile(pkgPath, `utf8`));
+
+    assert(!(pkg.volta?.node && volta?.node), `node version is already set for ${pkg.version}`);
+    assert(!(pkg.volta?.npm && volta?.npm), `npm version is already set for ${pkg.version}`);
+
+    const voltaConfig = {
+      ...volta,
+      ...pkg.volta,
+    };
+    assert(voltaConfig.node && voltaConfig.npm, `Missing complete volta configuration for ${pkg.version}, current config: ${JSON.stringify(voltaConfig)}`);
+
+    if (JSON.stringify(pkg.volta) !== JSON.stringify(voltaConfig)) {
+      pkg.volta = voltaConfig;
+      await fs.promises.writeFile(pkgPath, JSON.stringify(pkg, null, 4));
+    }
+  }
+
+  if (fs.existsSync(path.join(TS_REPO, `package-lock.json`)))
+    await execFile(`npm`, [`ci`], TS_REPO_SPAWN);
+  else
+    await execFile(`npm`, [`install`, `--before`, date.toString().trim()], TS_REPO_SPAWN);
+
+  await execFile(process.platform === `win32` ? `node_modules\\.bin\\hereby.cmd` : `./node_modules/.bin/hereby`, [`local`, `LKG`], TS_REPO_SPAWN);
 
   // It seems that in some circumstances the build can produce incorrect artifacts. When
   // that happens, the final binary is very small. We try to detect that.
@@ -210,7 +220,7 @@ async function buildRepository({from, to, onto}) {
   return tmpDir;
 }
 
-async function run({from, to, onto, range}) {
+async function run({from, to, onto, range, volta}) {
   const hash = crypto
     .createHash(`md5`)
     .update(JSON.stringify({from, to, onto}))
@@ -232,8 +242,8 @@ async function run({from, to, onto, range}) {
 
   await cloneRepository();
 
-  const base = await buildRepository({onto});
-  const patched = await buildRepository({from, to, onto});
+  const base = await buildRepository({onto, volta});
+  const patched = await buildRepository({from, to, onto, volta});
 
   const buffer = await execFile(`git`, [`diff`, `--no-index`, base, patched], {checkExitCode: false});
 
@@ -284,10 +294,10 @@ async function main() {
     const patch = await run(slice);
     const versions = await fetchVersions(slice.range);
 
-    for (const version of versions) {
+    await Promise.all(versions.map(async version => {
       console.log(`Validating ${version}...`);
       await validate(version, patch);
-    }
+    }));
 
     patches.push(patch);
   }
