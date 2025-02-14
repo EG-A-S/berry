@@ -7385,6 +7385,13 @@ const RAW_RUNTIME_STATE =
           ["@types/trusted-types", "npm:2.0.3"]\
         ],\
         "linkType": "HARD"\
+      }],\
+      ["npm:2.0.7", {\
+        "packageLocation": "./.yarn/cache/@types-trusted-types-npm-2.0.7-a07fc44f59-8e4202766a.zip/node_modules/@types/trusted-types/",\
+        "packageDependencies": [\
+          ["@types/trusted-types", "npm:2.0.7"]\
+        ],\
+        "linkType": "HARD"\
       }]\
     ]],\
     ["@types/tunnel", [\
@@ -9060,7 +9067,7 @@ const RAW_RUNTIME_STATE =
           ["clsx", "npm:1.2.1"],\
           ["cross-spawn", "npm:7.0.3"],\
           ["docusaurus-plugin-typedoc-api", "virtual:efae73f2e9aa11493dde5182b5b7f0894b5c101cb3c916b74523dc0bde92d8579259d43c7f83a5363dbd8939dc3d1e6c45c5965b9191878533d9a2c19b046d70#patch:docusaurus-plugin-typedoc-api@npm%3A4.2.0#~/.yarn/patches/docusaurus-plugin-typedoc-api-npm-4.2.0-fb78ec678c.patch::version=4.2.0&hash=b02f93"],\
-          ["dompurify", "npm:3.0.5"],\
+          ["dompurify", "npm:3.2.4"],\
           ["esast-util-from-js", "npm:2.0.1"],\
           ["esbuild-loader", "virtual:efae73f2e9aa11493dde5182b5b7f0894b5c101cb3c916b74523dc0bde92d8579259d43c7f83a5363dbd8939dc3d1e6c45c5965b9191878533d9a2c19b046d70#npm:2.20.0"],\
           ["fast-glob", "npm:3.2.12"],\
@@ -22060,10 +22067,11 @@ const RAW_RUNTIME_STATE =
       }]\
     ]],\
     ["dompurify", [\
-      ["npm:3.0.5", {\
-        "packageLocation": "./.yarn/cache/dompurify-npm-3.0.5-27fdde5676-24ed3a2648.zip/node_modules/dompurify/",\
+      ["npm:3.2.4", {\
+        "packageLocation": "./.yarn/cache/dompurify-npm-3.2.4-d8ea6c7c6a-98570c5338.zip/node_modules/dompurify/",\
         "packageDependencies": [\
-          ["dompurify", "npm:3.0.5"]\
+          ["dompurify", "npm:3.2.4"],\
+          ["@types/trusted-types", "npm:2.0.7"]\
         ],\
         "linkType": "HARD"\
       }]\
